@@ -6,9 +6,14 @@ coverage/
 # Local configuration. VITE_* values are baked into the bundle at build time,
 # so anything in here reaches the browser - keep it out of the repository.
 .env
+.env.production
 .env.local
 .env.*.local
 
 *.log
 .DS_Store
 .vite/
+
+# TypeScript incremental build cache - a local artifact, not source.
+tsconfig.tsbuildinfo
+*.tsbuildinfo

@@ -6,7 +6,24 @@
  * the browser sees a single origin and the session cookie travels normally.
  */
 
-const BASE = '/api';
+/**
+ * Where the API is, which is almost always "the same place this page came
+ * from".
+ *
+ * The default is a relative path on purpose. One origin is what lets the
+ * session cookie travel without CORS having to be right, and it is why the
+ * server can serve this bundle itself on a bare IP with no nginx.
+ *
+ * `VITE_API_URL` overrides it for the case that default cannot cover - the
+ * client deployed somewhere the API is not, a CDN, a separate host. Point it
+ * at another origin and the cookie becomes a cross-origin one: the server's
+ * CLIENT_ORIGIN must name this exact address, and over plain http a browser
+ * will still refuse a `secure` cookie. Worth knowing before reaching for it.
+ *
+ * Read at build time, so it is baked into the bundle. Changing it means
+ * building again, and it is readable by anyone - never put a secret here.
+ */
+const BASE = import.meta.env.VITE_API_URL ?? '/api';
 
 export interface ApiErrorBody {
   error: {
