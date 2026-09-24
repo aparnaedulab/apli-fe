@@ -1,0 +1,36 @@
+/* A small map with a pin on it. */
+
+.map-embed {
+  margin: 0;
+  display: grid;
+  gap: 6px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--paper-2);
+}
+
+.map-embed iframe {
+  display: block;
+  width: 100%;
+  height: var(--map-h, 220px);
+  border: 0;
+}
+
+.map-embed figcaption {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 11px 10px;
+  font-size: 12.5px;
+}
+
+.map-embed figcaption a {
+  color: var(--brand);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.map-embed figcaption a:hover {
+  text-decoration: underline;
+}

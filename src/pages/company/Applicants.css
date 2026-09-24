@@ -1,0 +1,800 @@
+/* ==========================================================================
+   The hiring queue: roles, then people
+
+   Two screens in one route. The first is the roles a recruiter is trying to
+   fill; the second is everybody inside one of them. Both are cards, because
+   at both levels the job is to compare a handful of things at a glance and
+   then act - not to read a table.
+
+   Namespaced `ac-` throughout: these stylesheets are bundled app wide, and a
+   bare `.card` or `.avatar` would land on four other screens.
+   ========================================================================== */
+
+.ac-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  margin-bottom: 4px;
+}
+
+.ac-head-left {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+
+.ac-head h1 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+
+.ac-head-count {
+  flex: none;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ac-lede {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: var(--ink-3);
+  max-width: 68ch;
+}
+
+.ac-pile-link {
+  margin-left: auto;
+  font-size: 12.5px;
+  color: var(--brand);
+  text-decoration: none;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ac-pile-link:hover {
+  text-decoration: underline;
+}
+
+/* Back out of a role. An arrow drawn in CSS, so no icon set is needed. */
+.ac-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+
+.ac-back::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.ac-back:hover {
+  color: var(--brand);
+}
+
+/* --- the filters ---------------------------------------------------------- */
+
+/*
+  One band: which stage, then how to narrow within it.
+
+  The counts used to be stated twice - once as a funnel panel and again,
+  unnumbered, as a row of tabs. Putting the number on the chip that filters by
+  it says it once and makes it clickable, which is a row of the screen saved
+  and one fewer thing to keep in agreement.
+*/
+.ac-filters {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  border-radius: 16px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+.ac-stages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ac-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--rule-2);
+  background: var(--surface);
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    border-color 0.13s ease,
+    background 0.13s ease,
+    color 0.13s ease;
+}
+
+.ac-chip:hover {
+  border-color: var(--ink-3);
+  color: var(--ink);
+}
+
+/* The count rides on the chip, so the funnel and the filter are one thing. */
+.ac-chip > span {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--paper-2);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+
+.ac-chip.is-on {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 650;
+}
+
+.ac-chip.is-on > span {
+  background: var(--surface);
+  color: var(--brand);
+}
+
+/* Nobody has opened these yet - the only stage that is a call to act, so
+   the only one that carries colour while unselected. */
+.ac-chip.is-new:not(.is-on) > span {
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 700;
+}
+
+.ac-chip.is-late:not(.is-on) {
+  border-color: color-mix(in srgb, var(--stop) 35%, transparent);
+  color: var(--stop);
+}
+
+.ac-chip.is-late:not(.is-on) > span {
+  background: color-mix(in srgb, var(--stop) 10%, transparent);
+  color: var(--stop);
+}
+
+.ac-chip.is-late.is-on {
+  border-color: var(--stop);
+  background: color-mix(in srgb, var(--stop) 10%, transparent);
+  color: var(--stop);
+}
+
+.ac-chip.is-late.is-on > span {
+  background: var(--surface);
+  color: var(--stop);
+}
+
+/* The narrowing row, under a hairline so the two jobs read as two jobs. */
+.ac-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+}
+
+/* Find one person in ninety. A magnifier drawn in CSS, so the field needs no
+   icon set behind it. */
+.ac-find {
+  position: relative;
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.ac-find input {
+  width: 100%;
+  padding: 8px 14px 8px 34px;
+  font: inherit;
+  font-size: 13px;
+  border: 1px solid var(--rule-2);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.ac-find::before {
+  content: '';
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  margin-top: -6px;
+  border: 1.6px solid var(--ink-3);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.ac-find::after {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  width: 5px;
+  height: 1.6px;
+  margin-top: 2px;
+  background: var(--ink-3);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+/*
+  Label and control on one line, inside one pill. A stacked label above every
+  select turns four small controls into a two-storey toolbar, and these are
+  read left to right as a sentence: "order by best match, branch any".
+*/
+.ac-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 6px 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--rule-2);
+  background: var(--surface);
+  font-size: 11.5px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.ac-pick:focus-within {
+  border-color: var(--brand);
+}
+
+.ac-pick select,
+.ac-pick input {
+  padding: 2px 6px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+  max-width: 170px;
+}
+
+.ac-pick select:focus-visible,
+.ac-pick input:focus-visible {
+  outline: none;
+}
+
+.ac-pick input {
+  width: 64px;
+  font-variant-numeric: tabular-nums;
+}
+
+.ac-clear {
+  margin-left: auto;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px dashed var(--rule-2);
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+
+.ac-clear:hover {
+  border-style: solid;
+  border-color: var(--stop);
+  color: var(--stop);
+}
+
+/* --- the funnel ----------------------------------------------------------- */
+
+/* The stage counts on a role card: the number a recruiter reports upwards,
+   and currently has to work out by counting rows. Inside a role the same
+   numbers ride on the filter chips instead. */
+.ac-funnel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 16px;
+  margin: 0;
+}
+
+.ac-funnel > div {
+  display: grid;
+  gap: 0;
+}
+
+.ac-funnel dt {
+  order: 2;
+  font-size: 10px;
+  color: var(--ink-3);
+}
+
+.ac-funnel dd {
+  order: 1;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.ac-funnel .is-new dd {
+  color: var(--brand);
+}
+
+.ac-funnel .is-good dd {
+  color: var(--pass);
+}
+
+/* --- the roles ------------------------------------------------------------ */
+
+.ac-jobs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 12px;
+}
+
+.ac-job {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  padding: 16px 18px 15px;
+  border-radius: 16px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  transition:
+    transform 0.16s cubic-bezier(0.2, 0.7, 0.3, 1),
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.ac-job:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--brand) 45%, transparent);
+  box-shadow: 0 10px 26px rgb(15 23 42 / 0.08);
+}
+
+/* Somebody nobody has opened yet. A line down the side rather than a tinted
+   card: the point is to find it in a grid, not to alarm. */
+.ac-job.is-waiting {
+  border-left: 3px solid var(--brand);
+}
+
+/* Nothing has come in. Still shown - a role that got nothing is news - but
+   it stops competing with the ones that need work. */
+.ac-job.is-empty {
+  background: var(--paper-2);
+  opacity: 0.8;
+}
+
+/*
+  The whole card opens the role. Laid over it rather than wrapping it, so
+  anything genuinely its own target stays one, and keyboard users get one tab
+  stop per card rather than six.
+*/
+.ac-job-hit {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  border-radius: inherit;
+  cursor: pointer;
+}
+
+.ac-job-hit:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.ac-job > *:not(.ac-job-hit) {
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.ac-job-top {
+  display: flex;
+  align-items: start;
+  gap: 10px;
+}
+
+.ac-job-top h2 {
+  margin: 0;
+  font-size: 15.5px;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.ac-job-top .pill {
+  flex: none;
+  margin-left: auto;
+  font-size: 10px;
+  padding: 2px 8px;
+}
+
+.ac-job-meta {
+  margin: -4px 0 0;
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+.ac-job-count {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+}
+
+.ac-job-count b {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.ac-job-count span {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.ac-job-none {
+  margin: 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+/* The one line that decides whether this role gets opened today. */
+.ac-job-call {
+  margin: 0;
+  padding: 7px 11px;
+  border-radius: 10px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 12.5px;
+  font-weight: 650;
+}
+
+.ac-job-late {
+  color: var(--stop);
+  font-weight: 700;
+}
+
+.ac-job-go {
+  justify-self: start;
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--ink-3);
+}
+
+.ac-job:hover .ac-job-go {
+  color: var(--brand);
+}
+
+.ac-job-go::after {
+  content: ' →';
+}
+
+/* --- the people ----------------------------------------------------------- */
+
+.ac-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 12px;
+}
+
+.ac-card {
+  display: grid;
+  gap: 9px;
+  align-content: start;
+  padding: 15px 16px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  transition:
+    border-color 0.14s ease,
+    box-shadow 0.14s ease,
+    opacity 0.14s ease;
+}
+
+.ac-card:hover {
+  border-color: color-mix(in srgb, var(--brand) 35%, transparent);
+  box-shadow: 0 6px 18px rgb(15 23 42 / 0.06);
+}
+
+/* Closed. Still listed, because a recruiter checks who they turned down -
+   but it is no longer a decision, so it stops competing for attention. */
+.ac-card.is-closed {
+  background: var(--paper-2);
+  opacity: 0.68;
+}
+
+.ac-card.is-busy {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.ac-card-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.ac-avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ac-who-text {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.ac-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.ac-name:hover {
+  color: var(--brand);
+  text-decoration: underline;
+}
+
+.ac-who-text small {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ac-marks {
+  flex: none;
+  margin-left: auto;
+  display: grid;
+  gap: 0;
+  text-align: right;
+}
+
+.ac-marks b {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.ac-marks small {
+  font-size: 10px;
+  color: var(--ink-3);
+}
+
+.ac-match,
+.ac-where {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px 6px;
+  min-width: 0;
+}
+
+.ac-match:empty,
+.ac-where:empty {
+  display: none;
+}
+
+.ac-match .pill,
+.ac-where .pill {
+  font-size: 10.5px;
+  padding: 2px 8px;
+}
+
+.ac-where .pill {
+  text-transform: capitalize;
+}
+
+.ac-welcomed {
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+.ac-round {
+  flex-basis: 100%;
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+.ac-when {
+  margin: 0;
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+/* --- score and feedback --------------------------------------------------- */
+
+.ac-note {
+  display: grid;
+  gap: 7px;
+  justify-items: start;
+}
+
+.ac-note .link-btn {
+  font-size: 11.5px;
+}
+
+.ac-note-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+
+.ac-note-fields label {
+  display: grid;
+  gap: 3px;
+  flex: 1 1 130px;
+}
+
+.ac-note-fields span {
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+
+.ac-note-fields input {
+  width: 100%;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 12.5px;
+  border: 1px solid var(--rule-2);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+/* --- what can be done ----------------------------------------------------- */
+
+.ac-card-foot {
+  display: grid;
+  gap: 9px;
+  padding-top: 11px;
+  border-top: 1px solid var(--rule);
+}
+
+.ac-reads {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ac-resume,
+.ac-full {
+  font-size: 11.5px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.ac-resume {
+  padding: 4px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--rule-2);
+  color: var(--ink-2);
+}
+
+.ac-resume:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+.ac-resume.is-none {
+  border-style: dashed;
+  color: var(--ink-3);
+  cursor: default;
+}
+
+.ac-full {
+  color: var(--ink-3);
+}
+
+.ac-full:hover {
+  color: var(--brand);
+  text-decoration: underline;
+}
+
+.ac-moves {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* Smaller than a page button: there can be ninety of these, and a full-size
+   primary on every card turns the grid into a wall of colour. */
+.ac-btn {
+  padding: 7px 13px;
+  font-size: 12px;
+  border-radius: 9px;
+  white-space: nowrap;
+}
+
+.ac-moves .link-btn.ac-btn {
+  padding: 7px 4px;
+}
+
+.ac-nudge {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+.ac-done {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+
+/* --- narrower ------------------------------------------------------------- */
+
+@media (max-width: 640px) {
+  .ac-jobs,
+  .ac-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ac-head h1 {
+    font-size: 21px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ac-job,
+  .ac-card {
+    transition: none;
+  }
+
+  .ac-job:hover {
+    transform: none;
+  }
+}

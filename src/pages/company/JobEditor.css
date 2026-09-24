@@ -1,0 +1,1316 @@
+/* --- rounds builder ------------------------------------------------------- */
+
+/*
+  The hiring process, drawn as one.
+
+  A rail runs down the left with a numbered dot per stage, so the order is
+  read rather than counted, and the line between the dots is what makes five
+  separate forms look like one journey a student takes. Each stage is a card:
+  one line until you open it, and grouped fieldsets once you do - what it is,
+  when, where, what happens - rather than fourteen inputs in a row.
+*/
+
+.rounds {
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.round {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+/* The line is drawn by the rail, not by borders on the cards, so it stays
+   continuous however tall the opened card grows. */
+.round-rail {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-self: stretch;
+  padding-top: 13px;
+}
+
+.round-rail::after {
+  content: '';
+  position: absolute;
+  top: 40px;
+  bottom: -16px;
+  width: 1px;
+  background: var(--rule);
+}
+
+.round:last-child .round-rail::after {
+  display: none;
+}
+
+.round-dot {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  color: var(--ink-3);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease,
+    color 0.12s ease;
+}
+
+.round.is-open .round-dot {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+
+.round-card {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface);
+  overflow: hidden;
+  transition: border-color 0.12s ease;
+}
+
+.round-card:hover {
+  border-color: var(--rule-2);
+}
+
+.round.is-open .round-card {
+  border-color: var(--brand);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+}
+
+.round-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px 0 0;
+}
+
+/* The whole line opens the round; the actions beside it do not. */
+.round-toggle {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  padding: 12px 4px 12px 14px;
+  font: inherit;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.round-title {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.round-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+/* Read-only facts, not the pressable .chip elsewhere on this form. Every
+   class below is the job editor's own: stylesheets in this app are global, and
+   `.round-body` and `.round-note` already belong to the landing page's
+   pipeline - which is why these are `.round-edit` and `.round-hint`. */
+.round-chip {
+  padding: 2px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--rule);
+  background: var(--paper-2);
+  font-size: 11.5px;
+  line-height: 1.7;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.round-chip.is-kind {
+  border-color: color-mix(in srgb, var(--brand) 35%, transparent);
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 600;
+}
+
+/* Whether a round cuts anybody is the one fact worth a colour: it is what
+   turns a list of meetings into a funnel. */
+.round-chip.is-cut {
+  border-color: color-mix(in srgb, var(--stop) 30%, transparent);
+  color: var(--stop);
+  background: color-mix(in srgb, var(--stop) 7%, transparent);
+}
+
+.round-chip.is-keep {
+  border-color: color-mix(in srgb, var(--pass) 30%, transparent);
+  color: var(--pass);
+  background: color-mix(in srgb, var(--pass) 7%, transparent);
+}
+
+.round-chevron {
+  margin-left: auto;
+  padding-left: 8px;
+  color: var(--ink-3);
+  font-size: 12px;
+  transition: transform 0.15s ease;
+}
+
+.round.is-open .round-chevron {
+  transform: rotate(180deg);
+}
+
+.round-edit {
+  display: grid;
+  gap: 12px;
+  padding: 4px 14px 16px;
+  border-top: 1px solid var(--rule);
+}
+
+.round-group {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin: 0;
+  padding: 12px 0 0;
+  display: grid;
+  gap: 10px;
+}
+
+.round-group:first-child {
+  border-top: 0;
+  padding-top: 12px;
+}
+
+.round-group > legend {
+  padding: 0;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.round-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  align-items: end;
+}
+
+/* One field: its label above it, whatever the control is. */
+.rf {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.rf-wide {
+  grid-column: span 2;
+}
+
+.rf-full {
+  grid-column: 1 / -1;
+}
+
+.rf input,
+.rf select,
+.rf textarea {
+  width: 100%;
+  padding: 7px 10px;
+  font: inherit;
+  font-size: 13.5px;
+  line-height: 1.5;
+  border: 1px solid var(--rule);
+  border-radius: 7px;
+  background: var(--paper-2);
+  color: var(--ink);
+}
+
+.rf textarea {
+  resize: vertical;
+}
+
+.rf input:focus,
+.rf select:focus,
+.rf textarea:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 16%, transparent);
+}
+
+.round-check {
+  display: flex;
+  align-items: start;
+  gap: 9px;
+  padding: 9px 11px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--paper-2);
+  cursor: pointer;
+}
+
+.round-check input {
+  margin-top: 2px;
+  accent-color: var(--brand);
+}
+
+.round-check span {
+  display: grid;
+  gap: 1px;
+}
+
+.round-check b {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.round-check small,
+.round-mode small {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+/* In person or online, as two cards rather than a dropdown: it decides which
+   half of the form follows, so it should not look like a minor setting. */
+.round-modes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+.round-mode {
+  display: flex;
+  align-items: start;
+  gap: 8px;
+  padding: 9px 11px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface);
+  cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    background 0.12s ease;
+}
+
+.round-mode:hover {
+  border-color: var(--rule-2);
+}
+
+.round-mode.is-current {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.round-mode input {
+  margin-top: 2px;
+  accent-color: var(--brand);
+}
+
+.round-mode span {
+  display: grid;
+  gap: 1px;
+}
+
+.round-mode b {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.round-hint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+
+@media (max-width: 760px) {
+  .round {
+    grid-template-columns: 22px minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .rf-wide {
+    grid-column: 1 / -1;
+  }
+}
+
+.round-actions {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.round-actions button {
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  color: var(--ink-2);
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  line-height: 1;
+}
+
+.round-actions button:hover:not(:disabled) {
+  border-color: var(--ink-3);
+  color: var(--ink);
+}
+
+.round-actions button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.round-actions button.is-danger:hover:not(:disabled) {
+  border-color: var(--stop);
+  color: var(--stop);
+}
+
+/* --- misc ----------------------------------------------------------------- */
+
+.problem-list {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.problem-list li {
+  color: var(--stop);
+  font-size: 14.5px;
+  margin-bottom: 6px;
+}
+
+.check.is-locked {
+  opacity: 0.75;
+  cursor: default;
+}
+
+.posting-mix {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 13px;
+}
+
+.posting-mix b {
+  font-weight: 500;
+}
+
+.posting-mix .is-pass {
+  color: var(--pass);
+}
+
+.posting-mix .is-hold {
+  color: var(--hold);
+}
+
+.posting-mix .is-stop {
+  color: var(--stop);
+}
+
+/* --- a round now carries a when and a where ------------------------------- */
+
+/* --- the package step groups what belongs together ------------------------ */
+
+.sub-block {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 14px 16px 16px;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.sub-block > legend {
+  padding: 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.sub-block .muted {
+  margin: 0;
+  font-size: 13px;
+}
+
+/* The lateral-entry choice. Same shape as the one on the Logins screen, kept
+   here so this stylesheet stands on its own. */
+.form-card .check-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 13px 15px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--brand-soft);
+  cursor: pointer;
+}
+
+.form-card .check-row input {
+  margin-top: 2px;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--brand);
+}
+
+.form-card .check-row b {
+  font-size: 14.5px;
+}
+
+.form-card .check-hint {
+  display: block;
+  margin-top: 3px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+
+/* --- who is running this hire --------------------------------------------- */
+
+.pick-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.pick-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.pick-row:hover {
+  border-color: var(--brand);
+}
+
+.pick-row input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--brand);
+}
+
+/* --- the conditions of the role ------------------------------------------- */
+
+.term-list {
+  list-style: decimal;
+  margin: 0;
+  padding-left: 22px;
+  display: grid;
+  gap: 8px;
+}
+
+.term-list li::marker {
+  color: var(--ink-3);
+  font-size: 13px;
+}
+
+.term-list input {
+  width: calc(100% - 36px);
+  padding: 8px 11px;
+  font: inherit;
+  font-size: 14px;
+  border: 1px solid var(--rule);
+  border-radius: 7px;
+  background: var(--paper-2);
+  color: inherit;
+}
+
+.term-list .is-danger {
+  margin-left: 6px;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--stop);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.sub-block .btn-secondary {
+  justify-self: start;
+}
+
+/* --- per year or per month ------------------------------------------------ */
+
+.period-choice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  border: 0;
+  padding: 0;
+  margin: 0 0 4px;
+}
+
+.period-choice > legend {
+  margin-bottom: 8px;
+}
+
+.period {
+  flex: 1 1 220px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 9px;
+  align-items: start;
+  padding: 11px 13px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+
+.period:hover {
+  border-color: var(--brand);
+}
+
+/* The chosen one is filled, so which unit you are typing in is never in doubt
+   while you are looking at the boxes below it. */
+.period.is-current {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.period input {
+  margin-top: 2px;
+  width: 15px;
+  height: 15px;
+  accent-color: var(--brand);
+}
+
+.period b {
+  font-size: 14px;
+}
+
+.period-hint {
+  display: block;
+  margin-top: 2px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-3);
+}
+
+/* --- the marks, one section per stage of the ladder ----------------------- */
+
+.stage-intro {
+  margin: 0;
+  font-size: 13px;
+}
+
+.stages {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.stage {
+  display: grid;
+  grid-template-columns: 58px 1fr;
+  gap: 14px;
+  align-items: start;
+  padding: 14px 16px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+
+/* The stage it belongs to, readable down the left edge so the section can be
+   matched against a criteria sheet line by line. */
+.stage-mark {
+  display: grid;
+  place-items: center;
+  padding: 6px 0;
+  border-radius: 7px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.stage-body {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.stage-title {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.stage-sub {
+  display: block;
+  margin-top: 3px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--ink-3);
+}
+
+.stage .field input {
+  max-width: 160px;
+}
+
+.stage .alert {
+  margin: 0;
+}
+
+/* Sits between two fields that are alternatives, not both required. */
+.or-between {
+  align-self: center;
+  padding-top: 18px;
+  font-size: 13px;
+  color: var(--ink-3);
+  flex: none;
+}
+
+.sub-block .form-row {
+  align-items: start;
+}
+
+/* Which of the chosen skills the role is really asking for. */
+.asked-for {
+  display: grid;
+  gap: 8px;
+  padding: 13px 15px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.asked-for .muted {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* --- narrowing a drive to particular batches ------------------------------ */
+
+.batch-pick {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--rule);
+}
+
+.batch-pick-head {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+
+.batch-pick .chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: none;
+}
+
+.batch-pick .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 12.5px;
+}
+
+/* How many students sit in that batch, so the choice is made on a number
+   rather than on a name nobody outside the college recognises. */
+.chip-count-inline {
+  padding: 0 5px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.09);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.chip.is-on .chip-count-inline {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* --- colleges on the portal with no drive open ---------------------------- */
+
+.not-open {
+  margin-top: 14px;
+  padding: 10px 14px;
+  border: 1px dashed var(--rule);
+  border-radius: var(--radius);
+  font-size: 13px;
+}
+
+.not-open > summary {
+  cursor: pointer;
+  color: var(--ink-3);
+}
+
+.not-open .muted {
+  margin: 8px 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.not-open-list {
+  margin: 0;
+  padding-left: 18px;
+  columns: 2;
+  column-gap: 24px;
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+
+@media (max-width: 640px) {
+  .not-open-list {
+    columns: 1;
+  }
+}
+
+/* What a round is actually like, under its scheduling. */
+.round-about {
+  display: grid;
+  gap: 3px;
+  padding-top: 8px;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.round-about textarea {
+  width: 100%;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13.5px;
+  line-height: 1.5;
+  border: 1px solid var(--rule);
+  border-radius: 7px;
+  background: var(--paper-2);
+  color: var(--ink);
+  resize: vertical;
+}
+
+/* The look-up button sits with the address, not above it. */
+.locate-field {
+  align-self: end;
+}
+
+.locate-field .btn {
+  justify-self: start;
+}
+
+.round-about input[type='url'] {
+  width: 100%;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13.5px;
+  border: 1px solid var(--rule);
+  border-radius: 7px;
+  background: var(--paper-2);
+  color: var(--ink);
+}
+
+/* --- small togglable chips ------------------------------------------------ */
+/* Used where the set is already small by construction: the skills you have
+   picked, and the batches inside one drive. Anything that could grow uses the
+   searchable dropdown instead. */
+
+.chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.chip {
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 13.5px;
+  line-height: 1.3;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: var(--paper-2);
+  color: var(--ink-3);
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease,
+    color 0.12s ease;
+}
+
+.chip:hover:not(:disabled) {
+  border-color: var(--brand);
+  color: var(--ink);
+}
+
+.chip.is-on {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+  font-weight: 600;
+}
+
+.chip:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+/* --- choosing drives, without a wall of checkboxes ------------------------ */
+
+.pick-drives {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+  margin-bottom: 14px;
+}
+
+.pick-drives .multi {
+  width: 100%;
+}
+
+/* Only the chosen ones are drawn in full, each with its own batch picker. */
+.chosen-drives {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.chosen-drives > li {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.chosen-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 14px;
+  font-size: 14px;
+}
+
+.answered-drives {
+  margin-bottom: 16px;
+  padding: 11px 13px;
+  border: 1px dashed var(--rule);
+  border-radius: var(--radius);
+}
+
+.answered-drives ul {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 5px;
+  font-size: 13px;
+}
+
+.answered-drives li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* --- how the interviews happen, asked once -------------------------------- */
+
+.shape-choice,
+.bar-choice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  border: 0;
+  padding: 0;
+  margin: 0 0 14px;
+}
+
+.shape-choice > legend,
+.bar-choice > legend {
+  margin-bottom: 8px;
+}
+
+.shape {
+  flex: 1 1 200px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 9px;
+  align-items: start;
+  padding: 11px 13px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.shape:hover {
+  border-color: var(--brand);
+}
+
+.shape.is-current {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.shape input {
+  margin-top: 2px;
+  width: 15px;
+  height: 15px;
+  accent-color: var(--brand);
+}
+
+.shape b {
+  font-size: 14px;
+}
+
+.shape-hint {
+  display: block;
+  margin-top: 2px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-3);
+}
+
+/* --- a round, collapsed to one line until you open it --------------------- */
+
+/* --- who this reaches ----------------------------------------------------- */
+
+.reach {
+  margin: 0 0 18px;
+  padding: 11px 15px;
+  border-radius: var(--radius);
+  border-left: 3px solid;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.reach .link-btn {
+  font-size: 13.5px;
+}
+
+.reach-ok {
+  border-color: var(--pass);
+  background: var(--pass-soft);
+  color: var(--pass);
+}
+
+/* Narrow but not empty: worth a second look, not an alarm. */
+.reach-warn {
+  border-color: var(--hold);
+  background: var(--hold-soft);
+  color: var(--hold);
+}
+
+/* Nobody at all. Almost always a bar against data no college records. */
+.reach-stop {
+  border-color: var(--stop);
+  background: var(--stop-soft);
+  color: var(--stop);
+}
+
+.reach-idle {
+  border-color: var(--rule);
+  background: var(--paper-2);
+  color: var(--ink-3);
+}
+
+/* --- three columns: where you are, what you fill in, what it becomes ------ */
+
+.editor {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr) 320px;
+  gap: 20px;
+  align-items: start;
+}
+
+/* The rail is a column now, so each step can carry its state in words
+   rather than only as a colour. */
+.rail {
+  position: sticky;
+  top: 18px;
+  display: grid;
+  gap: 2px;
+}
+
+.rail-step {
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 10px;
+  font: inherit;
+  text-align: left;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.rail-step:hover {
+  background: var(--paper-2);
+}
+
+.rail-step.is-current {
+  background: var(--brand-soft);
+  font-weight: 600;
+}
+
+.rail-num {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.rail-step.is-done .rail-num {
+  background: var(--pass);
+  border-color: var(--pass);
+  color: #fff;
+}
+
+.rail-step.is-empty .rail-num {
+  border-style: dashed;
+  color: var(--ink-3);
+}
+
+.rail-text {
+  display: grid;
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.rail-state {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--ink-3);
+}
+
+/* What is still stopping it going out, visible from every step. */
+.rail-todo {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px dashed var(--hold);
+  border-radius: var(--radius);
+  background: var(--hold-soft);
+}
+
+.rail-todo-head {
+  margin: 0 0 5px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--hold);
+}
+
+.rail-todo ul {
+  margin: 0;
+  padding-left: 15px;
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--hold);
+}
+
+.editor-pane {
+  min-width: 0;
+}
+
+/*
+ * The preview goes under the form rather than squeezing it.
+ *
+ * The breakpoint looks high because it is measured on the window while the
+ * editor sits inside the 248px nav shell: three columns only genuinely fit
+ * from about here up, and below it the form pane is the one that suffers.
+ */
+@media (max-width: 1400px) {
+  .editor {
+    grid-template-columns: 170px minmax(0, 1fr);
+  }
+
+  .preview {
+    grid-column: 1 / -1;
+    position: static;
+  }
+}
+
+@media (max-width: 760px) {
+  .editor {
+    grid-template-columns: 1fr;
+  }
+
+  .rail {
+    position: static;
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    overflow-x: auto;
+  }
+
+  .rail-state,
+  .rail-todo {
+    display: none;
+  }
+}
+
+/* --- the office address, folded away until it is wanted ------------------- */
+
+.office {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 0 14px;
+  margin-bottom: 20px;
+  background: var(--paper-2);
+}
+
+.office > summary {
+  padding: 11px 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  cursor: pointer;
+  list-style-position: inside;
+}
+
+.office[open] > summary {
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 14px;
+}
+
+.office > *:last-child {
+  margin-bottom: 14px;
+}
+
+/* --- the wizard frame, shared with institution onboarding ------------------ */
+
+/* The step body is wider than onboarding's: rounds and drives are tables. */
+.job-wizard .ob-body.job-wizard-body {
+  max-width: 880px;
+  display: grid;
+  gap: 16px;
+}
+
+.job-wizard .ob-body > .card {
+  margin: 0;
+  border-radius: var(--ob-radius);
+  box-shadow: var(--ob-shadow);
+}
+
+.job-wizard .ob-home strong {
+  font-size: 15px;
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.job-wizard .rail-todo {
+  margin: 0 8px;
+}
+
+.job-wizard .ob-progress p .pill {
+  margin-left: 8px;
+}
+
+.job-step-nav {
+  margin: 8px 0 48px;
+}
+
+.job-wizard-preview {
+  width: auto;
+}
+
+/* --- inclusion ---------------------------------------------------------------- */
+
+.inc-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.inc-option,
+.inc-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.inc-option input,
+.inc-check input {
+  margin-top: 2px;
+  accent-color: var(--brand);
+}
+
+.inc-option span,
+.inc-check span {
+  display: grid;
+  gap: 2px;
+}
+
+.inc-option.is-on,
+.inc-check.is-on {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.inc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 6px;
+}
+
+.inc-sub {
+  margin: 16px 0 8px;
+}
+
+.inc-actions {
+  display: flex;
+  gap: 14px;
+  margin-top: 6px;
+  font-size: 13px;
+}
+
+.inc-warning {
+  margin: 12px 0 0;
+}
+
+.inclusion .check-hint {
+  display: block;
+  font-size: 12.5px;
+  color: var(--ink-3);
+}

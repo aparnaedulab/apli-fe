@@ -1,0 +1,14 @@
+node_modules/
+dist/
+build/
+coverage/
+
+# Local configuration. VITE_* values are baked into the bundle at build time,
+# so anything in here reaches the browser - keep it out of the repository.
+.env
+.env.local
+.env.*.local
+
+*.log
+.DS_Store
+.vite/

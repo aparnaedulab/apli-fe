@@ -1,0 +1,302 @@
+/*
+ * Role management: a list of roles grouped by world, one open at a time.
+ * Spacing is grid gaps throughout, so nothing depends on a margin somebody
+ * remembered to set.
+ */
+
+.roles {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+/* --- the list ------------------------------------------------------------- */
+
+.roles-list {
+  display: grid;
+  gap: 22px;
+  position: sticky;
+  top: 24px;
+}
+
+.roles-group {
+  display: grid;
+  gap: 3px;
+}
+
+.roles-group-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.roles-group-title {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.roles-add {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--brand);
+  cursor: pointer;
+  padding: 0;
+}
+
+.roles-add:hover {
+  text-decoration: underline;
+}
+
+.role-row {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.role-row:hover:not(.is-current) {
+  background: var(--paper-2);
+}
+
+.role-row.is-current {
+  background: var(--surface);
+  border-color: var(--rule);
+}
+
+.role-row:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
+}
+
+/* A retired role still shows - people hold it - but reads as out of use. */
+.role-row.is-retired .role-row-name {
+  color: var(--ink-3);
+}
+
+.role-row-name {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.role-row.is-current .role-row-name {
+  font-weight: 600;
+}
+
+.role-tag {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+.role-row-meta {
+  font-size: 12px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- the editor ----------------------------------------------------------- */
+
+.roles-pane {
+  min-width: 0;
+}
+
+.role-editor,
+.roles-empty {
+  display: grid;
+  gap: 22px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 26px;
+}
+
+.roles-empty {
+  gap: 8px;
+}
+
+.roles-empty h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.roles-empty p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  max-width: 64ch;
+}
+
+.role-head {
+  display: grid;
+  gap: 5px;
+}
+
+.role-scope {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.role-head h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.018em;
+}
+
+.role-blurb {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-3);
+  max-width: 68ch;
+}
+
+/* --- the permission grid -------------------------------------------------- */
+
+.perms {
+  display: grid;
+  gap: 14px;
+}
+
+.perms-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.perms-count {
+  font-size: 12.5px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.perm-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2px 16px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 12px 14px 14px;
+  margin: 0;
+}
+
+.perm-group legend {
+  grid-column: 1 / -1;
+  padding: 0 5px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.perm {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 6px 4px;
+  border-radius: 4px;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.perm:hover:not(.is-locked) {
+  background: var(--paper-2);
+}
+
+.perm.is-locked {
+  cursor: default;
+}
+
+.perm input {
+  margin-top: 2px;
+  accent-color: var(--brand);
+  flex: none;
+}
+
+/* The literal capability, for anyone matching this against an error message. */
+.perm-key {
+  display: block;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+/* --- footer --------------------------------------------------------------- */
+
+.role-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--rule);
+  padding-top: 18px;
+}
+
+.role-note {
+  margin: -8px 0 0;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+@media (max-width: 960px) {
+  .roles {
+    grid-template-columns: 1fr;
+  }
+
+  .roles-list {
+    position: static;
+  }
+}
+
+/* The scope chooser sits inside the editor, above everything it decides. */
+.role-editor > .scope-choice {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.role-editor > .scope-choice > legend {
+  padding: 0;
+  margin-bottom: 10px;
+}

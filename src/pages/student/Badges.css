@@ -1,0 +1,178 @@
+/* ==========================================================================
+   My badges
+
+   A record of movement that does not depend on a company replying. What is
+   earned is large and warm; what is not is folded away, because eleven grey
+   circles above somebody who has two is a page saying "you have not got a
+   job" in nine different ways.
+
+   Namespaced `bg-`: these stylesheets are bundled app wide.
+   ========================================================================== */
+
+.bg-head {
+  margin-bottom: 14px;
+}
+
+.bg-head h1 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+
+.bg-head p {
+  margin: 4px 0 0;
+  max-width: 62ch;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.bg-apli {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin: 0 0 18px;
+  padding: 11px 15px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--brand) 22%, transparent);
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--brand) 8%, var(--surface)),
+    var(--surface) 65%
+  );
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.bg-apli .apli-face {
+  flex: none;
+  color: var(--brand);
+}
+
+/* --- what they have ------------------------------------------------------- */
+
+.bg-won {
+  margin: 0 0 20px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.bg-won a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 100%;
+  padding: 14px 16px;
+  border-radius: 15px;
+  border: 1px solid color-mix(in srgb, var(--pass) 30%, transparent);
+  background: linear-gradient(
+    150deg,
+    color-mix(in srgb, var(--pass) 9%, var(--surface)),
+    var(--surface) 68%
+  );
+  text-decoration: none;
+  transition:
+    transform 0.16s cubic-bezier(0.2, 0.7, 0.3, 1),
+    box-shadow 0.16s ease;
+}
+
+.bg-won a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgb(15 23 42 / 0.08);
+}
+
+/* The tick is the whole ornament. Anything more would be decoration on a
+   page whose point is that these are real. */
+.bg-mark {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--pass);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.bg-what {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.bg-what b {
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.bg-what small {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+/* --- what is still ahead -------------------------------------------------- */
+
+/*
+  Folded. Opened on purpose it is a map of what comes next; left open it is a
+  scoreboard a student keeps against themselves.
+*/
+.bg-ahead {
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+}
+
+.bg-ahead > .link-btn {
+  font-size: 12.5px;
+}
+
+.bg-ahead ul {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 8px;
+}
+
+/* Quiet on purpose: these are directions, not failures. A dashed edge and no
+   tick says "not yet" without drawing an empty medal. */
+.bg-ahead a {
+  display: block;
+  height: 100%;
+  padding: 11px 13px;
+  border-radius: 13px;
+  border: 1px dashed var(--rule-2);
+  text-decoration: none;
+  transition: border-color 0.14s ease;
+}
+
+.bg-ahead a:hover {
+  border-color: var(--brand);
+}
+
+.bg-ahead .bg-what b {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.bg-ahead a:hover .bg-what b {
+  color: var(--brand);
+}
+
+.bg-ahead .bg-what small {
+  line-height: 1.45;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-won a {
+    transition: none;
+  }
+
+  .bg-won a:hover {
+    transform: none;
+  }
+}

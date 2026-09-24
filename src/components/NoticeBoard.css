@@ -1,0 +1,127 @@
+/* ---------------------------------------------------------------------------
+   The notice board.
+
+   It sits on three different dashboards - student, company and placement cell -
+   which have three different shells, so it is built only from the shared
+   tokens and brings no layout assumptions of its own beyond its own box.
+
+   Everything is `nb-` prefixed. The obvious names were already taken: the
+   platform console has a `.notice` of its own, a flex banner with a brand
+   background, and inheriting it laid each notice out sideways.
+--------------------------------------------------------------------------- */
+
+.noticeboard {
+  margin-bottom: 20px;
+  padding: 16px 18px;
+  border: 1px solid var(--rule);
+  /* The one coloured edge: enough to say "this is from the institution, not
+     part of your work", without turning a notice into an alarm. */
+  border-left: 3px solid var(--brand);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.noticeboard-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.noticeboard-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 11px;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.nb-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nb-item + .nb-item {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+}
+
+.nb-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.nb-top h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+.nb-top time {
+  flex: none;
+  font-size: 12px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.nb-body {
+  margin: 6px 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  /* Newlines typed into the notice are kept: a circular with three dated
+     points in it is unreadable as one paragraph. */
+  white-space: pre-wrap;
+}
+
+.nb-body.is-folded {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.nb-more {
+  margin-top: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--brand);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.nb-more:hover {
+  text-decoration: underline;
+}
+
+.nb-from {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.nb-until {
+  color: var(--hold);
+}

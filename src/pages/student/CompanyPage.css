@@ -1,0 +1,372 @@
+/* The company page: three labelled layers, so a reader always knows who is speaking. */
+
+.cp {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 820px;
+}
+
+.cp-back {
+  margin: 0 0 12px;
+  font-size: 14px;
+}
+
+.cp-back a {
+  color: var(--brand);
+}
+
+.cp-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cp-head h1 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 30px;
+  letter-spacing: -0.02em;
+}
+
+.cp-logo {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.cp-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #fff;
+}
+
+/* The facts beside the name, and the links out. */
+.cp-sub {
+  margin: 3px 0 0;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.cp-sub a {
+  color: var(--brand);
+  text-decoration: none;
+}
+
+.cp-sub a:hover {
+  text-decoration: underline;
+}
+
+.cp-layer {
+  padding: 18px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+/* The measured layer looks different on purpose: it is ours, not theirs. */
+.cp-measured {
+  background: var(--paper-2);
+  border-style: dashed;
+}
+
+.cp-tag {
+  margin: 0 0 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+
+.cp-tag span {
+  color: var(--ink-3);
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: var(--sans);
+}
+
+.cp-layer h3 {
+  margin: 14px 0 4px;
+  font-size: 15px;
+}
+
+.cp-text {
+  margin: 0;
+  color: var(--ink-2);
+  white-space: pre-line;
+}
+
+.cp-empty {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: 14px;
+}
+
+.cp-roles {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cp-roles a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--rule);
+}
+
+.cp-roles a:hover {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.cp-roles strong {
+  flex: none;
+}
+
+.cp-roles small {
+  flex: 1;
+  color: var(--ink-3);
+}
+
+.cp-roles span {
+  color: var(--brand);
+}
+
+/*
+  The pictures a company uploads. Drawn only when they exist - a page with no
+  cover and no photographs should read as a plain page, not a broken one.
+*/
+.cp-cover {
+  margin: -4px 0 12px;
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 16 / 5;
+  background: var(--paper-2);
+}
+
+.cp-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* The headline: one line of the company's own words, right under its name. */
+.cp-headline {
+  margin: 4px 0 0;
+  font-size: 15px;
+  color: var(--ink);
+}
+
+/*
+  Updates. A feed a company writes and nobody answers - so it is laid out for
+  reading, not for interacting with: no action bar under each post, and the
+  time is the only metadata.
+*/
+.cp-posts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cp-post {
+  padding: 14px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  background: var(--paper);
+}
+
+.cp-post-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cp-post-head strong {
+  display: block;
+  font-size: 14px;
+}
+
+.cp-post-head time {
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+.cp-post-head .pill {
+  margin-left: auto;
+}
+
+.cp-post-logo {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.cp-post-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.cp-post-title {
+  margin: 12px 0 0;
+  font-size: 17px;
+}
+
+/* The body is the company's own markup, kept to the page's own type scale. */
+.cp-post-body {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.cp-post-body p,
+.cp-post-body ul,
+.cp-post-body ol,
+.cp-post-body blockquote {
+  margin: 10px 0 0;
+}
+
+.cp-post-body h3 {
+  margin: 14px 0 0;
+  font-size: 15px;
+}
+
+.cp-post-body ul,
+.cp-post-body ol {
+  padding-left: 20px;
+}
+
+.cp-post-body blockquote {
+  padding-left: 12px;
+  border-left: 3px solid var(--rule-2);
+  color: var(--ink-2);
+}
+
+.cp-post-body a {
+  color: var(--brand);
+}
+
+.cp-post-media {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.cp-post-media img,
+.cp-post-media video {
+  width: 100%;
+  border-radius: 10px;
+  background: var(--paper-2);
+}
+
+.cp-post-media span {
+  display: block;
+  margin-top: 4px;
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+.cp-feed > .btn {
+  margin-top: 14px;
+  align-self: flex-start;
+}
+
+/* --- the photographs, and what we measured -------------------------------- */
+
+.cp-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cp-gallery li {
+  display: grid;
+  gap: 4px;
+}
+
+.cp-gallery img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--rule);
+}
+
+.cp-gallery span {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.cp-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px 18px;
+  margin: 0;
+}
+
+.cp-facts > div {
+  display: grid;
+  gap: 1px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.cp-facts dt {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.cp-facts dd {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.cp-facts p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ink-3);
+}
+
+/* Not enough of it to stand on yet, and said so rather than shown as fact. */
+.cp-facts .is-thin dd {
+  color: var(--ink-3);
+  font-weight: 500;
+}

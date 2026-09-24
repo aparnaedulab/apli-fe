@@ -1,0 +1,299 @@
+/* ---------------------------------------------------------------------------
+   Drives: the cell's side and the company's side.
+
+   One stylesheet for both, because they are two views of one thing and they
+   should not drift apart - the numbers a company sees must look the same as
+   the numbers the cell was shown before inviting them.
+--------------------------------------------------------------------------- */
+
+.drive-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.drive-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.drive-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.drive-head h2 {
+  margin: 0 0 2px;
+  font-size: 17px;
+}
+
+.drive-head .muted {
+  margin: 0;
+  font-size: 13px;
+}
+
+.drive-pitch {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  white-space: pre-wrap;
+}
+
+.drive-bar {
+  margin: 0;
+  font-size: 12.5px;
+}
+
+.drive-reason {
+  margin: 0;
+}
+
+.drive-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.drive-actions .muted {
+  margin: 0;
+  font-size: 12.5px;
+}
+
+/* --- the numbers ---------------------------------------------------------- */
+
+.drive-report {
+  padding: 14px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--paper-2);
+}
+
+.drive-figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+}
+
+.drive-figure b {
+  display: block;
+  font-size: 24px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.drive-figure span {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+/* The one that decides it. */
+.drive-figure.is-strong b {
+  color: var(--brand);
+}
+
+.drive-split {
+  margin: 12px 0 4px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.drive-note {
+  margin: 8px 0 0;
+  font-size: 12px;
+}
+
+/* --- forms ---------------------------------------------------------------- */
+
+.drive-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.drive-form-wide {
+  grid-column: 1 / -1;
+}
+
+.drive-form textarea.input {
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+.drive-schedule {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--paper-2);
+}
+
+.drive-schedule .drive-actions {
+  grid-column: 1 / -1;
+}
+
+.drive-decline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--paper-2);
+}
+
+.drive-decline .field {
+  flex: 1 1 320px;
+}
+
+/* --- whose bar it is ------------------------------------------------------ */
+
+/* The company's own copy of the bar, with the counts moving under it. */
+.drive-barform {
+  padding: 14px;
+  border: 1px solid var(--rule-2);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.drive-barform-head {
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+.drive-barform-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.drive-barform-row .field {
+  flex: 1 1 150px;
+  margin: 0;
+}
+
+.drive-barform .muted {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+}
+
+/* --- the facts, each with its question -------------------------------------
+   The card used to run five of these together after dots, which reads as one
+   long sentence nobody finishes. A label per fact is more rows and far less
+   work to read.
+--------------------------------------------------------------------------- */
+
+.drive-sub {
+  margin: 2px 0 0;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.drive-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px 20px;
+  margin: 0;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--rule);
+}
+
+.drive-facts > div {
+  min-width: 0;
+}
+
+.drive-facts dt {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.drive-facts dd {
+  margin: 3px 0 0;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+/* --- panels that open under a card ----------------------------------------- */
+
+.drive-panel {
+  padding: 14px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--paper-2);
+}
+
+.drive-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.drive-panel .muted {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.drive-roles {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+}
+
+.drive-roles li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.drive-roles li:last-child {
+  border-bottom: 0;
+}
+
+.drive-roles b {
+  display: block;
+  font-size: 13.5px;
+  color: var(--ink);
+}
+
+.drive-roles small {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.drive-addrole {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.drive-addrole .muted {
+  font-size: 12.5px;
+}

@@ -1,0 +1,222 @@
+/* ==========================================================================
+   Counselling, from the placement cell's side
+
+   The other half of the at-risk list. That one is the college looking at
+   students; this one is students putting their hand up - and somebody who
+   asked is already halfway through the hard part.
+
+   Namespaced `cc-`: these stylesheets are bundled app wide.
+   ========================================================================== */
+
+.cc-head {
+  margin-bottom: 16px;
+}
+
+.cc-head h1 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+
+.cc-head p {
+  margin: 4px 0 0;
+  max-width: 66ch;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-3);
+}
+
+.cc-group {
+  margin-bottom: 22px;
+}
+
+.cc-group h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 9px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.cc-group h2 span {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--paper-2);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0;
+}
+
+.cc-group ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+/* --- one request ---------------------------------------------------------- */
+
+.cc-row {
+  display: grid;
+  gap: 9px;
+  padding: 13px 15px;
+  border-radius: 14px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+.cc-row.is-open {
+  border-left: 3px solid var(--brand);
+}
+
+/*
+  Waiting five days or more.
+
+  A request nobody picks up is worse than no request at all: the student has
+  been answered by the silence, and it is not the answer anybody meant.
+*/
+.cc-row.is-late {
+  border-left-color: var(--stop);
+}
+
+.cc-row.is-done,
+.cc-row.is-closed {
+  background: var(--paper-2);
+}
+
+.cc-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+}
+
+.cc-who {
+  display: grid;
+  gap: 0;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.cc-who b {
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.cc-who small {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+/* Why they asked - what the cell is walking into, before they open anything. */
+.cc-reason {
+  padding: 3px 11px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--brand);
+}
+
+.cc-age {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.cc-row.is-late .cc-age {
+  color: var(--stop);
+  font-weight: 600;
+}
+
+/* Their own words, quoted rather than summarised. */
+.cc-note {
+  margin: 0;
+  padding-left: 12px;
+  border-left: 2px solid var(--rule-2);
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  white-space: pre-wrap;
+}
+
+/* --- what the cell does with it ------------------------------------------- */
+
+.cc-do {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 10px;
+  padding: 11px 12px;
+  border-radius: 12px;
+  background: var(--paper-2);
+}
+
+.cc-do.is-wide {
+  display: grid;
+}
+
+.cc-do label {
+  display: grid;
+  gap: 3px;
+}
+
+.cc-do label.is-wide {
+  width: 100%;
+}
+
+.cc-do span {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+
+.cc-do input,
+.cc-do textarea {
+  padding: 7px 11px;
+  font: inherit;
+  font-size: 13px;
+  border: 1px solid var(--rule-2);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.cc-do textarea {
+  width: 100%;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+.cc-do .btn-sm {
+  padding: 8px 15px;
+  font-size: 12.5px;
+}
+
+.cc-do.is-wide .btn-sm {
+  justify-self: start;
+}
+
+.cc-booked {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand);
+}
+
+/* What was agreed, once it has been. Written for the student, kept here so
+   whoever picks it up next can see what was already said. */
+.cc-outcome {
+  margin: 0;
+  padding-left: 12px;
+  border-left: 3px solid var(--pass);
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  white-space: pre-wrap;
+}

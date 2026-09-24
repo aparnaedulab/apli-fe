@@ -1,0 +1,49 @@
+/* The language switcher and the one-time "still in English" note. */
+
+.lang-switch {
+  display: flex;
+  gap: 2px;
+  margin: 12px 10px 4px;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+}
+
+.lang-opt {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 4px;
+  border-radius: 7px;
+}
+
+.lang-opt:hover {
+  color: var(--ink);
+}
+
+.lang-opt.is-on {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgb(20 22 28 / 0.12);
+}
+
+.lang-note {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--brand-soft);
+  font-size: 14px;
+}
+
+.lang-note .btn {
+  padding: 6px 14px;
+  font-size: 13px;
+}

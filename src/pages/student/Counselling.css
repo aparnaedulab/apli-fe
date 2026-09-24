@@ -1,0 +1,290 @@
+/* ==========================================================================
+   Career counselling
+
+   Quiet on purpose. Somebody opening this page may be having a bad month,
+   and a screen that shouts at them about it is the last thing that helps.
+   Nothing here is coloured like an alarm, and nothing counts their failures.
+
+   Namespaced `cn-`: these stylesheets are bundled app wide.
+   ========================================================================== */
+
+.cn {
+  max-width: 680px;
+}
+
+.cn-head {
+  margin-bottom: 16px;
+}
+
+.cn-head h1 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+
+.cn-head p {
+  margin: 4px 0 0;
+  max-width: 62ch;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-3);
+}
+
+/* --- a moment that might need one ----------------------------------------- */
+
+/*
+  An offer of help, never an assessment. The facts behind it are ones the
+  student can already see on their own applications page - the risk engine's
+  verdict stays with the college, which is where it was designed to stay.
+*/
+.cn-now {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--brand) 25%, transparent);
+  background: linear-gradient(
+    140deg,
+    color-mix(in srgb, var(--brand) 7%, var(--surface)),
+    var(--surface) 65%
+  );
+}
+
+.cn-now .apli-face {
+  flex: none;
+  color: var(--brand);
+}
+
+.cn-now p {
+  margin: 0 0 10px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.cn-now .btn-sm {
+  padding: 7px 15px;
+  font-size: 13px;
+}
+
+/* --- what is already asked for -------------------------------------------- */
+
+.cn-open,
+.cn-ask,
+.cn-past {
+  margin-bottom: 22px;
+}
+
+.cn h2 {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.cn-open ul,
+.cn-past ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.cn-open li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 13px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+.cn-what {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.cn-what b {
+  font-size: 13.5px;
+  color: var(--ink);
+}
+
+.cn-what small {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+/* A time that has been set. The one thing on this page worth a colour. */
+.cn-when {
+  margin-top: 3px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand);
+}
+
+/* --- asking --------------------------------------------------------------- */
+
+/*
+  Six reasons rather than an empty box. A student who has to compose the
+  question often does not ask at all, and the reason is also what tells the
+  cell which conversation they are walking into.
+*/
+.cn-reasons {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 8px;
+}
+
+.cn-reason {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  gap: 2px;
+  padding: 12px 14px;
+  border-radius: 13px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.14s ease,
+    background 0.14s ease;
+}
+
+.cn-reason:hover {
+  border-color: color-mix(in srgb, var(--brand) 40%, transparent);
+}
+
+.cn-reason.is-on {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.cn-reason b {
+  font-size: 13.5px;
+  color: var(--ink);
+}
+
+.cn-reason small {
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--ink-3);
+}
+
+.cn-reason.is-on b,
+.cn-reason.is-on small {
+  color: var(--brand);
+}
+
+.cn-box {
+  margin-top: 10px;
+  padding: 13px 15px;
+  border-radius: 13px;
+  background: var(--paper-2);
+}
+
+.cn-box label {
+  display: grid;
+  gap: 4px;
+}
+
+.cn-box span {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+.cn-box textarea {
+  width: 100%;
+  padding: 9px 12px;
+  font: inherit;
+  font-size: 13.5px;
+  line-height: 1.55;
+  border: 1px solid var(--rule-2);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  resize: vertical;
+}
+
+.cn-box .btn-row {
+  margin-top: 10px;
+}
+
+/* --- what was agreed ------------------------------------------------------ */
+
+/*
+  Kept, and written for the student rather than about them. A conversation
+  that leaves no record cannot be followed up, and nobody can be held to what
+  was said in it.
+*/
+.cn-past li {
+  padding: 13px 15px;
+  border-radius: 13px;
+  border-left: 3px solid var(--pass);
+  background: var(--paper-2);
+}
+
+.cn-past b {
+  font-size: 13.5px;
+  color: var(--ink);
+}
+
+.cn-past small {
+  margin-left: 8px;
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+.cn-past p {
+  margin: 6px 0 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  white-space: pre-wrap;
+}
+
+/* --- the line this page does not cross ------------------------------------ */
+
+/*
+  A placement portal is not a counselling service, and a booking form in a job
+  app is no place for somebody in real distress. Said permanently, without
+  being asked for, and set apart so it does not read as one more feature.
+*/
+.cn-else {
+  margin: 26px 0 0;
+  padding: 14px 16px;
+  border-radius: 13px;
+  border: 1px dashed var(--rule-2);
+  max-width: 64ch;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+.cn-quiet {
+  margin: 14px 0 0;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.cn-quiet a {
+  color: var(--brand);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cn-reason {
+    transition: none;
+  }
+}

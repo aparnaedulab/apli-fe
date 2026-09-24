@@ -1,0 +1,53 @@
+/*
+ * Styles for the shared batch form, next to the component so that any screen
+ * rendering it gets them - the campus batches page and the college page in
+ * operations both do.
+ */
+
+.presets {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.preset {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: left;
+  font: inherit;
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 11px 13px;
+  cursor: pointer;
+}
+
+.preset:hover:not(:disabled) {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.preset:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
+}
+
+.preset-label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.preset-hint {
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--ink-3);
+}
+
+.form-note {
+  margin-top: -4px;
+  margin-bottom: 18px;
+  max-width: 70ch;
+}

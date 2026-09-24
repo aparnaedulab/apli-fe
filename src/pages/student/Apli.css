@@ -1,0 +1,203 @@
+/*
+  Apli: a face on the student's side of the portal.
+
+  Warm without being childish. This is read by somebody deciding where to
+  spend the next three years, so it has to feel like a colleague rather than
+  a mascot in a game - which mostly means restraint: one line at a time, no
+  bouncing, and an expression that changes with what is actually being said.
+*/
+
+.apli-face {
+  display: block;
+  color: var(--brand);
+}
+
+.apli-body {
+  fill: currentColor;
+}
+
+.apli-eyes circle {
+  fill: #fff;
+  transform-origin: center;
+}
+
+/* A blink every few seconds. Slow and rare: anything faster is a distraction
+   on a page somebody is trying to read. */
+@keyframes apli-blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.12);
+  }
+}
+
+.apli-eyes {
+  animation: apli-blink 6.5s ease-in-out infinite;
+  transform-origin: center 23px;
+}
+
+.apli-mouth {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.apli-stalk {
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.apli-dot {
+  fill: currentColor;
+}
+
+/* The expression, which is the only thing that changes between moods. */
+.apli-face.is-cheer .apli-mouth {
+  d: path('M18 29c1.8 2.6 3.8 3.9 6 3.9s4.2-1.3 6-3.9');
+}
+
+.apli-face.is-nudge .apli-mouth {
+  d: path('M19 31h10');
+}
+
+.apli-face.is-think .apli-mouth {
+  d: path('M20 31c1.2-1.2 2.5-1.8 4-1.8s2.8.6 4 1.8');
+}
+
+.apli-face.is-think .apli-dot,
+.apli-face.is-nudge .apli-dot {
+  animation: apli-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes apli-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* --- Apli with something to say ------------------------------------------- */
+
+.apli {
+  display: flex;
+  align-items: start;
+  gap: 14px;
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--brand) 22%, transparent);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--brand) 8%, var(--surface)),
+    var(--surface) 65%
+  );
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.apli.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+.apli-avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--brand) 12%, transparent);
+}
+
+.apli-says {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.apli-who {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--brand);
+}
+
+.apli-who span {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand) 12%, transparent);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.apli-line {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.apli-do {
+  justify-self: start;
+  margin-top: 5px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--brand);
+  text-decoration: none;
+}
+
+.apli-do::after {
+  content: ' →';
+}
+
+.apli-do:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 560px) {
+  .apli {
+    gap: 11px;
+    padding: 13px 14px;
+  }
+
+  .apli-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 13px;
+  }
+
+  .apli-line {
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .apli {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .apli-eyes,
+  .apli-dot {
+    animation: none;
+  }
+}

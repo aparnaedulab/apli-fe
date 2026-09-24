@@ -1,0 +1,309 @@
+/* ---------------------------------------------------------------------------
+   Motion.
+
+   One rule decides what belongs in this file: an animation here has to mean
+   something the product means. Waiting breathes, because a wait that is being
+   counted is the whole argument of the page. An application travels down its
+   rounds, because that is literally what an application does. A pass settles
+   once and then stays still, because a decision that keeps twitching does not
+   look decided.
+
+   Nothing that merely moves is in here. A page about being strung along for
+   eight months cannot itself be restless.
+
+   The policy from Landing.css still holds, and this file is written to it:
+   nothing important waits on an animation, nothing here changes layout, and
+   every last rule is switched off under prefers-reduced-motion at the bottom.
+--------------------------------------------------------------------------- */
+
+/* ===========================================================================
+   1. Waiting breathes
+   ======================================================================== */
+
+/* The amber states - "in progress", "waiting on Zenith Labs", "4 days left to
+   answer you". They pulse slowly, at about the rate of a calm breath, so that
+   a wait reads as something still running rather than something stuck. This is
+   the one animation on the page that carries an argument, so it is the only
+   one that loops indefinitely. */
+@keyframes waiting {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--hold) 34%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--hold) 0%, transparent);
+  }
+}
+
+.landing .pill-hold,
+.landing .pin.is-hold {
+  animation: waiting 2.8s ease-in-out infinite;
+}
+
+/* The round a candidate is actually sitting in. The marker gets the same
+   breath, half a beat behind the pill beside it, so the two read as one state
+   rather than two animations that happen to be near each other. */
+.landing .round:has(.pill-hold) .round-index {
+  animation: waiting 2.8s ease-in-out infinite;
+  animation-delay: -1.4s;
+}
+
+/* ===========================================================================
+   2. An application travels
+   ======================================================================== */
+
+/* A light that runs down the rounds once they are on screen: the application
+   moving through the list, which is the sentence the whole product is built
+   around. It runs three times and stops - a permanent loop here would compete
+   with the waiting pulse, which is the one that has something to say. */
+@keyframes travelDown {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(var(--travel-distance, 200px));
+    opacity: 0;
+  }
+}
+
+.landing .pipeline-rounds {
+  position: relative;
+}
+
+.landing .pipeline-rounds::after {
+  content: '';
+  position: absolute;
+  left: 11px;
+  top: 0;
+  width: 2px;
+  height: 46px;
+  border-radius: 2px;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    color-mix(in srgb, var(--brand) 85%, transparent),
+    transparent
+  );
+  --travel-distance: calc(100% - 46px);
+  animation: travelDown 4.2s cubic-bezier(0.5, 0, 0.5, 1) 0.6s 3;
+  opacity: 0;
+}
+
+/* ===========================================================================
+   3. A decision settles
+   ======================================================================== */
+
+/* A pass arrives once - a short sheen across the pill, and then it is still.
+   `both` holds the finished state, so a pill that has settled stays settled
+   even if the browser drops frames. */
+@keyframes settle {
+  from {
+    background-position: 140% 0;
+  }
+  to {
+    background-position: -40% 0;
+  }
+}
+
+.landing .pill-pass {
+  background-image: linear-gradient(
+    100deg,
+    transparent 38%,
+    color-mix(in srgb, var(--pass) 30%, transparent) 50%,
+    transparent 62%
+  );
+  background-size: 220% 100%;
+  background-repeat: no-repeat;
+  animation: settle 1.5s ease-out 0.5s both;
+}
+
+/* ===========================================================================
+   4. Light on a surface
+   ======================================================================== */
+
+/* One pass of light across the headline as the page opens. Once, not on a
+   loop: it is the page catching the light as it arrives, and a headline that
+   keeps glinting is a headline nobody finishes reading. */
+@keyframes headlineLight {
+  from {
+    background-position: 180% 0;
+  }
+  to {
+    background-position: -80% 0;
+  }
+}
+
+.landing .hero h1 em {
+  background-size: 260% 100%;
+  animation: headlineLight 2.6s cubic-bezier(0.32, 0.72, 0.3, 1) 0.35s both;
+}
+
+/* The rule beside an eyebrow draws itself out from the text as the section
+   arrives - a small thing, but it makes a heading feel placed rather than
+   printed. */
+.landing .reveal .eyebrow-rule,
+.landing .hero-ask-rule {
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.1s;
+}
+
+.landing .reveal.is-in .eyebrow-rule,
+.landing .hero-ask-rule {
+  transform: scaleX(1);
+}
+
+/* ===========================================================================
+   5. Things that answer the pointer
+   ======================================================================== */
+
+/* Cards lift towards the cursor. Small - 3px and a brighter edge - because
+   these are panels of text, not buttons, and a card that leaps is a card
+   somebody clicks by accident. */
+.landing .inside-card,
+.landing .how-step,
+.landing .fear-side {
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.landing .inside-card:hover,
+.landing .how-step:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--brand) 42%, transparent);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 10%) inset,
+    0 40px 70px -36px rgb(0 0 0 / 90%);
+}
+
+/* The arrow on the primary call to action already leans the way it is going
+   (.btn-arrow in interactive.css). Left alone deliberately: repeating it here
+   would only override a working rule with a slightly worse number. */
+
+.landing .btn-primary,
+.landing .btn-secondary {
+  transition:
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.landing .btn-primary:hover,
+.landing .btn-secondary:hover {
+  transform: translateY(-1px);
+}
+
+.landing .btn-primary:active,
+.landing .btn-secondary:active {
+  transform: translateY(0);
+  transition-duration: 0.06s;
+}
+
+/* ===========================================================================
+   6. The supporter strip
+   ======================================================================== */
+
+/* The names arrive in sequence rather than all at once, left to right, the
+   way somebody would read them. Six frames apart is enough to be felt and not
+   enough to be waited for. */
+@keyframes chipIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.landing .reveal.is-in .sup-strip li {
+  animation: chipIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.landing .reveal.is-in .sup-strip li:nth-child(1) {
+  animation-delay: 0.02s;
+}
+
+.landing .reveal.is-in .sup-strip li:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.landing .reveal.is-in .sup-strip li:nth-child(3) {
+  animation-delay: 0.18s;
+}
+
+.landing .reveal.is-in .sup-strip li:nth-child(4) {
+  animation-delay: 0.26s;
+}
+
+.landing .reveal.is-in .sup-strip li:nth-child(n + 5) {
+  animation-delay: 0.34s;
+}
+
+/* ===========================================================================
+   7. Keyboard focus
+   ======================================================================== */
+
+/* Focus is the one ring that should be impossible to miss, so it is the one
+   thing here that is allowed to arrive instantly. */
+.landing a:focus-visible,
+.landing button:focus-visible {
+  outline: 2px solid var(--brand-hover);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ===========================================================================
+   8. Off, on request
+   ======================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .landing .pill-hold,
+  .landing .pin.is-hold,
+  .landing .round:has(.pill-hold) .round-index,
+  .landing .pipeline-rounds::after,
+  .landing .pill-pass,
+  .landing .hero h1 em,
+  .landing .reveal.is-in .sup-strip li {
+    animation: none;
+  }
+
+  /* The travelling light has nothing to say standing still. */
+  .landing .pipeline-rounds::after {
+    display: none;
+  }
+
+  /* The rules are drawn, not animated into place. */
+  .landing .reveal .eyebrow-rule,
+  .landing .hero-ask-rule {
+    transform: scaleX(1);
+    transition: none;
+  }
+
+  .landing .inside-card,
+  .landing .how-step,
+  .landing .fear-side,
+  .landing .btn-primary,
+  .landing .btn-secondary {
+    transition: none;
+  }
+
+  .landing .inside-card:hover,
+  .landing .how-step:hover,
+  .landing .btn-primary:hover,
+  .landing .btn-secondary:hover {
+    transform: none;
+  }
+}

@@ -1,0 +1,140 @@
+/*
+ * Registration reuses the sign-in shell, but has fifteen fields where sign-in
+ * has two - so the panel is wider, scrolls, and pairs fields into rows.
+ */
+
+.register .register-panel {
+  max-width: 720px;
+  justify-content: flex-start;
+  padding-top: 40px;
+  padding-bottom: 56px;
+  overflow-y: auto;
+  max-height: 100vh;
+}
+
+/* Two steps, so the shape of what is left to do is visible from the first. */
+.steps {
+  display: flex;
+  gap: 8px;
+  list-style: none;
+  margin: 0 0 28px;
+  padding: 0;
+}
+
+.steps li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-3);
+  padding: 9px 12px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--paper);
+}
+
+.steps li.is-current {
+  color: var(--ink);
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.steps li.is-done {
+  color: var(--ink-2);
+}
+
+.steps-num {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--rule);
+  color: var(--ink-2);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.steps li.is-current .steps-num {
+  background: var(--brand);
+  color: var(--on-brand);
+}
+
+.register-note {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  background: var(--paper-2);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin: 0 0 24px;
+}
+
+.register-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.register-actions .btn {
+  flex: 1;
+}
+
+@media (max-width: 900px) {
+  .register .register-panel {
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+/*
+  What happens after the form, in the order it happens. A company that has
+  just typed fifteen answers and cannot sign in needs to know why, and when
+  that changes - otherwise it reads as a broken sign-up.
+*/
+.register-done {
+  display: grid;
+  gap: 20px;
+  justify-items: start;
+}
+
+.register-next {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.register-next li {
+  counter-increment: step;
+  position: relative;
+  padding-left: 34px;
+  color: var(--ink-2);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.register-next li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 1px;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--brand);
+  background: color-mix(in srgb, var(--brand) 12%, transparent);
+}
+
+.register-next b {
+  display: block;
+  color: var(--ink);
+}

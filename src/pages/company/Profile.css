@@ -1,0 +1,387 @@
+/*
+  The company profile: the profile and the posts on the left, the student's
+  page on the right. The two columns are the point of the screen - a company
+  that cannot see the result of a sentence writes nothing, or writes it once
+  and never looks again.
+*/
+
+.cprof {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.cprof-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cprof-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid var(--rule-2);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.cprof-block h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.cprof-block > .muted {
+  margin: -6px 0 0;
+  font-size: 14px;
+}
+
+.cprof-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.cprof-field > span {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.cprof-field input,
+.cprof-field select,
+.cprof-field textarea {
+  width: 100%;
+  font: inherit;
+  font-size: 15px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-2);
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.cprof-field textarea {
+  resize: vertical;
+}
+
+.cprof-field input:focus,
+.cprof-field select:focus,
+.cprof-field textarea:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+
+.cprof-field small {
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+.cprof-count {
+  align-self: flex-end;
+}
+
+.cprof-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+/* --- pictures ------------------------------------------------------------ */
+
+.cprof-pics {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.cprof-pic {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.cprof-pic-label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.cprof-drop {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  aspect-ratio: 16 / 6;
+  border: 1px dashed var(--rule-2);
+  border-radius: 10px;
+  background: var(--paper-2);
+  color: var(--ink-3);
+  font-size: 13px;
+  text-align: center;
+  padding: 6px;
+}
+
+.cprof-drop.is-square {
+  aspect-ratio: 1;
+}
+
+.cprof-drop.is-over {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.cprof-drop img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.cprof-fallback {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.cprof-pic-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* --- footer, preview ---------------------------------------------------- */
+
+.cprof-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.cprof-preview {
+  position: sticky;
+  top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cprof-preview-label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* The preview is a courtesy; on a narrow screen the form is the work. */
+@media (max-width: 1100px) {
+  .cprof {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cprof-preview {
+    position: static;
+  }
+
+  .cprof-pics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/*
+  A few shapes this screen needs that live in the onboarding stylesheet, which
+  a recruiter's page does not load. Scoped to this screen so they stay local
+  rather than becoming a second global definition of the same names.
+*/
+.cprof .btn-sm {
+  padding: 7px 12px;
+  font-size: 13px;
+}
+
+.cprof .linkish {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--brand);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.cprof .linkish:hover {
+  text-decoration: underline;
+}
+
+.cprof .linkish:disabled {
+  color: var(--ink-3);
+  cursor: default;
+  text-decoration: none;
+}
+
+.cprof .notice {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--brand-soft);
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.cprof .kbd {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  margin-left: 8px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: rgb(255 255 255 / 0.18);
+  opacity: 0.8;
+}
+
+.cprof .field-error {
+  margin: 0;
+  color: var(--stop);
+  font-size: 13px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Posts                                                                      */
+/* -------------------------------------------------------------------------- */
+
+.cpost {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cpost-write {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  background: var(--paper-2);
+}
+
+/* The toolbar sits on the box rather than above it, so the two read as one
+   control rather than a strip of buttons that might belong to anything. */
+.cpost-editor {
+  border: 1px solid var(--rule-2);
+  border-radius: 10px;
+  background: var(--paper);
+  overflow: hidden;
+}
+
+/* An empty editable box gives no hint of what it is for; a placeholder that
+   disappears on the first character does. */
+.cpost-input:empty::before {
+  content: attr(data-placeholder);
+  color: var(--ink-3);
+}
+
+.cpost-media ul {
+  list-style: none;
+  margin: 0 0 10px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.cpost-media li {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cpost-media img,
+.cpost-media video {
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: var(--paper-2);
+}
+
+.cpost-media input {
+  font-size: 13px;
+}
+
+.cpost-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cpost-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cpost-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cpost-list li {
+  padding: 12px 14px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+}
+
+.cpost-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.cpost-when {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+.cpost-acts {
+  display: flex;
+  gap: 12px;
+}
+
+.cpost-title {
+  display: block;
+  margin-top: 8px;
+  font-size: 15px;
+}
+
+.cpost-body {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+.cpost-body p,
+.cpost-body ul,
+.cpost-body ol {
+  margin: 6px 0 0;
+}
+
+.cpost-body ul,
+.cpost-body ol {
+  padding-left: 18px;
+}

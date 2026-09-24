@@ -1,0 +1,548 @@
+/* ==========================================================================
+   Assessments, from the company's side
+
+   Set a test, assign it to the people you shortlisted, record what came back.
+   Namespaced `ca-`; the cards, fields and pills come from the shared sheets.
+   ========================================================================== */
+
+.ca-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  gap: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.ca-head h1 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+
+.ca-head p {
+  margin: 4px 0 0;
+  max-width: 70ch;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.ca-head .btn {
+  margin-left: auto;
+  flex: none;
+}
+
+/* Back out of one. An arrow drawn in CSS, so no icon set is needed. */
+.ca-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+
+.ca-back::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.ca-back:hover {
+  color: var(--brand);
+}
+
+/* --- the tests you have set ----------------------------------------------- */
+
+.ca-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.ca-card {
+  position: relative;
+  display: grid;
+  gap: 9px;
+  align-content: start;
+  padding: 16px 18px 15px;
+  border-radius: 16px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  transition:
+    transform 0.16s cubic-bezier(0.2, 0.7, 0.3, 1),
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.ca-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--brand) 45%, transparent);
+  box-shadow: 0 10px 26px rgb(15 23 42 / 0.08);
+}
+
+/* Somebody still owes this one. A line down the side rather than a tinted
+   card: the point is to find it in a grid, not to alarm. */
+.ca-card.is-waiting {
+  border-left: 3px solid var(--brand);
+}
+
+/* The whole card opens it, laid over rather than wrapping, so keyboard users
+   get one stop per card. */
+.ca-card-hit {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  border-radius: inherit;
+  cursor: pointer;
+}
+
+.ca-card-hit:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.ca-card > *:not(.ca-card-hit) {
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.ca-card h2 {
+  margin: 0;
+  font-size: 15.5px;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.ca-card-meta {
+  margin: -4px 0 0;
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+.ca-nums {
+  display: flex;
+  gap: 22px;
+  margin: 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+}
+
+.ca-nums > div {
+  display: grid;
+  gap: 0;
+}
+
+.ca-nums dt {
+  order: 2;
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+
+.ca-nums dd {
+  order: 1;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.ca-nums .is-waiting dd {
+  color: var(--brand);
+}
+
+.ca-go {
+  justify-self: start;
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--ink-3);
+}
+
+.ca-card:hover .ca-go {
+  color: var(--brand);
+}
+
+.ca-go::after {
+  content: ' →';
+}
+
+/* --- setting one up ------------------------------------------------------- */
+
+.ca-make,
+.ca-assign {
+  margin-bottom: 16px;
+}
+
+/*
+  The label, not proctoring.
+
+  A student sitting a test at home unwatched is making a different claim from
+  one sitting it in a hall, and a recruiter reading the score later weighs it
+  by exactly that - so it is recorded rather than left to be assumed.
+*/
+.ca-watch {
+  display: flex;
+  align-items: start;
+  gap: 10px;
+  margin: 4px 0 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--rule);
+  background: var(--paper-2);
+  cursor: pointer;
+}
+
+.ca-watch input {
+  margin-top: 2px;
+  accent-color: var(--brand);
+}
+
+.ca-watch span {
+  display: grid;
+  gap: 2px;
+}
+
+.ca-watch b {
+  font-size: 13.5px;
+  color: var(--ink);
+}
+
+.ca-watch small {
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+
+/* --- choosing who sits it -------------------------------------------------- */
+
+.ca-pick-all {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.ca-pick-all .muted {
+  margin-left: auto;
+  font-size: 12px;
+}
+
+.ca-pick {
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 2px;
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.ca-pick label {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 8px 11px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.ca-pick label:hover {
+  background: var(--paper-2);
+}
+
+.ca-pick input {
+  accent-color: var(--brand);
+}
+
+.ca-pick-who {
+  display: grid;
+  gap: 0;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.ca-pick-who b {
+  font-size: 13.5px;
+  color: var(--ink);
+}
+
+.ca-pick-who small {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+.ca-pick .pill {
+  flex: none;
+  font-size: 10.5px;
+  text-transform: capitalize;
+}
+
+/* --- four ways to choose the same people ---------------------------------- */
+
+/*
+  A role, a college, a batch, or a pasted list of addresses. All four narrow
+  the same pool: people who have applied to one of this company's own roles.
+  That limit is the point - reaching a campus a company has no drive with is
+  the college's to arrange, not a recruiter's to take.
+*/
+.ca-ways {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.ca-way {
+  padding: 6px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--rule-2);
+  background: var(--surface);
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    border-color 0.13s ease,
+    background 0.13s ease,
+    color 0.13s ease;
+}
+
+.ca-way:hover {
+  border-color: var(--ink-3);
+  color: var(--ink);
+}
+
+.ca-way.is-on {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 650;
+}
+
+/* Said once, where the choosing happens, rather than left to be discovered
+   when a selection comes back smaller than expected. */
+.ca-limit {
+  margin: 0 0 14px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: var(--paper-2);
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--ink-3);
+  max-width: 76ch;
+}
+
+.ca-emails {
+  margin-bottom: 12px;
+}
+
+.ca-emails textarea {
+  width: 100%;
+  padding: 9px 12px;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  border: 1px solid var(--rule-2);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  resize: vertical;
+}
+
+/* Named, not silently dropped: a recruiter who pastes forty and is told
+   "sent to 38" cannot tell which two never arrived, and the two are usually
+   the ones that mattered. */
+.ca-unmatched {
+  font-size: 12.5px;
+  line-height: 1.55;
+  word-break: break-word;
+}
+
+/* --- who has it, and what came back --------------------------------------- */
+
+.ca-people {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.ca-person {
+  display: grid;
+  gap: 8px;
+  padding: 13px 15px;
+  border-radius: 14px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+/* Sat and waiting on the recruiter. The only state that is theirs to act on,
+   so the only one with an edge. */
+.ca-person.is-submitted {
+  border-left: 3px solid var(--brand);
+}
+
+.ca-person.is-passed {
+  border-left: 3px solid var(--pass);
+}
+
+.ca-person.is-missed,
+.ca-person.is-failed {
+  background: var(--paper-2);
+}
+
+.ca-person-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.ca-person-who {
+  display: grid;
+  gap: 0;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.ca-person-who b {
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.ca-person-who small {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+.ca-person-due {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.ca-ref {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.ca-ref code {
+  padding: 1px 7px;
+  border-radius: 6px;
+  background: var(--paper-2);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-2);
+}
+
+/* --- recording the result ------------------------------------------------- */
+
+.ca-mark {
+  display: grid;
+  grid-template-columns: 110px 110px minmax(0, 1fr);
+  gap: 10px;
+  align-items: end;
+  padding: 12px 13px;
+  border-radius: 12px;
+  background: var(--paper-2);
+}
+
+.ca-mark label {
+  display: grid;
+  gap: 3px;
+}
+
+.ca-mark label.is-wide {
+  grid-column: 3;
+}
+
+.ca-mark span {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+
+.ca-mark input {
+  width: 100%;
+  padding: 7px 10px;
+  font: inherit;
+  font-size: 13px;
+  border: 1px solid var(--rule-2);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.ca-mark .btn-row {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.ca-mark .btn-sm {
+  padding: 7px 14px;
+  font-size: 12.5px;
+}
+
+/* A score with no words beside it is a number nobody can argue with, so the
+   two are shown as one thing. */
+.ca-result {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin: 0;
+}
+
+.ca-result b {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.ca-result span {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+@media (max-width: 720px) {
+  .ca-mark {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .ca-mark label.is-wide {
+    grid-column: 1 / -1;
+  }
+
+  .ca-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ca-card {
+    transition: none;
+  }
+
+  .ca-card:hover {
+    transform: none;
+  }
+}

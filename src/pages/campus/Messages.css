@@ -1,0 +1,38 @@
+/* WhatsApp message log */
+
+.ms-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.ms-types .chip {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--rule-2);
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.ms-when,
+.ms-num,
+.ms-tpl {
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.ms-num,
+.ms-tpl {
+  font-family: var(--mono);
+  color: var(--ink-2);
+}
+
+.ms-why {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--ink-3);
+  max-width: 320px;
+}

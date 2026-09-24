@@ -1,0 +1,47 @@
+.offers-select {
+  max-width: 260px;
+  font: inherit;
+  padding: 6px 10px;
+  border: 1px solid var(--rule-2);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.stat.is-warn .stat-value {
+  color: var(--hold);
+}
+
+.stat.is-stop .stat-value {
+  color: var(--stop);
+}
+
+.offers-table .joining-history {
+  margin-top: 6px;
+}
+
+/* Tabs, local so the page does not depend on the platform console's styles. */
+.offers-tabs {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+}
+
+.offers-tabs .seg-opt {
+  border: 0;
+  background: transparent;
+  color: var(--ink-2);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 7px 14px;
+  border-radius: 7px;
+}
+
+.offers-tabs .seg-opt.is-on {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgb(20 22 28 / 0.12);
+}

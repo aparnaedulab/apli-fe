@@ -1,0 +1,344 @@
+/* ---------------------------------------------------------------------------
+   What is going on.
+
+   Built on the admin layout's existing pieces - .card, .stat, .funnel, .muted -
+   so this page inherits the rest of the console rather than inventing a second
+   look for it. Only what is genuinely new is here.
+--------------------------------------------------------------------------- */
+
+/* --- the window picker ---------------------------------------------------- */
+
+.pulse-window {
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: var(--paper-2);
+}
+
+.pulse-window-opt {
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease;
+}
+
+.pulse-window-opt:hover {
+  color: var(--ink);
+}
+
+.pulse-window-opt.is-on {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgb(20 22 28 / 12%);
+}
+
+/* The page dims rather than blanking while a new window loads: the figures on
+   screen are still true, they are simply about to be replaced. */
+.is-reloading {
+  opacity: 0.55;
+  transition: opacity 0.15s ease;
+}
+
+/* --- the pulse row -------------------------------------------------------- */
+
+.pulse-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.pulse-delta {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Direction is stated in words as well as colour - "no change" reads the same
+   to somebody who cannot tell the greens from the reds. */
+.pulse-delta.is-up {
+  color: var(--pass);
+}
+
+.pulse-delta.is-down {
+  color: var(--stop);
+}
+
+.pulse-delta.is-flat {
+  color: var(--ink-3);
+}
+
+.pulse-foot {
+  margin: 12px 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+/* --- two panels side by side ---------------------------------------------- */
+
+.pulse-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+/* --- the headline figures inside a panel ---------------------------------- */
+
+.big-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.big {
+  padding: 12px 14px;
+  border: 1px solid var(--rule);
+  border-left-width: 3px;
+  border-radius: 8px;
+  background: var(--paper-2);
+}
+
+.big.is-good {
+  border-left-color: var(--pass);
+}
+
+.big.is-watch {
+  border-left-color: var(--hold);
+}
+
+.big.is-bad {
+  border-left-color: var(--stop);
+}
+
+.big-value {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.big-label {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+
+.sub-head {
+  margin: 20px 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+}
+
+/* --- who has been waiting longest ----------------------------------------- */
+
+.stall-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.stall-list li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.stall-list li:last-child {
+  border-bottom: 0;
+}
+
+.stall-who {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.stall-who b {
+  font-size: 13.5px;
+  color: var(--ink);
+}
+
+.stall-who small {
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+.stall-days {
+  flex: none;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--stop);
+}
+
+/* --- the funnel's drop ---------------------------------------------------- */
+
+.funnel-drop .funnel-step {
+  position: relative;
+}
+
+.funnel-drop-pct {
+  display: block;
+  margin-top: 2px;
+  font-size: 11.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--stop);
+}
+
+/* --- league tables -------------------------------------------------------- */
+
+.league {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.league th {
+  padding: 0 8px 8px;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.league td {
+  padding: 9px 8px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink-2);
+}
+
+.league tr:last-child td {
+  border-bottom: 0;
+}
+
+.league td:first-child {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* The numbers take only the width they need, so the name - the only column
+   anybody reads as words - gets the rest instead of wrapping to three lines. */
+.league .num {
+  width: 1%;
+  padding-left: 14px;
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A row with nothing happening on it is still worth showing - that is the
+   point of a league table - but it should not read as loudly as an active one. */
+.league tr.is-quiet td {
+  color: var(--ink-3);
+}
+
+.league tr.is-quiet td:first-child {
+  font-weight: 500;
+}
+
+/* --- the feed ------------------------------------------------------------- */
+
+.feed {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.feed li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 13.5px;
+}
+
+.feed li:last-child {
+  border-bottom: 0;
+}
+
+.feed-kind {
+  flex: none;
+  min-width: 82px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--ink-2);
+}
+
+.feed-kind.is-offered,
+.feed-kind.is-published {
+  border-color: color-mix(in srgb, var(--brand) 45%, var(--rule));
+  color: var(--brand);
+}
+
+.feed-kind.is-accepted,
+.feed-kind.is-hired {
+  border-color: color-mix(in srgb, var(--pass) 45%, var(--rule));
+  color: var(--pass);
+}
+
+.feed-kind.is-rejected {
+  border-color: color-mix(in srgb, var(--stop) 40%, var(--rule));
+  color: var(--stop);
+}
+
+.feed-what {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.feed-where {
+  color: var(--ink-3);
+  font-size: 12.5px;
+}
+
+.feed li time {
+  margin-left: auto;
+  flex: none;
+  color: var(--ink-3);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 720px) {
+  .feed li {
+    flex-wrap: wrap;
+  }
+
+  .feed li time {
+    margin-left: 0;
+  }
+}

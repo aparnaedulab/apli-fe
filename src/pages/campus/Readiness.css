@@ -1,0 +1,103 @@
+/* The college's readiness overview. Totals only. */
+
+.crd-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.crd-grid .card {
+  margin: 0;
+}
+
+.crd-areas {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.crd-areas li {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr) 36px;
+  gap: 10px;
+  align-items: center;
+  font-size: 14px;
+}
+
+.crd-areas li strong {
+  text-align: right;
+  font-family: var(--mono);
+}
+
+.crd-areas li.is-first span:first-child {
+  font-weight: 700;
+  color: var(--hold);
+}
+
+.crd-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--rule);
+  overflow: hidden;
+}
+
+.crd-bar span {
+  display: block;
+  height: 100%;
+  background: var(--brand);
+}
+
+.crd-areas li.is-first .crd-bar span {
+  background: var(--hold);
+}
+
+.crd-dist {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  height: 180px;
+  margin-top: 12px;
+  padding-top: 20px;
+}
+
+.crd-col {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.crd-col-bar {
+  width: 100%;
+  min-height: 2px;
+  border-radius: 6px 6px 0 0;
+  background: var(--brand);
+}
+
+.crd-count {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.crd-label {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+@media (max-width: 820px) {
+  .crd-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .crd-areas li {
+    grid-template-columns: 120px minmax(0, 1fr) 32px;
+  }
+}

@@ -1,0 +1,292 @@
+/* ---------------------------------------------------------------------------
+   Guides - the one reading surface on the student side.
+
+   Set in a narrow measure, because these are paragraphs rather than rows: a
+   line of prose stretched across a 1140px page is read badly whatever it says.
+--------------------------------------------------------------------------- */
+
+/* --- what is worth reading today ----------------------------------------- */
+
+.gd-now {
+  margin: 0 0 30px;
+  padding: 16px 18px;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--brand);
+  border-radius: var(--radius);
+  background: var(--brand-soft);
+}
+
+.gd-now h2 {
+  margin: 0 0 10px;
+  font-family: var(--display);
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.gd-now ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gd-now a {
+  display: block;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  text-decoration: none;
+  color: inherit;
+}
+
+.gd-now a:hover {
+  border-color: var(--brand);
+}
+
+.gd-now-cue {
+  display: block;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.gd-now small {
+  display: block;
+  margin-top: 3px;
+  color: var(--ink-3);
+}
+
+/* --- the shelves ---------------------------------------------------------- */
+
+.gd-shelf {
+  margin-bottom: 30px;
+}
+
+.gd-shelf-head h2 {
+  margin: 0 0 2px;
+  font-family: var(--display);
+  font-size: 19px;
+}
+
+.gd-shelf-head p {
+  margin: 0 0 14px;
+  max-width: 62ch;
+}
+
+.gd-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.gd-card {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  height: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface);
+  text-decoration: none;
+  color: inherit;
+}
+
+.gd-card:hover {
+  border-color: var(--brand);
+}
+
+.gd-card b {
+  font-family: var(--display);
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+.gd-card span {
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.gd-card small {
+  margin-top: auto;
+  padding-top: 6px;
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+.gd-foot {
+  margin: 26px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  font-size: 14px;
+}
+
+/* --- reading one ---------------------------------------------------------- */
+
+.gd-read {
+  max-width: 66ch;
+}
+
+.gd-back {
+  margin-bottom: 10px;
+}
+
+.gd-time {
+  margin: 6px 0 0;
+  color: var(--ink-3);
+  font-size: 13px;
+}
+
+.gd-section {
+  margin: 0 0 22px;
+  scroll-margin-top: 20px;
+}
+
+.gd-section h2 {
+  margin: 0 0 6px;
+  font-family: var(--display);
+  font-size: 17px;
+}
+
+.gd-section p {
+  margin: 0 0 9px;
+  line-height: 1.62;
+}
+
+/* The section a strip pointed at. Marked, not highlighted: the reader should
+   know which part answered their question without the page shouting. */
+.gd-section.is-aimed {
+  padding-left: 14px;
+  margin-left: -17px;
+  border-left: 3px solid var(--brand);
+}
+
+.gd-list {
+  margin: 0 0 9px;
+  padding-left: 20px;
+  line-height: 1.6;
+}
+
+.gd-list li {
+  margin-bottom: 4px;
+}
+
+.gd-check {
+  margin: 26px 0;
+  padding: 16px 18px;
+}
+
+.gd-check h2 {
+  margin: 0 0 2px;
+  font-family: var(--display);
+  font-size: 16px;
+}
+
+.gd-check p {
+  margin: 0 0 10px;
+  font-size: 14px;
+}
+
+.gd-check ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.gd-check label {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  cursor: pointer;
+  line-height: 1.45;
+}
+
+.gd-check input {
+  margin-top: 3px;
+  accent-color: var(--brand);
+}
+
+.gd-check input:checked + span {
+  color: var(--ink-3);
+  text-decoration: line-through;
+}
+
+.gd-do {
+  margin: 0 0 22px;
+}
+
+.gd-do h2 {
+  margin: 0 0 6px;
+  font-family: var(--display);
+  font-size: 16px;
+}
+
+.gd-do ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.gd-do a {
+  display: inline-block;
+  padding: 7px 12px;
+  border: 1px solid var(--rule-2);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--brand);
+}
+
+.gd-do a:hover {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.gd-next {
+  margin: 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+/* --- the strip, where a guide is worth handing over ----------------------- */
+
+.gd-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  margin: 10px 0;
+  padding: 9px 12px;
+  border: 1px dashed var(--rule-2);
+  border-radius: var(--radius);
+  background: var(--paper-2);
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.gd-strip a {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .gd-grid {
+    grid-template-columns: 1fr;
+  }
+}

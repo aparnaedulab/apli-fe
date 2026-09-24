@@ -1,0 +1,115 @@
+/* An institution's sign-in page. Builds on Login.css; only the differences live here. */
+
+.tenant-brand {
+  margin-bottom: 36px;
+}
+
+.tenant-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.tenant-monogram {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--brand);
+  color: var(--on-brand);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.tenant-contact {
+  margin-top: 28px;
+  padding: 18px 20px;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.tenant-contact h2 {
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 12px;
+}
+
+.tenant-contact dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+}
+
+.tenant-contact dl > div {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.tenant-contact dt {
+  color: var(--ink-3);
+}
+
+.tenant-contact dd {
+  margin: 0;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.tenant-contact a {
+  color: var(--brand);
+}
+
+.tenant-powered {
+  margin: 24px 0 0;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+/* --- not found / signed in elsewhere --------------------------------------- */
+
+.tenant-missing {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+}
+
+.tenant-missing-card {
+  max-width: 440px;
+  text-align: center;
+}
+
+.tenant-missing-card h1 {
+  font-family: var(--display);
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 16px 0 8px;
+}
+
+.tenant-missing-card p {
+  color: var(--ink-2);
+  margin: 0 0 16px;
+}
+
+.tenant-missing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+}
+
+@media (max-width: 480px) {
+  .tenant-contact dl > div {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+}

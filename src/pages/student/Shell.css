@@ -1,0 +1,598 @@
+/*
+  The student's portal.
+
+  A rail down the side and a page beside it - the same shape as the rest of
+  the platform, so somebody moving between them is not relearning where
+  things are. What differs is the weight: fewer items, more room between
+  them, and a look that belongs to somebody reading rather than to somebody
+  working a queue.
+*/
+
+.sh {
+  display: grid;
+  grid-template-columns: 236px minmax(0, 1fr);
+  min-height: 100vh;
+  background:
+    radial-gradient(60rem 30rem at 22% -10%, color-mix(in srgb, var(--brand) 8%, transparent), transparent 70%),
+    var(--paper);
+}
+
+/* --- the rail ------------------------------------------------------------- */
+
+.sh-rail {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 18px 14px;
+  overflow-y: auto;
+  border-right: 1px solid var(--rule);
+  background: color-mix(in srgb, var(--surface) 70%, var(--paper));
+  backdrop-filter: blur(6px);
+}
+
+.sh-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 8px;
+  text-decoration: none;
+  color: var(--ink);
+  font-weight: 650;
+  font-size: 15.5px;
+  letter-spacing: -0.01em;
+}
+
+.sh-rail nav {
+  display: grid;
+  gap: 16px;
+}
+
+.sh-group {
+  display: grid;
+  gap: 2px;
+}
+
+.sh-group-label {
+  margin: 0 0 4px;
+  padding: 0 10px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.sh-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+  text-decoration: none;
+  transition:
+    background 0.14s ease,
+    color 0.14s ease;
+}
+
+.sh-link:hover {
+  background: color-mix(in srgb, var(--brand) 8%, transparent);
+  color: var(--ink);
+}
+
+/* The current section, said with a bar and weight rather than a slab of
+   colour: a rail is glanced at, and should stay quiet. */
+.sh-link.is-current {
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 600;
+}
+
+.sh-link.is-current::before {
+  content: '';
+  position: absolute;
+  left: -14px;
+  top: 7px;
+  bottom: 7px;
+  width: 3px;
+  border-radius: 0 999px 999px 0;
+  background: var(--brand);
+}
+
+/*
+  Not built yet.
+
+  Kept on the rail so the shape of the portal is visible, set apart by a rule
+  and one heading rather than by a badge on every row - thirteen badges all
+  saying the same word stop being read as information and start being read as
+  texture.
+*/
+.sh-soon {
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+}
+
+.sh-link.is-soon {
+  color: var(--ink-3);
+  font-size: 13px;
+}
+
+.sh-link.is-soon:hover {
+  color: var(--ink-2);
+}
+
+/* A hollow dot: present, but nothing behind it yet. */
+.sh-link.is-soon::after {
+  content: '';
+  margin-left: auto;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  border: 1px solid var(--rule-2);
+}
+
+.sh-link.is-soon.is-current::after {
+  border-color: var(--brand);
+}
+
+.sh-more {
+  width: 100%;
+  margin-top: 2px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+
+.sh-more:hover {
+  background: color-mix(in srgb, var(--brand) 8%, transparent);
+  color: var(--brand);
+}
+
+/* --- who is signed in ----------------------------------------------------- */
+
+.sh-me {
+  margin-top: auto;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 3px 9px;
+  padding: 11px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+.sh-initials {
+  grid-row: span 2;
+  align-self: center;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.sh-me-who {
+  display: grid;
+  min-width: 0;
+}
+
+.sh-me-who b {
+  font-size: 13px;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sh-me-who small {
+  font-size: 11px;
+  color: var(--ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sh-out {
+  grid-column: 2;
+  justify-self: start;
+  margin-top: 2px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+
+.sh-out:hover {
+  color: var(--stop);
+}
+
+/* --- the page ------------------------------------------------------------- */
+
+.sh-main {
+  min-width: 0;
+}
+
+/* Nothing sits above the page any more, so it starts at the top of the
+   column: the rail already says where the student is, and an empty strip
+   would only push the first thing they came for further down. */
+/*
+  The way back, for a page reached from somewhere in particular.
+
+  Rendered by the layout rather than by each destination, so a section can
+  link anywhere in the student side without that page having to know it
+  exists - and nobody who followed a badge into their applications is left
+  working out how to get back.
+*/
+.sh-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-3);
+  text-decoration: none;
+}
+
+.sh-back::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.sh-back:hover {
+  color: var(--brand);
+}
+
+.sh-page {
+  max-width: 1100px;
+  padding: 26px 28px 64px;
+}
+
+.sh .page-head {
+  margin-bottom: 18px;
+}
+
+.sh .page-head h1 {
+  font-size: 26px;
+  letter-spacing: -0.02em;
+}
+
+.sh .page-lede {
+  max-width: 72ch;
+}
+
+/* Below this the rail would take a third of the screen, so it becomes a row
+   across the top instead and the page gets the rest. */
+@media (max-width: 900px) {
+  .sh {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sh-rail {
+    position: static;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    overflow-x: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--rule);
+    padding: 12px 16px;
+  }
+
+  .sh-rail nav {
+    display: flex;
+    gap: 12px;
+  }
+
+  .sh-group {
+    display: flex;
+    gap: 4px;
+  }
+
+  .sh-group-label,
+  .sh-me-who,
+  .sh-out {
+    display: none;
+  }
+
+  .sh-link {
+    white-space: nowrap;
+    border-radius: 999px;
+    border: 1px solid var(--rule);
+  }
+
+  .sh-link.is-current::before {
+    display: none;
+  }
+
+  .sh-me {
+    margin-top: 0;
+    grid-template-columns: auto;
+    padding: 4px;
+    border: 0;
+    background: transparent;
+  }
+
+  .sh-page {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .sh .page-head h1 {
+    font-size: 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sh-link {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
+   The student's interface
+
+   Everything below is scoped to `.sh`, which only the student shell sets, so
+   the operations and campus screens keep the look they were built for. They
+   share a stylesheet because they share primitives - a card, a button, a
+   pill - and those primitives were drawn for somebody working a queue all
+   day: tight, square, high-contrast, everything within a click.
+
+   A student is not working a queue. They open this between lectures, on a
+   phone, to find out whether the thing they have been waiting for has
+   happened. So the same primitives are redrawn softer and roomier here, with
+   the type doing more of the work than the borders.
+   ========================================================================== */
+
+/* --- cards ---------------------------------------------------------------- */
+
+.sh .card {
+  padding: 20px 22px;
+  margin-bottom: 16px;
+  border-radius: 16px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.03);
+}
+
+.sh .card h2 {
+  font-size: 16px;
+  letter-spacing: -0.01em;
+}
+
+.sh .card > .muted:first-of-type {
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.sh .card-head {
+  margin-bottom: 12px;
+}
+
+/*
+  Cards arrive in the order they should be read.
+
+  A whole screen appearing at once is a wall; a stagger of a few frames turns
+  it into a page that assembles top to bottom at reading speed. It runs once,
+  on the way in, and never again.
+*/
+@keyframes sh-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.sh-page > .card,
+.sh-page > section,
+.sh-page > .apli,
+.sh-page > .job-tabs,
+.sh-page > .empty {
+  animation: sh-rise 0.4s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+.sh-page > *:nth-child(2) {
+  animation-delay: 40ms;
+}
+.sh-page > *:nth-child(3) {
+  animation-delay: 80ms;
+}
+.sh-page > *:nth-child(4) {
+  animation-delay: 120ms;
+}
+.sh-page > *:nth-child(n + 5) {
+  animation-delay: 160ms;
+}
+
+/* --- buttons -------------------------------------------------------------- */
+
+.sh .btn {
+  border-radius: 999px;
+  padding: 9px 18px;
+  font-size: 13.5px;
+  font-weight: 600;
+  transition:
+    transform 0.14s cubic-bezier(0.2, 0.7, 0.3, 1),
+    box-shadow 0.14s ease,
+    background 0.14s ease;
+}
+
+.sh .btn-primary {
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--brand) 26%, transparent);
+}
+
+.sh .btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--brand) 32%, transparent);
+}
+
+.sh .btn-secondary:hover:not(:disabled) {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+.sh .btn:disabled {
+  box-shadow: none;
+  transform: none;
+}
+
+.sh .btn-sm {
+  padding: 6px 13px;
+  font-size: 12.5px;
+}
+
+.sh .link-btn {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand);
+}
+
+/* --- fields --------------------------------------------------------------- */
+
+.sh input:not([type='checkbox']):not([type='radio']),
+.sh select,
+.sh textarea {
+  border-radius: 10px;
+  border-color: var(--rule-2);
+  background: var(--surface);
+  transition:
+    border-color 0.14s ease,
+    box-shadow 0.14s ease;
+}
+
+.sh input:not([type='checkbox']):not([type='radio']):focus,
+.sh select:focus,
+.sh textarea:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent);
+}
+
+.sh .field-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.sh .field-hint {
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* --- pills and alerts ----------------------------------------------------- */
+
+.sh .pill {
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/*
+  An alert here is usually about the student rather than about the system, so
+  it reads as a note beside the page rather than a warning stripe across it.
+*/
+.sh .alert {
+  border-radius: 12px;
+  border-left-width: 3px;
+  padding: 12px 15px;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+/* --- empty states --------------------------------------------------------- */
+
+.sh .empty {
+  border-radius: 16px;
+  border-style: dashed;
+  padding: 44px 28px;
+  background: color-mix(in srgb, var(--brand) 3%, transparent);
+}
+
+.sh .empty h2 {
+  font-size: 17px;
+}
+
+.sh .empty p {
+  max-width: 46ch;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+
+/* --- tables --------------------------------------------------------------- */
+
+.sh .data-table {
+  font-size: 13.5px;
+}
+
+.sh .data-table th {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.sh .data-table td,
+.sh .data-table th {
+  padding-top: 11px;
+  padding-bottom: 11px;
+}
+
+.sh .data-table tbody tr:hover {
+  background: color-mix(in srgb, var(--brand) 4%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sh-page > .card,
+  .sh-page > section,
+  .sh-page > .apli,
+  .sh-page > .job-tabs,
+  .sh-page > .empty {
+    animation: none;
+  }
+
+  .sh .btn,
+  .sh .job-card,
+  .sh input,
+  .sh select,
+  .sh textarea {
+    transition: none;
+  }
+
+  .sh .btn-primary:hover:not(:disabled),
+  .sh .job-card:hover {
+    transform: none;
+  }
+}

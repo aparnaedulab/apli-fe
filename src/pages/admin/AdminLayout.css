@@ -1,0 +1,1813 @@
+.admin {
+  --nav-w: 248px;
+  display: grid;
+  grid-template-columns: var(--nav-w) 1fr;
+  min-height: 100vh;
+  /* The rail animates; the content pane just follows the grid track. */
+  transition: grid-template-columns 160ms ease;
+}
+
+.admin.is-collapsed {
+  --nav-w: 64px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin {
+    transition: none;
+  }
+}
+
+.admin-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px 16px 24px;
+  border-right: 1px solid var(--rule);
+  background: var(--paper-2);
+  /* The rail stays put while a long table scrolls beside it. */
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.is-collapsed .admin-nav {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.admin-nav-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 24px;
+  min-height: 32px;
+}
+
+.admin-collapse {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+
+.admin-collapse:hover {
+  color: var(--ink);
+  background: var(--surface);
+  border-color: var(--rule);
+}
+
+.admin-collapse:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
+}
+
+/* Collapsed, the button is the only thing on the row, so it centres. */
+.is-collapsed .admin-nav-head {
+  justify-content: center;
+}
+
+.is-collapsed .admin-brand {
+  display: none;
+}
+
+.admin-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.admin-nav-label {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0 0 8px;
+}
+
+.admin-nav nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.admin-groups {
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-right: -6px;
+  padding-right: 6px;
+}
+
+.admin-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--radius);
+  font-size: 14.5px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+/* A count on a nav item, for something waiting on this person. It sits at the
+   far end of the row so a long label pushes it along rather than wrapping. */
+.admin-badge {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 19px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--brand);
+  color: var(--on-brand);
+  font-size: 11.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-link:hover:not(.is-current) {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.admin-link-icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--ink-3);
+}
+
+.admin-link.is-current .admin-link-icon {
+  color: currentColor;
+}
+
+.admin-link:hover .admin-link-icon {
+  color: var(--ink-2);
+}
+
+.admin-link-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --- collapsed: a rail of icons ------------------------------------------ */
+
+.is-collapsed .admin-link {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.is-collapsed .admin-link-text,
+.is-collapsed .admin-nav-label,
+.is-collapsed .admin-user-who,
+.is-collapsed .admin-signout-text {
+  /* Not display:none - the tooltip and the reader still need the name, and
+     the group headings still separate the sections visually via the gap. */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.is-collapsed .admin-group + .admin-group {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+}
+
+.admin-link.is-current {
+  background: var(--brand);
+  color: var(--on-brand);
+  font-weight: 500;
+}
+
+.admin-link.is-soon {
+  color: var(--ink-3);
+  cursor: default;
+}
+
+.admin-link em {
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: 9.5px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+}
+
+.admin-user {
+  margin-top: auto;
+  padding-top: 18px;
+  border-top: 1px solid var(--rule);
+}
+
+.is-collapsed .admin-user {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-user-name {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.admin-user-email {
+  margin: 1px 0 12px;
+  font-size: 12.5px;
+  color: var(--ink-3);
+  word-break: break-all;
+}
+
+.admin-signout {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--rule-2);
+  background: var(--surface);
+  color: var(--ink-2);
+  padding: 7px 14px;
+  border-radius: var(--radius);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.admin-signout-icon {
+  display: none;
+  width: 17px;
+  height: 17px;
+}
+
+.is-collapsed .admin-signout {
+  padding: 7px;
+}
+
+.is-collapsed .admin-signout-icon {
+  display: block;
+}
+
+.admin-signout:hover {
+  border-color: var(--ink-3);
+  color: var(--ink);
+}
+
+/*
+ * The content pane fills the screen.
+ *
+ * It used to stop at 1000px, which left most of a wide monitor empty while
+ * the tables it holds were being squeezed. Width is capped per element
+ * instead: prose stays at a readable measure, tables and grids take the room.
+ */
+.admin-main {
+  /* Less at the top than it was: the notification bar now sits in that space
+     and supplies the gap itself. */
+  padding: 16px clamp(20px, 3vw, 48px) 72px;
+  min-width: 0;
+}
+
+/* The bell, top right of the content rather than buried at the foot of the
+   sidebar. A row of its own rather than floated over the page, because
+   .page-head already puts action buttons in that corner and two things
+   fighting for it is worse than one line of space. */
+.admin-topbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.admin-head {
+  margin-bottom: 36px;
+}
+
+.admin-head h1 {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 30px;
+  letter-spacing: -0.024em;
+  margin: 0 0 10px;
+}
+
+.admin-lede {
+  margin: 0;
+  color: var(--ink-2);
+  max-width: 60ch;
+}
+
+.admin-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 44px;
+}
+
+.admin-card {
+  background: var(--surface);
+  padding: 20px 22px;
+}
+
+.admin-card-value {
+  font-family: var(--display);
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1;
+  margin: 0 0 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-card-label {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--ink-3);
+}
+
+.admin-next h2 {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 19px;
+  letter-spacing: -0.016em;
+  margin: 0 0 4px;
+}
+
+.admin-next ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: n;
+}
+
+.admin-next li {
+  counter-increment: n;
+  position: relative;
+  padding: 18px 0 18px 44px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink-2);
+  font-size: 15px;
+  max-width: 64ch;
+}
+
+.admin-next li:last-child {
+  border-bottom: 0;
+}
+
+.admin-next li::before {
+  content: counter(n, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 20px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--brand);
+}
+
+.admin-next li b {
+  display: block;
+  color: var(--ink);
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+@media (max-width: 780px) {
+  /* Below this the rail is a header instead, so collapsing has no meaning. */
+  .admin,
+  .admin.is-collapsed {
+    --nav-w: auto;
+    grid-template-columns: 1fr;
+  }
+
+  .admin-nav,
+  .is-collapsed .admin-nav {
+    position: static;
+    height: auto;
+    padding: 16px 20px 20px;
+    border-right: 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .admin-collapse {
+    display: none;
+  }
+
+  .is-collapsed .admin-brand {
+    display: inline-flex;
+  }
+
+  .admin-groups {
+    overflow: visible;
+  }
+
+  /* Labels come back at every size below the breakpoint. */
+  .is-collapsed .admin-link-text,
+  .is-collapsed .admin-nav-label,
+  .is-collapsed .admin-user-who,
+  .is-collapsed .admin-signout-text {
+    position: static;
+    width: auto;
+    height: auto;
+    clip: auto;
+  }
+
+  .is-collapsed .admin-link {
+    justify-content: flex-start;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .is-collapsed .admin-signout-icon {
+    display: none;
+  }
+
+  .admin-user {
+    margin-top: 18px;
+  }
+}
+
+/* --- shared page furniture used by every admin screen -------------------- */
+
+/*
+ * The heading is a label, not the point of the page. It used to run to about
+ * 120px of eyebrow, 30px title and a two-line paragraph before a single row of
+ * data appeared; on a laptop that was a third of the screen spent saying which
+ * page you are on.
+ */
+.page-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px 24px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.page-head h1 {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 23px;
+  letter-spacing: -0.02em;
+  margin: 0 0 3px;
+}
+
+.page-lede {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-3);
+  max-width: 74ch;
+}
+
+/* The eyebrow says which area you are in - the sidebar already highlights it. */
+.page-head .eyebrow {
+  display: none;
+}
+
+.crumb {
+  margin: 0 0 18px;
+  font-size: 14px;
+}
+
+.crumb a {
+  color: var(--brand);
+}
+
+.crumb a:hover {
+  text-decoration: underline;
+}
+
+.muted {
+  color: var(--ink-3);
+}
+
+.mono {
+  font-family: var(--mono);
+  font-size: 0.92em;
+}
+
+.alert {
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: 14.5px;
+  margin: 0 0 20px;
+}
+
+.alert-error {
+  border-left: 3px solid var(--stop);
+  background: var(--stop-soft);
+  color: var(--stop);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.card h2 {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: -0.014em;
+  margin: 0 0 14px;
+}
+
+.card > .muted {
+  margin-top: -6px;
+  margin-bottom: 18px;
+  font-size: 14.5px;
+}
+
+.empty {
+  border: 1px dashed var(--rule-2);
+  border-radius: 8px;
+  padding: 40px 28px;
+  text-align: center;
+}
+
+.empty h2 {
+  font-family: var(--display);
+  font-size: 18px;
+  margin: 0 0 8px;
+}
+
+.empty p {
+  margin: 0 auto;
+  max-width: 48ch;
+  color: var(--ink-3);
+  font-size: 14.5px;
+}
+
+/* --- tables --------------------------------------------------------------- */
+
+.table-wrap {
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  overflow-x: auto;
+  background: var(--surface);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14.5px;
+  min-width: 560px;
+}
+
+.data-table thead th {
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 400;
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper-2);
+  white-space: nowrap;
+  /* The header stays while the rows scroll under it. */
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.data-table tbody td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink-2);
+  vertical-align: middle;
+}
+
+.data-table tbody tr:hover td {
+  background: var(--paper-2);
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.data-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table .right {
+  text-align: right;
+}
+
+.row-link {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.row-link:hover {
+  color: var(--brand);
+  text-decoration: underline;
+}
+
+/* A derived caution on a row: this choice will not do what you think. Amber,
+   not red - nothing is broken and nothing is being refused. */
+.row-warn {
+  display: block;
+  margin-top: 3px;
+  padding-left: 9px;
+  border-left: 2px solid var(--hold);
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--hold);
+}
+
+.row-sub {
+  display: block;
+  font-size: 12.5px;
+  color: var(--ink-3);
+  margin-top: 2px;
+}
+
+.link-btn {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--brand);
+}
+
+.link-btn:hover {
+  text-decoration: underline;
+}
+
+.link-btn.is-danger {
+  color: var(--stop);
+}
+
+/* --- forms ---------------------------------------------------------------- */
+
+.form-card .form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.form-card .field {
+  margin-bottom: 0;
+}
+
+.form-card select {
+  width: 100%;
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius);
+}
+
+.form-card input:read-only {
+  background: var(--paper-2);
+  color: var(--ink-3);
+}
+
+/* --- stats ---------------------------------------------------------------- */
+
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.stat {
+  background: var(--surface);
+  padding: 18px 20px;
+}
+
+.stat-value {
+  font-family: var(--display);
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1;
+  margin: 0 0 5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+/* --- one-time invite link ------------------------------------------------- */
+
+.invite-link {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+
+.invite-link p {
+  margin: 0 0 16px;
+  color: var(--ink-2);
+  font-size: 14.5px;
+  max-width: 64ch;
+}
+
+.link-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.link-row input {
+  flex: 1 1 320px;
+  padding: 11px 14px;
+  font-size: 13.5px;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius);
+  background: var(--paper-2);
+  color: var(--ink);
+}
+
+.next-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: n;
+}
+
+.next-list li {
+  counter-increment: n;
+  position: relative;
+  padding: 16px 0 16px 44px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink-2);
+  font-size: 15px;
+  max-width: 64ch;
+}
+
+.next-list li:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.next-list li::before {
+  content: counter(n, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 18px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--brand);
+}
+
+.next-list li b {
+  display: block;
+  color: var(--ink);
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+/* --- extras used by the campus screens ------------------------------------ */
+
+.alert-warn {
+  border-left: 3px solid var(--hold);
+  background: var(--hold-soft);
+  color: var(--hold);
+}
+
+.alert-ok {
+  border-left: 3px solid var(--pass);
+  background: var(--pass-soft);
+  color: var(--pass);
+}
+
+.field-label .muted {
+  font-weight: 400;
+  font-size: 13px;
+}
+
+.form-card textarea {
+  width: 100%;
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 14.5px;
+  font-family: var(--mono);
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius);
+  resize: vertical;
+  min-height: 96px;
+}
+
+.form-card textarea:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 18%, transparent);
+}
+
+.form-card .field + button {
+  margin-top: 18px;
+}
+
+.btn-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.link-list {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  max-height: 240px;
+  overflow-y: auto;
+  margin-bottom: 16px;
+  background: var(--paper-2);
+}
+
+.link-list-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 240px) 1fr;
+  gap: 14px;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 12.5px;
+}
+
+.link-list-row:last-child {
+  border-bottom: 0;
+}
+
+.link-list-url {
+  color: var(--ink-3);
+  overflow-wrap: anywhere;
+}
+
+.skipped {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+}
+
+.skipped-title {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--hold);
+}
+
+.skipped ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.skipped li {
+  font-size: 13.5px;
+  color: var(--ink-3);
+  margin-bottom: 4px;
+}
+
+.tick-col {
+  width: 38px;
+  padding-right: 0 !important;
+}
+
+.tick-col input {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--brand);
+  cursor: pointer;
+}
+
+/* --- checkbox groups (drive batches, rules) ------------------------------- */
+
+.check-group {
+  border: 0;
+  padding: 0;
+  margin: 0 0 20px;
+}
+
+.check-group legend {
+  padding: 0;
+  margin-bottom: 10px;
+}
+
+.check-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.check {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 11px 14px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-size: 14.5px;
+  cursor: pointer;
+}
+
+.check:hover {
+  border-color: var(--rule-2);
+}
+
+.check:has(input:checked) {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.check input {
+  width: 15px;
+  height: 15px;
+  margin-top: 3px;
+  accent-color: var(--brand);
+}
+
+.check-sub {
+  display: block;
+  font-size: 12.5px;
+  color: var(--ink-3);
+  margin-top: 2px;
+}
+
+.check.standalone {
+  max-width: 62ch;
+  margin-bottom: 18px;
+}
+
+/* --- job request preview -------------------------------------------------- */
+
+.prose {
+  margin: 0 0 14px;
+  color: var(--ink-2);
+  font-size: 15px;
+  line-height: 1.6;
+  max-width: 70ch;
+  white-space: pre-wrap;
+}
+
+.sub-heading {
+  font-family: var(--display);
+  font-size: 14.5px;
+  font-weight: 600;
+  margin: 18px 0 6px;
+  color: var(--ink);
+}
+
+.facts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  margin: 18px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+}
+
+.facts-grid dt {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 3px;
+}
+
+.facts-grid dd {
+  margin: 0;
+  font-size: 14.5px;
+  color: var(--ink);
+  text-transform: capitalize;
+}
+
+.criteria-list {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.criteria-list li {
+  font-size: 14.5px;
+  color: var(--ink-2);
+  margin-bottom: 6px;
+}
+
+.round-preview {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.round-preview li {
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.round-preview li:last-child {
+  border-bottom: 0;
+}
+
+.round-preview b {
+  font-size: 14.5px;
+  color: var(--ink);
+}
+
+.decide {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+
+/* --- applicant pipeline --------------------------------------------------- */
+
+.job-filter {
+  padding: 10px 14px;
+  font: inherit;
+  font-size: 14.5px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius);
+  min-width: 200px;
+}
+
+.progress-cell b {
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.timeline li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.timeline li::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 26px;
+  bottom: -6px;
+  width: 1px;
+  background: var(--rule);
+}
+
+.timeline li:last-child::before {
+  display: none;
+}
+
+.timeline-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--rule-2);
+  margin-top: 5px;
+}
+
+.timeline b {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.offer-box {
+  border: 1px solid var(--pass);
+  background: var(--pass-soft);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-bottom: 18px;
+}
+
+.offer-box p {
+  margin: 0 0 14px;
+  font-size: 14.5px;
+  color: var(--ink-2);
+}
+
+.withdraw {
+  margin-top: 14px;
+}
+
+/* --- funnel --------------------------------------------------------------- */
+
+.funnel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 18px 0;
+}
+
+.funnel-step {
+  background: var(--surface);
+  padding: 14px 12px;
+  text-align: center;
+}
+
+.funnel-value {
+  display: block;
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.funnel-label {
+  display: block;
+  font-size: 11.5px;
+  color: var(--ink-3);
+  margin-top: 5px;
+  text-transform: capitalize;
+}
+
+.stat-row.inner {
+  border: 1px solid var(--rule);
+  margin-bottom: 0;
+}
+
+.stat-of {
+  font-size: 15px;
+  color: var(--ink-3);
+  font-weight: 400;
+  margin-left: 3px;
+}
+
+/* --- grouped sidebar ------------------------------------------------------ */
+
+.admin-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.admin-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.admin-group .admin-nav-label {
+  margin-bottom: 6px;
+}
+
+/* --- list controls -------------------------------------------------------- */
+
+.list-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.search {
+  flex: 1 1 260px;
+  padding: 10px 14px;
+  font: inherit;
+  font-size: 14.5px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius);
+}
+
+.search:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 18%, transparent);
+}
+
+.list-controls select {
+  padding: 10px 14px;
+  font: inherit;
+  font-size: 14.5px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius);
+  min-width: 160px;
+}
+
+.count-chip {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-3);
+  padding: 6px 12px;
+  border: 1px solid var(--rule);
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 22px;
+  font-size: 14px;
+}
+
+.pager button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* --- overview groups ------------------------------------------------------ */
+
+.stat-group {
+  margin-bottom: 28px;
+}
+
+.stat-group h2 {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0 0 10px;
+}
+
+.stat.is-link {
+  display: block;
+  transition: background-color 0.15s ease;
+}
+
+.stat.is-link:hover {
+  background: var(--brand-soft);
+}
+
+.stat.is-link:hover .stat-value {
+  color: var(--brand);
+}
+
+/* --- needs attention ------------------------------------------------------ */
+
+.attention {
+  border: 1px solid var(--hold);
+  background: var(--hold-soft);
+  border-radius: 8px;
+  padding: 20px 22px;
+  margin-bottom: 30px;
+}
+
+.attention h2 {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--hold);
+  margin: 0 0 14px;
+}
+
+.attention-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.attention-item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  transition: border-color 0.15s ease;
+}
+
+.attention-item:hover {
+  border-color: var(--hold);
+}
+
+.attention-item b {
+  font-family: var(--display);
+  font-size: 22px;
+  line-height: 1;
+  color: var(--hold);
+  font-variant-numeric: tabular-nums;
+}
+
+.attention-item span {
+  font-size: 13.5px;
+  color: var(--ink-2);
+  line-height: 1.4;
+}
+
+/* --- sectioned forms ------------------------------------------------------ */
+
+.form-section {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  padding: 20px 0 0;
+  margin: 0 0 8px;
+}
+
+.form-section:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.form-section legend {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding: 0;
+  margin-bottom: 14px;
+}
+
+.section-note {
+  margin: -6px 0 16px;
+  font-size: 13.5px;
+  color: var(--ink-3);
+  max-width: 64ch;
+  line-height: 1.5;
+}
+
+.field-hint {
+  display: block;
+  font-size: 12.5px;
+  color: var(--ink-3);
+  margin-top: 4px;
+}
+
+.field-error {
+  display: block;
+  font-size: 12.5px;
+  color: var(--stop);
+  margin-top: 4px;
+}
+
+.field input[aria-invalid='true'] {
+  border-color: var(--stop);
+}
+
+/* --- toggle switch -------------------------------------------------------- */
+
+.toggle-field {
+  padding: 16px 0 4px;
+}
+
+.switch {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 12px;
+  align-items: start;
+  cursor: pointer;
+  max-width: 62ch;
+}
+
+.switch input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-track {
+  position: relative;
+  width: 38px;
+  height: 22px;
+  border-radius: 11px;
+  background: var(--rule-2);
+  transition: background-color 0.2s ease;
+  margin-top: 2px;
+}
+
+.switch-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--surface);
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 25%);
+}
+
+.switch input:checked + .switch-track {
+  background: var(--brand);
+}
+
+.switch input:checked + .switch-track .switch-thumb {
+  transform: translateX(16px);
+}
+
+.switch input:focus-visible + .switch-track {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.switch-text {
+  font-size: 14.5px;
+  color: var(--ink);
+}
+
+.toggle-field .field {
+  margin-top: 16px;
+  max-width: 40ch;
+}
+
+/* --- inline add ----------------------------------------------------------- */
+
+.inline-add {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.inline-add input {
+  flex: 1 1 180px;
+  padding: 9px 12px;
+  font: inherit;
+  font-size: 14.5px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius);
+}
+
+.inline-add input:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 18%, transparent);
+}
+
+.add-row {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--rule);
+  max-width: 46ch;
+}
+
+/* --- a card that carries a count or a date beside its heading ------------- */
+.card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.card-head h2 {
+  margin: 0;
+}
+
+/* --- status tabs, used as a work queue ----------------------------------- */
+.tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 20px;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink-2);
+  padding: 9px 14px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.tab:hover {
+  color: var(--ink);
+}
+
+.tab.is-current {
+  color: var(--ink);
+  font-weight: 500;
+  border-bottom-color: var(--brand);
+}
+
+/* The count is the reason to look at the tab, so it carries the emphasis. */
+.tab-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--hold-soft);
+  color: var(--hold);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.tab.is-current .tab-count {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+/* --- the record a decision is made on ------------------------------------ */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2px 24px;
+  margin: 0;
+}
+
+.fact {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 14px;
+}
+
+.fact dt {
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.fact dd {
+  margin: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+/* A blank is a fact too - it is shown, not skipped. */
+.fact dd.is-missing {
+  color: var(--ink-3);
+  font-style: italic;
+}
+
+.fact-about {
+  margin: 18px 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  max-width: 68ch;
+}
+
+/* --- the decision -------------------------------------------------------- */
+.review-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.review-head h2 {
+  margin: 0 0 4px;
+}
+
+.review-head .muted {
+  max-width: 62ch;
+  margin: 0;
+}
+
+.review-pending {
+  border-left: 3px solid var(--hold);
+}
+
+.review-rejected,
+.review-suspended {
+  border-left: 3px solid var(--stop);
+}
+
+.review-verified {
+  border-left: 3px solid var(--pass);
+}
+
+.review-reason {
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 1.55;
+  background: var(--stop-soft);
+  color: var(--ink);
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  max-width: 62ch;
+}
+
+.review-when {
+  margin: 10px 0 0;
+  font-size: 13px;
+}
+
+.review-ask {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+}
+
+.review-ask .field {
+  max-width: 62ch;
+}
+
+.btn-danger {
+  background: var(--stop);
+  border: 1px solid var(--stop);
+  color: #fff;
+}
+
+.btn-danger:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+.btn-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/*
+ * A form card holding the full company field set. The default form card is
+ * sized for three or four fields; this one has sixteen and needs the room to
+ * pair them up.
+ */
+.form-wide {
+  max-width: 780px;
+}
+
+.form-wide .muted {
+  margin: -4px 0 20px;
+  max-width: 62ch;
+}
+
+/* A checkbox reading as one sentence with its label, not a stray box. */
+.check-line {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 14px;
+  color: var(--ink);
+  min-height: 40px;
+}
+
+.check-line input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--brand);
+  flex: none;
+}
+
+/* --- choosing what a thing belongs to ------------------------------------- */
+.scope-choice {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+  margin: 10px 0 20px;
+}
+
+.scope {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 13px 15px;
+  cursor: pointer;
+  background: var(--paper);
+}
+
+.scope:hover {
+  border-color: var(--rule-2);
+}
+
+.scope.is-current {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.scope input {
+  margin-top: 2px;
+  accent-color: var(--brand);
+  flex: none;
+}
+
+.scope b {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.scope-hint {
+  display: block;
+  margin-top: 3px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* --- a round, explained, on the college's decision screen ----------------- */
+
+.round-detail {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.round-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+.round-facts > span {
+  padding: 2px 8px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.round-about-text {
+  margin-top: 2px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+/* Joining an online round, on the college's screen. */
+.round-link {
+  justify-self: start;
+  padding: 5px 11px;
+  border: 1px solid var(--brand);
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand);
+  text-decoration: none;
+}

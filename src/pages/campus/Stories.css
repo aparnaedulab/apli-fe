@@ -1,0 +1,27 @@
+.cs-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cs-author {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.cs-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cs-actions .st-input {
+  flex: 1;
+  min-width: 220px;
+}
+
+.cs-empty {
+  padding: 24px 0;
+}

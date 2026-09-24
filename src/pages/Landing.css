@@ -1,0 +1,796 @@
+/* ---------------------------------------------------------------------------
+   Landing page
+
+   Motion policy: nothing important is hidden waiting on an observer. The
+   .reveal base state only lifts and fades slightly, and every animation is
+   switched off entirely under prefers-reduced-motion (bottom of this file).
+--------------------------------------------------------------------------- */
+
+.landing {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-x: clip;
+}
+
+/* --- motion primitives ---------------------------------------------------- */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes toastIn {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  15%,
+  85% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes travel {
+  0% {
+    left: 0;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    left: calc(100% - 8px);
+    opacity: 0;
+  }
+}
+
+.hero-in {
+  animation: rise 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* --- header --------------------------------------------------------------- */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--paper) 86%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid transparent;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.site-header.is-scrolled {
+  border-bottom-color: var(--rule);
+  box-shadow: 0 1px 16px -8px rgb(20 22 28 / 30%);
+}
+
+.site-header-inner {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  height: 68px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+}
+
+.brand-mark {
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  background: var(--brand);
+  position: relative;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.brand:hover .brand-mark {
+  transform: rotate(-8deg) scale(1.08);
+}
+
+/* The real lockup, in place of the placeholder square. It is drawn in
+   currentColor, so it takes the ink of whatever it is sitting on rather than
+   needing a light file and a dark one. */
+.brand-logo {
+  display: block;
+  height: 26px;
+  width: auto;
+  color: var(--ink);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.brand:hover .brand-logo {
+  transform: scale(1.04);
+}
+
+.brand-logo.is-footer {
+  height: 30px;
+}
+
+.brand-mark::after {
+  content: '';
+  position: absolute;
+  inset: 5px 5px auto auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--paper);
+}
+
+.brand-name {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.015em;
+}
+
+.site-nav {
+  display: flex;
+  gap: 28px;
+  margin-right: auto;
+  font-size: 15px;
+  color: var(--ink-2);
+}
+
+.site-nav a {
+  position: relative;
+  padding-bottom: 2px;
+  transition: color 0.18s ease;
+}
+
+.site-nav a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1.5px;
+  background: var(--brand);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.site-nav a:hover {
+  color: var(--ink);
+}
+
+.site-nav a:hover::after {
+  transform: scaleX(1);
+}
+
+.site-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+}
+
+.btn-lg {
+  padding: 13px 24px;
+  font-size: 15.5px;
+}
+
+.btn-primary,
+.btn-secondary {
+  transition:
+    background-color 0.16s ease,
+    border-color 0.16s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+  transform: translateY(-1px);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 8px 20px -10px var(--brand);
+}
+
+.btn-primary:active,
+.btn-secondary:active {
+  transform: translateY(0);
+}
+
+/* --- hero ----------------------------------------------------------------- */
+
+.hero {
+  padding: 84px 0 92px;
+  border-bottom: 1px solid var(--rule);
+  position: relative;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    62% 70% at 78% 30%,
+    color-mix(in srgb, var(--brand) 8%, transparent),
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.hero-inner {
+  display: grid;
+  grid-template-columns: 1.02fr 0.98fr;
+  gap: 60px;
+  align-items: center;
+  position: relative;
+}
+
+.hero h1 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(38px, 5.3vw, 60px);
+  line-height: 1.03;
+  letter-spacing: -0.033em;
+  text-wrap: balance;
+  margin: 0 0 20px;
+}
+
+.hero h1 em {
+  font-style: normal;
+  color: var(--brand);
+}
+
+.hero-lede {
+  font-size: 18px;
+  color: var(--ink-2);
+  max-width: 47ch;
+  margin: 0 0 32px;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.hero-note {
+  margin: 18px 0 0;
+  font-size: 14px;
+  color: var(--ink-3);
+}
+
+/* --- live pipeline card --------------------------------------------------- */
+
+.pipeline {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 22px;
+  box-shadow: 0 24px 50px -30px rgb(20 22 28 / 45%);
+}
+
+.pipeline-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 16px;
+}
+
+.pipeline-role {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 17px;
+  margin: 0 0 3px;
+  letter-spacing: -0.01em;
+}
+
+.pipeline-org {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--ink-3);
+}
+
+.pipeline-progress {
+  height: 3px;
+  border-radius: 2px;
+  background: var(--rule);
+  overflow: hidden;
+}
+
+.pipeline-progress-fill {
+  display: block;
+  height: 100%;
+  background: var(--brand);
+  border-radius: 2px;
+  transition: width 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pipeline-rounds {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0 0;
+}
+
+.pipeline-round {
+  display: grid;
+  grid-template-columns: 26px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--rule);
+  transition: opacity 0.4s ease;
+}
+
+.pipeline-round:last-child {
+  border-bottom: 0;
+}
+
+.pipeline-round.is-idle {
+  opacity: 0.55;
+}
+
+.round-index {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--rule-2);
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-3);
+  transition:
+    background-color 0.35s ease,
+    border-color 0.35s ease,
+    color 0.35s ease;
+}
+
+.pipeline-round.is-pass .round-index {
+  background: var(--pass-soft);
+  border-color: var(--pass);
+  color: var(--pass);
+}
+
+.pipeline-round.is-active .round-index {
+  background: var(--hold-soft);
+  border-color: var(--hold);
+  color: var(--hold);
+  animation: pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--hold) 40%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--hold) 0%, transparent);
+  }
+}
+
+.round-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.round-name {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.round-note {
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+.pipeline-toast-slot {
+  min-height: 40px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+}
+
+.pipeline-toast {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--pass);
+  animation: toastIn 1.6s ease both;
+}
+
+/* --- bands ---------------------------------------------------------------- */
+
+.band {
+  padding: 88px 0;
+}
+
+.band-alt {
+  background: var(--paper-2);
+  border-block: 1px solid var(--rule);
+}
+
+.section-head {
+  max-width: 62ch;
+  margin-bottom: 44px;
+}
+
+.section-head-center {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.section-head h2 {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(26px, 3.5vw, 37px);
+  line-height: 1.13;
+  letter-spacing: -0.026em;
+  text-wrap: balance;
+  margin: 0;
+}
+
+.section-sub {
+  margin: 14px 0 0;
+  color: var(--ink-2);
+  font-size: 17px;
+}
+
+/* --- approval gate -------------------------------------------------------- */
+
+.gate {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 36px 32px 28px;
+}
+
+.gate-track {
+  display: grid;
+  grid-template-columns: 1fr 64px 1fr 64px 1fr;
+  align-items: center;
+  gap: 0;
+}
+
+.gate-node {
+  opacity: 0.45;
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gate-node.is-on,
+.gate-node-decision.is-pending,
+.gate-node-decision.is-accepted {
+  opacity: 1;
+}
+
+.gate-node-label {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0 0 10px;
+}
+
+.gate-card {
+  border: 1px solid var(--rule-2);
+  border-radius: 8px;
+  padding: 16px;
+  background: var(--paper);
+  transition:
+    border-color 0.4s ease,
+    box-shadow 0.4s ease,
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gate-node-decision.is-pending .gate-card {
+  border-color: var(--hold);
+  box-shadow: 0 0 0 3px var(--hold-soft);
+}
+
+.gate-node-decision.is-accepted .gate-card {
+  border-color: var(--pass);
+  box-shadow: 0 0 0 3px var(--pass-soft);
+  transform: translateY(-2px);
+}
+
+.gate-card-title {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 15.5px;
+  margin: 0 0 3px;
+  letter-spacing: -0.008em;
+}
+
+.gate-card-meta {
+  margin: 0 0 12px;
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+.gate-avatars {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+
+.gate-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--rule);
+  transition:
+    background-color 0.45s ease,
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gate-avatar.is-lit {
+  background: var(--brand);
+  transform: translateY(-2px);
+}
+
+.gate-connector {
+  position: relative;
+  height: 2px;
+  margin-top: 22px;
+}
+
+.gate-connector-line {
+  position: absolute;
+  inset: 0;
+  background: var(--rule);
+}
+
+.gate-connector.is-active .gate-connector-line {
+  background: color-mix(in srgb, var(--brand) 45%, var(--rule));
+}
+
+.gate-connector-dot {
+  position: absolute;
+  top: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--brand);
+  opacity: 0;
+}
+
+.gate-connector.is-active .gate-connector-dot {
+  animation: travel 1.6s ease-in-out infinite;
+}
+
+.gate-caption {
+  margin: 28px 0 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  text-align: center;
+  font-size: 15.5px;
+  color: var(--ink-2);
+  min-height: 24px;
+  animation: fadeIn 0.5s ease;
+}
+
+/* --- closing cta ---------------------------------------------------------- */
+
+.cta {
+  background: var(--brand);
+  color: var(--on-brand);
+  padding: 64px 0;
+}
+
+.cta-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+}
+
+.cta h2 {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(25px, 3vw, 33px);
+  letter-spacing: -0.022em;
+  margin: 0 0 8px;
+}
+
+.cta p {
+  margin: 0;
+  max-width: 52ch;
+  opacity: 0.86;
+}
+
+.cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.cta .btn-primary {
+  background: var(--on-brand);
+  color: var(--brand);
+}
+
+.cta .btn-primary:hover {
+  box-shadow: 0 8px 20px -10px rgb(0 0 0 / 45%);
+}
+
+.cta .btn-secondary {
+  color: var(--on-brand);
+  border-color: color-mix(in srgb, var(--on-brand) 45%, transparent);
+}
+
+.cta .btn-secondary:hover {
+  background: color-mix(in srgb, var(--on-brand) 12%, transparent);
+  border-color: var(--on-brand);
+}
+
+/* --- footer --------------------------------------------------------------- */
+
+.site-footer {
+  margin-top: auto;
+  border-top: 1px solid var(--rule);
+  padding: 36px 0;
+  background: var(--paper);
+}
+
+.site-footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 32px;
+}
+
+.footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  font-size: 14.5px;
+  color: var(--ink-2);
+}
+
+.footer-nav a:hover {
+  color: var(--ink);
+}
+
+.footer-note {
+  margin: 0 0 0 auto;
+  font-size: 13.5px;
+  color: var(--ink-3);
+}
+
+/* --- responsive ----------------------------------------------------------- */
+
+@media (max-width: 980px) {
+  .hero-inner {
+    grid-template-columns: 1fr;
+    gap: 44px;
+  }
+
+  .hero {
+    padding: 56px 0 64px;
+  }
+
+  .site-nav {
+    display: none;
+  }
+
+  .gate-track {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .gate-connector {
+    width: 2px;
+    height: 34px;
+    margin: 6px auto;
+  }
+
+  .gate-connector-line {
+    inset: 0;
+  }
+
+  .gate-connector-dot {
+    display: none;
+  }
+
+  .gate-node {
+    margin-bottom: 4px;
+  }
+}
+
+@media (max-width: 560px) {
+  .band {
+    padding: 60px 0;
+  }
+
+  .gate {
+    padding: 24px 18px 20px;
+  }
+
+  .footer-note {
+    margin-left: 0;
+  }
+}
+
+/* --- reduced motion: everything lands in its final state ------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .pipeline-toast,
+  .gate-caption {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .pipeline-round.is-active .round-index,
+  .gate-connector.is-active .gate-connector-dot {
+    animation: none;
+  }
+
+  .btn-primary:hover,
+  .btn-secondary:hover {
+    transform: none;
+  }
+}

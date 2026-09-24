@@ -1,0 +1,125 @@
+/* ---------------------------------------------------------------------------
+   Campus events: the cell's own sessions beside the weeks companies propose.
+
+   Built on the opportunity cards the page already used; this adds the making
+   of an event, the invitation panel, and the three lists a session's people
+   fall into.
+--------------------------------------------------------------------------- */
+
+.ev-heading {
+  margin: 8px 0 12px;
+  font-family: var(--display);
+  font-size: 17px;
+}
+
+/* An event the college owns, marked once down the edge rather than with a
+   badge on every row inside it. */
+.opp-card.is-ours {
+  border-left: 3px solid var(--brand);
+}
+
+/* --- making one ----------------------------------------------------------- */
+
+.ev-form {
+  margin-bottom: 20px;
+}
+
+.ev-form h2 {
+  margin: 0 0 2px;
+  font-family: var(--display);
+  font-size: 18px;
+}
+
+.ev-form > .muted {
+  margin: 0 0 14px;
+  max-width: 68ch;
+}
+
+.ev-session {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.ev-session input,
+.ev-session select {
+  min-width: 0;
+}
+
+.ev-session input[type='text'],
+.ev-session input:not([type]) {
+  flex: 1 1 200px;
+}
+
+.ev-session input[type='number'] {
+  width: 84px;
+}
+
+.ev-grow {
+  flex: 1;
+}
+
+/* --- a session's row ------------------------------------------------------- */
+
+.ev-role {
+  display: block;
+  color: var(--ink-3);
+}
+
+.ev-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* --- inviting -------------------------------------------------------------- */
+
+.ev-invite {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.ev-scope {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 14px;
+}
+
+.ev-scope label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.ev-invite select {
+  min-width: 220px;
+}
+
+/* --- who is on the list ---------------------------------------------------- */
+
+.ev-group + .ev-group {
+  margin-top: 10px;
+}
+
+.ev-group-label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--ink-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 11px;
+}
+
+.ev-group-people {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+}

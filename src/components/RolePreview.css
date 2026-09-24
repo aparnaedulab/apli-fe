@@ -1,0 +1,125 @@
+/*
+  What a role lets somebody do, as two columns: what they can and what they
+  cannot. The second column is the one that settles the choice, so it gets the
+  same room as the first rather than being a footnote.
+*/
+
+.role-preview {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--paper-2);
+  padding: 0;
+  margin: 0;
+}
+
+.role-preview > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 13px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  list-style: none;
+}
+
+/* A caret we draw, so it points the same way in every browser. */
+.role-preview > summary::-webkit-details-marker {
+  display: none;
+}
+
+.role-preview > summary::before {
+  content: '▸';
+  color: var(--ink-3);
+  font-size: 11px;
+  transition: transform 0.15s ease;
+}
+
+.role-preview[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.role-preview-count {
+  margin-left: auto;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--ink-3);
+}
+
+.role-preview-lede {
+  margin: 0;
+  padding: 0 13px 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.role-preview-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+  padding: 0 13px 13px;
+}
+
+.role-preview-head {
+  margin: 0 0 6px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.role-preview-head.is-can {
+  color: var(--pass);
+}
+
+.role-preview-head.is-cannot {
+  color: var(--ink-3);
+}
+
+.role-preview ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+}
+
+.role-preview li {
+  display: grid;
+  grid-template-columns: 15px minmax(0, 1fr);
+  gap: 6px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.role-preview li.is-can {
+  color: var(--ink);
+}
+
+.role-preview li.is-can::before {
+  content: '✓';
+  color: var(--pass);
+  font-size: 12px;
+}
+
+.role-preview li.is-cannot {
+  color: var(--ink-3);
+}
+
+.role-preview li.is-cannot::before {
+  content: '✕';
+  font-size: 11px;
+}
+
+.role-preview-none {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-3);
+}

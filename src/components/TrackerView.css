@@ -1,0 +1,200 @@
+/* The live application tracker: steps, the wait, the history. */
+
+.tk-steps {
+  list-style: none;
+  margin: 14px 0 6px;
+  padding: 0;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+}
+
+.tk-step {
+  flex: 1;
+  min-width: 96px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  padding: 0 4px;
+}
+
+/* The line joining one step to the next. */
+.tk-step::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: -50%;
+  right: 50%;
+  height: 2px;
+  background: var(--rule-2);
+}
+
+.tk-step:first-child::before {
+  display: none;
+}
+
+.tk-step.is-passed::before,
+.tk-step.is-current::before,
+.tk-step.is-failed::before {
+  background: var(--pass);
+}
+
+.tk-dot {
+  position: relative;
+  z-index: 1;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--surface);
+  border: 2px solid var(--rule-2);
+  color: var(--ink-3);
+}
+
+.tk-step.is-passed .tk-dot {
+  background: var(--pass);
+  border-color: var(--pass);
+  color: #fff;
+}
+
+.tk-step.is-current .tk-dot {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--on-brand);
+  box-shadow: 0 0 0 5px var(--brand-soft);
+}
+
+.tk-step.is-failed .tk-dot {
+  background: var(--stop);
+  border-color: var(--stop);
+  color: #fff;
+}
+
+.tk-step.is-skipped .tk-dot {
+  border-style: dashed;
+}
+
+.tk-name {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.tk-state {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+.tk-step.is-current .tk-state {
+  color: var(--brand);
+  font-weight: 600;
+}
+
+.tk-step.is-failed .tk-state {
+  color: var(--stop);
+}
+
+.tk-none {
+  margin: 10px 0;
+}
+
+.tk-wait {
+  margin: 12px 0 0;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: var(--paper-2);
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.tk-wait.is-overdue {
+  background: var(--hold-soft);
+  color: var(--hold);
+}
+
+.tk-timeline {
+  margin-top: 10px;
+}
+
+.tk-toggle {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--brand);
+}
+
+.tk-toggle .muted {
+  font-weight: 400;
+}
+
+.tk-events {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0 0 0 14px;
+  border-left: 2px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tk-event {
+  position: relative;
+  display: flex;
+  gap: 10px;
+  font-size: 13.5px;
+}
+
+.tk-event::before {
+  content: '';
+  position: absolute;
+  left: -20px;
+  top: 7px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--rule-2);
+}
+
+.tk-event.is-round::before {
+  background: var(--stop);
+}
+
+.tk-event time {
+  flex: none;
+  width: 56px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-3);
+  padding-top: 1px;
+}
+
+.tk-note {
+  display: block;
+  font-size: 12.5px;
+  color: var(--ink-3);
+  font-style: italic;
+}
+
+/* Company list: the overdue marker and the banner. */
+
+.tk-overdue-pill {
+  margin-left: 6px;
+}
+
+.tk-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}

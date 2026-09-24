@@ -1,0 +1,150 @@
+.rules-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* The toggle switch, as in onboarding, without importing the console's styles. */
+.rules-toggles .toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  cursor: pointer;
+  position: relative;
+}
+
+.rules-toggles .toggle.is-disabled {
+  cursor: default;
+}
+
+.rules-toggles .toggle input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rules-toggles .toggle-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.rules-toggles .toggle-label {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.rules-toggles .toggle-desc {
+  font-size: 13.5px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+
+.rules-toggles .toggle-track {
+  flex: none;
+  width: 40px;
+  height: 24px;
+  margin-top: 1px;
+  border-radius: 999px;
+  background: var(--rule-2);
+  position: relative;
+  transition: background 0.2s ease;
+}
+
+.rules-toggles .toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.rules-toggles .toggle input:checked + .toggle-track {
+  background: var(--brand);
+}
+
+.rules-toggles .toggle input:checked + .toggle-track .toggle-thumb {
+  transform: translateX(16px);
+}
+
+.rules-toggles .toggle input:focus-visible + .toggle-track {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.rules-toggles .toggle.is-disabled .toggle-track {
+  opacity: 0.55;
+}
+
+.rules-days {
+  display: flex;
+  /* flex-start, not centre: every switch above this row sits on its label's
+     line, and a control floating halfway down a two-line block broke the one
+     vertical edge the section had. */
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.rules-days select {
+  flex: none;
+  width: auto;
+  min-width: 118px;
+  font: inherit;
+  font-weight: 600;
+  padding: 7px 34px 7px 12px;
+  border: 1px solid var(--rule-2);
+  border-radius: 8px;
+  background-color: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  /* The native arrow was the one control on this form that still looked like
+     the browser rather than the product. */
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5 6 6.5l5-5' stroke='%23858da0' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.rules-days select:hover {
+  border-color: var(--ink-3);
+}
+
+.rules-days select:focus-visible {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+
+.rules-days select:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.rules-foot {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.rules-foot .muted {
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .rules-days {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

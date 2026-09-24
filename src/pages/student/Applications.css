@@ -1,0 +1,793 @@
+/* ==========================================================================
+   My applications
+
+   One card per role, and everything about that role on it. Read by somebody
+   anxious, so the order on the card is the order of the questions they
+   arrived with: which job, where does it stand, what has changed, is
+   anything waiting on me.
+
+   Everything here is namespaced `ap-`: these stylesheets are bundled app
+   wide, and a bare `.card` or `.tile` would land on three other screens.
+   ========================================================================== */
+
+.ap-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  margin-bottom: 14px;
+}
+
+.ap-head-left {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.ap-head h1 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+
+/* How much is new, said once at the top. The cards say which. */
+.ap-head-new {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--brand);
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.ap-read-all {
+  margin-left: auto;
+  padding: 6px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--rule-2);
+  background: var(--surface);
+  font: inherit;
+  font-size: 12px;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+
+.ap-read-all:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+/* --- what is next --------------------------------------------------------- */
+
+/*
+  The question this page is opened with.
+
+  Everything else here describes a state; this is the only part that says
+  what happens next and when. A student with three interviews in a week
+  should never have to read nine cards to find out what Thursday is - so it
+  sits above them all, ordered by when rather than by anything else.
+*/
+.ap-next {
+  margin: 0 0 14px;
+  padding: 11px 15px;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--brand) 22%, transparent);
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--brand) 8%, var(--surface)),
+    var(--surface) 65%
+  );
+}
+
+/* Apli says the one line, and says it about the next real thing when there
+   is one. */
+.ap-apli {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.ap-apli .apli-face {
+  flex: none;
+  color: var(--brand);
+}
+
+.ap-next.has-dates .ap-apli {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.ap-next h2 {
+  margin: 12px 0 7px;
+  padding-top: 11px;
+  border-top: 1px solid color-mix(in srgb, var(--brand) 18%, transparent);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+
+.ap-next ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+}
+
+/* Day, what it is, time. Read left to right as a line off a notice board. */
+.ap-next li {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.ap-next time {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--brand);
+}
+
+.ap-next-what {
+  display: grid;
+  gap: 0;
+  min-width: 0;
+}
+
+.ap-next-what b {
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.ap-next-what small {
+  font-size: 11px;
+  color: var(--ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The figure they are actually planning around. */
+.ap-next-time {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* --- the tiles, which are also the filter --------------------------------- */
+
+.ap-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.ap-tile {
+  display: grid;
+  gap: 1px;
+  padding: 13px 14px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.14s ease,
+    transform 0.14s cubic-bezier(0.2, 0.7, 0.3, 1),
+    box-shadow 0.14s ease;
+}
+
+.ap-tile:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--brand) 40%, transparent);
+  box-shadow: 0 8px 20px rgb(15 23 42 / 0.07);
+}
+
+.ap-tile b {
+  font-size: 26px;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.ap-tile span {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.ap-tile small {
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+.ap-tile.is-current {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.ap-tile.is-current b,
+.ap-tile.is-current span {
+  color: var(--brand);
+}
+
+/*
+  The one thing on the page that is theirs to do. It is allowed to be loud,
+  and it is only ever rendered when the count is real - a permanent amber
+  panel that usually says nothing stops being read within a week.
+*/
+.ap-tile.is-hot {
+  border-color: color-mix(in srgb, var(--hold) 45%, transparent);
+  background: color-mix(in srgb, var(--hold) 9%, var(--surface));
+}
+
+.ap-tile.is-hot b,
+.ap-tile.is-hot span {
+  color: var(--hold);
+}
+
+.ap-tile.is-hot.is-current {
+  border-color: var(--hold);
+  box-shadow: 0 0 0 1px var(--hold) inset;
+}
+
+/* --- one application, as a row that opens -------------------------------- */
+
+/*
+  Shut, a row answers the three questions a student scanning has: which role,
+  where it stands, and whether anything has happened. Open, it is everything
+  about that application. A grid of cards made every application shout its
+  whole contents at once; a list lets them find the one that changed.
+*/
+.ap-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.ap-row {
+  border-radius: 14px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  overflow: hidden;
+  transition: border-color 0.14s ease, box-shadow 0.14s ease;
+}
+
+.ap-row:hover {
+  border-color: color-mix(in srgb, var(--brand) 30%, transparent);
+}
+
+.ap-row.is-open {
+  border-color: color-mix(in srgb, var(--brand) 35%, transparent);
+  box-shadow: 0 6px 20px rgb(15 23 42 / 0.06);
+}
+
+/* Something here has not been read. A line down the side, not a tinted row:
+   on a list of nine, three filled rows are noise. */
+.ap-row.is-unread {
+  border-left: 3px solid var(--brand);
+}
+
+.ap-row.is-closed {
+  background: var(--paper-2);
+}
+
+/* --- the row itself ------------------------------------------------------- */
+
+.ap-row-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ap-row-head:hover {
+  background: var(--paper-2);
+}
+
+.ap-row.is-closed .ap-row-head:hover {
+  background: transparent;
+}
+
+.ap-mark {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.ap-row-who {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.ap-row-who b {
+  font-size: 14px;
+  line-height: 1.3;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ap-row-who small {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* How far along, as a shape. Read sideways, faster than the words under it. */
+.ap-row-far {
+  flex: none;
+  display: grid;
+  gap: 3px;
+  width: 92px;
+}
+
+.ap-bar {
+  display: flex;
+  gap: 3px;
+}
+
+.ap-bar i {
+  flex: 1;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--rule-2);
+}
+
+.ap-bar i.is-done {
+  background: var(--pass);
+}
+
+.ap-bar i.is-now {
+  background: var(--brand);
+}
+
+.ap-row-far small {
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+
+.ap-row-head .pill {
+  flex: none;
+  white-space: nowrap;
+}
+
+/*
+  How much has happened here.
+
+  The point of the row. A student does not scan this page reading statuses;
+  they scan it looking for the one that changed, and a number they can see
+  without opening anything is the fastest way to find it. Filled while any of
+  it is unread, hollow once it has all been seen.
+*/
+.ap-count {
+  flex: none;
+  display: grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  border: 1px solid var(--rule-2);
+  background: var(--surface);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.ap-count.is-new {
+  border-color: transparent;
+  background: var(--brand);
+  color: #fff;
+}
+
+.ap-mine {
+  flex: none;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--hold) 14%, transparent);
+  color: var(--hold);
+  font-size: 10.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ap-caret {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid var(--ink-3);
+  border-bottom: 2px solid var(--ink-3);
+  transform: rotate(45deg);
+  transition: transform 0.16s ease;
+}
+
+.ap-caret.is-open {
+  transform: rotate(-135deg);
+}
+
+/* --- what is inside it ---------------------------------------------------- */
+
+.ap-row-body {
+  display: grid;
+  gap: 11px;
+  padding: 2px 14px 13px;
+  border-top: 1px solid var(--rule);
+}
+
+/*
+  The status in a sentence, tone on a rule rather than a block of colour -
+  a filled amber panel at the top of an opened row reads as an alarm.
+*/
+.ap-said {
+  margin: 12px 0 0;
+  padding: 2px 0 2px 11px;
+  border-left: 3px solid var(--rule-2);
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.ap-row.is-live .ap-said {
+  border-left-color: var(--hold);
+}
+
+.ap-row.is-offer .ap-said {
+  border-left-color: var(--pass);
+  font-weight: 600;
+}
+
+.ap-row.is-closed .ap-said {
+  color: var(--ink-2);
+}
+
+/* --- the updates ---------------------------------------------------------- */
+
+.ap-news {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--paper-2);
+}
+
+.ap-news h3 {
+  margin: 0 0 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.ap-news ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.ap-news li {
+  display: grid;
+  gap: 1px;
+  padding-left: 11px;
+  border-left: 2px solid var(--rule-2);
+}
+
+.ap-news li.is-new {
+  border-left-color: var(--brand);
+}
+
+.ap-news li b {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.ap-news li.is-new b {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.ap-news li > span {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+.ap-news-foot {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  margin-top: 1px;
+}
+
+.ap-news time {
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+.ap-news-foot .link-btn {
+  font-size: 11px;
+}
+
+/* --- theirs to do --------------------------------------------------------- */
+
+.ap-todo {
+  display: grid;
+  gap: 4px;
+  padding: 12px 13px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--hold) 35%, transparent);
+  background: color-mix(in srgb, var(--hold) 7%, var(--surface));
+}
+
+.ap-todo.is-offer {
+  border-color: color-mix(in srgb, var(--pass) 40%, transparent);
+  background: color-mix(in srgb, var(--pass) 7%, var(--surface));
+}
+
+.ap-todo-title {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 650;
+  color: var(--ink);
+}
+
+.ap-todo p.muted {
+  margin: 0;
+  font-size: 12px;
+}
+
+.ap-todo .btn-row,
+.ap-todo > .btn {
+  margin-top: 8px;
+}
+
+.ap-todo .btn {
+  padding: 8px 14px;
+  font-size: 13px;
+}
+
+/* --- the foot ------------------------------------------------------------- */
+
+.ap-row-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+}
+
+.ap-when {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+.ap-row-foot .ap-open {
+  margin-left: auto;
+  font-size: 12px;
+}
+
+/* Quiet, but not hidden. */
+.ap-row-foot .ap-withdraw {
+  font-size: 11.5px;
+  opacity: 0.75;
+}
+
+.ap-row-foot .ap-withdraw:hover {
+  opacity: 1;
+}
+
+.ap-more {
+  display: grid;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+}
+
+/* --- where to be, and when ------------------------------------------------ */
+
+/*
+  The point of being called to a round. Only ever on a card for a round the
+  student has actually been called to: before that the company may not have
+  booked a hall, and a half-filled "venue: to be confirmed" is worse than the
+  sentence that says the dates are coming.
+*/
+.ap-where {
+  display: grid;
+  gap: 6px;
+  padding: 12px 13px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--brand) 30%, transparent);
+  background: color-mix(in srgb, var(--brand) 5%, var(--surface));
+}
+
+.ap-where h3 {
+  margin: 0;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+
+.ap-where-when {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.ap-where-when b {
+  font-size: 13.5px;
+  color: var(--ink);
+}
+
+.ap-mode {
+  padding: 2px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--rule-2);
+  background: var(--surface);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.ap-mode.is-online {
+  border-color: color-mix(in srgb, var(--pass) 35%, transparent);
+  color: var(--pass);
+}
+
+/* The one line they came for. */
+.ap-where-date {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.ap-where-at {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+.ap-where-go {
+  justify-self: start;
+  padding: 6px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--brand);
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--brand);
+  text-decoration: none;
+}
+
+.ap-where-go:hover {
+  background: var(--brand);
+  color: #fff;
+}
+
+/*
+  The map itself, because a student finding a campus they have never been to
+  at nine in the morning does not want an address to retype into a phone.
+*/
+.ap-map {
+  width: 100%;
+  height: 170px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--paper-2);
+}
+
+/* --- nothing here --------------------------------------------------------- */
+
+.ap-none {
+  display: grid;
+  place-content: center;
+  gap: 4px;
+  padding: 44px 24px;
+  border-radius: 16px;
+  border: 1px dashed var(--rule-2);
+  text-align: center;
+}
+
+.ap-none p {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.ap-empty {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 56px 24px;
+  border-radius: 18px;
+  border: 1px dashed var(--rule-2);
+  background: var(--surface);
+  text-align: center;
+}
+
+.ap-empty .apli-face {
+  color: var(--brand);
+}
+
+.ap-empty h2 {
+  margin: 4px 0 0;
+  font-size: 18px;
+}
+
+.ap-empty p {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.ap-empty .btn {
+  margin-top: 8px;
+}
+
+@media (max-width: 640px) {
+  /* The row keeps its name and its state; the progress shape goes, because
+     at this width there is no room for a picture of it beside the words. */
+  .ap-row-far {
+    display: none;
+  }
+
+  .ap-head h1 {
+    font-size: 21px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ap-tile,
+  .ap-row,
+  .ap-caret {
+    transition: none;
+  }
+
+  .ap-tile:hover {
+    transform: none;
+  }
+}

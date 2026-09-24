@@ -1,0 +1,367 @@
+/* Confidence & wellbeing - soft edges, plenty of room, nothing urgent. */
+
+.wb-private {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--pass-soft);
+  font-size: 13.5px;
+}
+
+.wb-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.wb-mood,
+.wb-ladder,
+.wb-warmup,
+.wb-wins,
+.wb-after,
+.wb-talk {
+  margin-bottom: 16px;
+}
+
+.wb-grid > .card {
+  margin-bottom: 0;
+}
+
+.wb-mood h2,
+.wb-ladder h2,
+.wb-warmup h2,
+.wb-wins h2,
+.wb-after h2,
+.wb-talk h2 {
+  margin: 0 0 8px;
+  font-size: 17px;
+}
+
+.wb-soft {
+  margin: 0 0 10px;
+  font-size: 13.5px;
+  color: var(--ink-3);
+}
+
+/* Mood */
+
+.wb-faces {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0 12px;
+}
+
+.wb-face {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 4px;
+  border-radius: 12px;
+  border: 1.5px solid var(--rule);
+  background: var(--surface);
+  font-size: 24px;
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.wb-face small {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.wb-face:hover {
+  transform: translateY(-2px);
+}
+
+.wb-face.is-on {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+
+.wb-mood-save,
+.wb-win-add {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.wb-mood-save .input,
+.wb-win-add .input {
+  flex: 1;
+  min-width: 0;
+}
+
+.wb-trend {
+  margin: 6px 0 0;
+}
+
+.wb-trend svg {
+  width: 100%;
+  height: 72px;
+}
+
+.wb-trend polyline {
+  fill: none;
+  stroke: var(--brand);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.wb-trend-mid {
+  stroke: var(--rule);
+  stroke-dasharray: 4 4;
+}
+
+.wb-trend figcaption {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+/* Ladder - drawn bottom-up would be clever; top-down is clearer. */
+
+.wb-ladder ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: rung;
+}
+
+.wb-ladder li {
+  counter-increment: rung;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.wb-ladder label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.wb-ladder li.is-done span {
+  color: var(--ink-3);
+  text-decoration: line-through;
+}
+
+.wb-go {
+  flex: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand);
+}
+
+/* Warm-up */
+
+.wb-warmup-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.wb-steps {
+  display: grid;
+  gap: 14px;
+  margin: 14px 0 0;
+  padding-left: 22px;
+}
+
+.wb-steps h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+}
+
+.wb-steps p {
+  margin: 0 0 6px;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.wb-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.wb-breath {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.wb-breath-label {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* The box: a dot travels one side per four-second phase; the core swells on
+   the in-breath and settles on the out-breath. */
+.wb-box {
+  position: relative;
+  flex: none;
+  width: 110px;
+  height: 110px;
+  border: 3px solid var(--brand-soft);
+  border-radius: 14px;
+}
+
+.wb-box-core {
+  position: absolute;
+  inset: 30%;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  transition: inset 4s ease-in-out;
+}
+
+.wb-box-dot {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--brand);
+  transition:
+    top 4s linear,
+    left 4s linear;
+}
+
+.wb-box.wb-phase-0 .wb-box-dot {
+  top: -8px;
+  left: calc(100% - 5px);
+}
+
+.wb-box.wb-phase-0 .wb-box-core,
+.wb-box.wb-phase-1 .wb-box-core {
+  inset: 12%;
+}
+
+.wb-box.wb-phase-1 .wb-box-dot {
+  top: calc(100% - 5px);
+  left: calc(100% - 5px);
+}
+
+.wb-box.wb-phase-2 .wb-box-dot {
+  top: calc(100% - 5px);
+  left: -8px;
+}
+
+.wb-box.wb-phase-3 .wb-box-dot {
+  top: -8px;
+  left: -8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wb-box-dot,
+  .wb-box-core,
+  .wb-face {
+    transition: none;
+  }
+}
+
+/* Wins */
+
+.wb-win-list {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+}
+
+.wb-win-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.wb-star {
+  color: #d97706;
+}
+
+.wb-win-text {
+  flex: 1;
+  font-size: 14.5px;
+}
+
+.wb-win-text small {
+  display: block;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.wb-remove {
+  border: 0;
+  background: none;
+  color: var(--ink-3);
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 4px;
+}
+
+.wb-remove:hover {
+  color: var(--stop);
+}
+
+/* After a rejection */
+
+.wb-after {
+  border-left: 4px solid var(--brand);
+}
+
+.wb-after p {
+  margin: 0 0 8px;
+  font-size: 14.5px;
+}
+
+.wb-next {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--brand-soft);
+}
+
+/* Need to talk */
+
+.wb-talk {
+  background: var(--paper-2);
+}
+
+.wb-talk p {
+  margin: 0 0 8px;
+  font-size: 14.5px;
+}
+
+.wb-talk a {
+  color: var(--brand);
+  font-weight: 600;
+}
+
+@media (max-width: 760px) {
+  .wb-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wb-face {
+    font-size: 20px;
+  }
+}

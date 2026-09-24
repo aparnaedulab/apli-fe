@@ -1,0 +1,1201 @@
+/* The trust parts of the student's job pages: the honest offer card, the
+   roles they cannot apply for yet, and reporting a role. */
+
+.company-link {
+  margin-left: 10px;
+  font-family: var(--sans);
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--brand);
+  font-weight: 600;
+}
+
+.company-link:hover {
+  text-decoration: underline;
+}
+
+/* Offer card */
+
+.offer-card {
+  border-left: 4px solid var(--brand);
+}
+
+.offer-card .eyebrow {
+  margin: 0 0 4px;
+}
+
+.offer-inhand {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.offer-inhand span {
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink-2);
+  letter-spacing: 0;
+}
+
+.offer-inhand-missing {
+  font-size: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.offer-split {
+  margin: 16px 0 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+}
+
+.offer-split > div {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--paper-2);
+}
+
+.offer-split > div.is-maybe {
+  background: var(--hold-soft);
+}
+
+.offer-split > div.is-bond {
+  background: var(--stop-soft);
+}
+
+.offer-split dt {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.offer-split dd {
+  margin: 2px 0 0;
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+}
+
+.offer-split small {
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.offer-how {
+  margin-top: 12px;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--brand);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.offer-working {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--rule);
+  font-size: 14px;
+}
+
+.offer-working table {
+  width: 100%;
+  max-width: 420px;
+  border-collapse: collapse;
+}
+
+.offer-working td {
+  padding: 4px 0;
+}
+
+.offer-working td:last-child {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.offer-working .offer-total td {
+  border-top: 1px solid var(--rule-2);
+  font-weight: 700;
+  padding-top: 8px;
+}
+
+.offer-working ul {
+  margin: 12px 0 6px;
+  padding-left: 18px;
+  color: var(--ink-2);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Roles the student cannot apply for yet */
+
+.not-eligible {
+  margin-top: 24px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.not-eligible summary {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  font-weight: 600;
+  list-style: none;
+}
+
+.not-eligible summary::-webkit-details-marker {
+  display: none;
+}
+
+.not-eligible summary::before {
+  content: '▸';
+  color: var(--ink-3);
+  margin-right: 8px;
+}
+
+.not-eligible[open] summary::before {
+  content: '▾';
+}
+
+.not-eligible summary > span:first-child {
+  flex: 1;
+}
+
+.not-eligible summary .muted {
+  font-weight: 400;
+  font-size: 13px;
+}
+
+.not-eligible-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--paper-2);
+  font-size: 12px;
+}
+
+.not-eligible > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.not-eligible > ul > li {
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+}
+
+.not-eligible-role {
+  margin: 0 0 4px;
+}
+
+.not-eligible-reasons {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.not-eligible-fix {
+  display: block;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+/* Reporting a role */
+
+.report-role {
+  margin-top: 20px;
+}
+
+.report-role .linkish {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--brand);
+  font-weight: 600;
+  font-size: inherit;
+}
+
+.report-reasons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 12px 0;
+}
+
+.report-reason {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--rule);
+  cursor: pointer;
+}
+
+.report-reason.is-on {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.report-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* --- worth a look, and how to narrow the rest ----------------------------- */
+
+/*
+  Two things share this screen: a short strip of roles the portal thinks are
+  worth reading first, and the whole list with a way to cut it down. The strip
+  is deliberately small - three cards, never more - because a recommendation
+  list as long as the real list is just the real list with a title on it.
+*/
+
+/* Side by side only once it is under the list rather than beside it. */
+@media (max-width: 1080px) {
+  .foryou-row {
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  }
+}
+
+.foryou-card h3 a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.foryou-card h3 a:hover {
+  color: var(--brand);
+}
+
+/* The score as a bar rather than only a number: it is a rough thing, and a
+   bar reads as rough where "73%" reads as measured. */
+.match-bar {
+  display: block;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--rule);
+  overflow: hidden;
+}
+
+.match-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--brand);
+  transition: width 0.5s cubic-bezier(0.3, 0.8, 0.3, 1);
+}
+
+/* --- what a card now carries ---------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .foryou-card,
+  .match-bar > span {
+    transition: none;
+  }
+
+  .foryou-card:hover {
+    transform: none;
+  }
+}
+
+/* --- who they would be working for ---------------------------------------- */
+
+.job-company {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.job-company-logo {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid var(--rule);
+  background: var(--paper-2);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-3);
+  overflow: hidden;
+}
+
+.job-company-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #fff;
+}
+
+.job-company-name {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.job-company-links {
+  margin: 2px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  font-size: 13px;
+}
+
+.job-company-links a {
+  color: var(--brand);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.job-company-links a:hover {
+  text-decoration: underline;
+}
+
+/* --- the last step before an application goes ----------------------------- */
+
+/*
+  A dialog, because applying cannot be taken back.
+
+  It stops on the three things that decide whether they meant it - the role,
+  what is being sent about them, and which resume - and names the resume
+  rather than drawing it: a page of PDF in here would bury the button they
+  came to press.
+*/
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.99);
+  }
+}
+
+.modal-back {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgb(15 23 42 / 0.45);
+  backdrop-filter: blur(2px);
+}
+
+.modal {
+  width: min(560px, 100%);
+  max-height: min(80vh, 760px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  box-shadow: 0 18px 50px rgb(15 23 42 / 0.28);
+  animation: modal-in 0.18s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 18px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.modal-head h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.modal-x {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+
+.modal-x:hover:not(:disabled) {
+  color: var(--ink);
+}
+
+/* The body scrolls; the head and the buttons stay put. */
+.modal-body {
+  overflow-y: auto;
+  padding: 4px 18px 16px;
+  display: grid;
+  gap: 4px;
+}
+
+.modal-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 13px 18px;
+  border-top: 1px solid var(--rule);
+}
+
+.apply-block {
+  padding: 13px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.apply-block:last-of-type {
+  border-bottom: 0;
+}
+
+.apply-label {
+  margin: 0 0 6px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.apply-role {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.apply-sub {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.apply-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+  margin: 8px 0 0;
+}
+
+.apply-facts div {
+  display: grid;
+  gap: 1px;
+}
+
+.apply-facts dt {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+.apply-facts dd {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* One resume: its name, and a way to look if they want to. */
+.apply-one {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin: 0;
+  font-size: 14px;
+}
+
+.apply-one a,
+.apply-list a {
+  font-size: 12.5px;
+  color: var(--brand);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.apply-one a:hover,
+.apply-list a:hover {
+  text-decoration: underline;
+}
+
+.apply-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+
+.apply-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.apply-list label {
+  flex: 1;
+  display: flex;
+  align-items: start;
+  gap: 9px;
+  padding: 9px 11px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface);
+  cursor: pointer;
+  min-width: 0;
+}
+
+.apply-list label.is-current {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.apply-list input {
+  margin-top: 3px;
+  accent-color: var(--brand);
+}
+
+.apply-list span {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.apply-list b {
+  font-size: 13.5px;
+  color: var(--ink);
+}
+
+.apply-list small {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.apply-default {
+  margin-top: 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal {
+    animation: none;
+  }
+}
+
+/* --- worth a look, beside the list ---------------------------------------- */
+
+.sh .foryou {
+  padding: 15px 16px 17px;
+  border-radius: 16px;
+  border-color: color-mix(in srgb, var(--brand) 25%, transparent);
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--brand) 7%, var(--surface)),
+    var(--surface) 70%
+  );
+}
+
+.sh .foryou-head h2 {
+  font-size: 14px;
+}
+
+.sh .foryou-head .muted {
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.sh .foryou-card {
+  border-radius: 12px;
+  padding: 12px 13px 13px;
+  background: var(--surface);
+}
+
+.sh .foryou-card h3 {
+  font-size: 13.5px;
+}
+
+/* On the detail page: when it went out, and how many are already in for it. */
+.job-card-when {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+/* --- the toolbar ---------------------------------------------------------- */
+
+.sh .job-filters {
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  margin-bottom: 12px;
+}
+
+.sh .job-search,
+.sh .job-filters select {
+  border-radius: 10px;
+  font-size: 13px;
+  padding: 7px 11px;
+}
+
+.sh .job-toggle {
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 12.5px;
+}
+
+.sh .job-count {
+  font-size: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jc {
+    transition: none;
+  }
+
+  .jc:hover {
+    transform: none;
+  }
+}
+
+/* ==========================================================================
+   Jobs: the list on the left, the role on the right
+
+   A student browsing roles is comparing, not reading one thing. The old
+   shape made them leave the list to look at anything and then find their
+   place again, so they read the two whose titles happened to appeal and
+   stopped. Side by side, opening a role costs nothing.
+
+   The list stays narrow and each row carries only what a comparison needs -
+   who, where, how fresh, how long left, whether they are already in it.
+   Everything else is in the pane.
+   ========================================================================== */
+
+/* --- the header, which is a row rather than a block ----------------------- */
+
+/*
+  The title, the count and the search on one line.
+
+  A full page heading above a filter bar was two rows saying very little: the
+  lede explained what the list makes obvious, and the search sat below the
+  fold of the eye. This puts the one control anybody uses first in the space
+  the heading was wasting.
+*/
+.jb-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  margin-bottom: 14px;
+}
+
+.jb-head-left {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.jb-head h1 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+
+.jb-head-count {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.jb-head-search {
+  flex: 1 1 280px;
+  min-width: 0;
+  margin-left: auto;
+  position: relative;
+}
+
+.jb-head-search input {
+  width: 100%;
+  padding: 10px 14px 10px 36px;
+  font: inherit;
+  font-size: 13.5px;
+  border: 1px solid var(--rule-2);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+/* A magnifier drawn in CSS, so the field needs no icon set behind it. */
+.jb-head-search::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  margin-top: -6px;
+  border: 1.6px solid var(--ink-3);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.jb-head-search::after {
+  content: '';
+  position: absolute;
+  left: 22px;
+  top: 50%;
+  width: 6px;
+  height: 1.6px;
+  margin-top: 3px;
+  background: var(--ink-3);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+/* --- the filter bar ------------------------------------------------------- */
+
+.jb-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 10px 12px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  border-radius: 16px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+.jb-field {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.jb-field > span {
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+.jb-field input,
+.jb-field select {
+  padding: 8px 11px;
+  font: inherit;
+  font-size: 13px;
+  border: 1px solid var(--rule-2);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.jb-search {
+  flex: 1 1 260px;
+}
+
+.jb-search input {
+  width: 100%;
+}
+
+.jb-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  font-size: 12.5px;
+  color: var(--ink-2);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.jb-toggle:has(input:checked) {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.jb-toggle input {
+  accent-color: var(--brand);
+}
+
+.jb-clear {
+  align-self: center;
+}
+
+/* --- the two columns ------------------------------------------------------ */
+
+.jb-split {
+  display: grid;
+  grid-template-columns: minmax(300px, 400px) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.jb-list {
+  border-radius: 16px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  overflow: hidden;
+  /* Its own scroll, so the pane beside it keeps its place while the list
+     is worked through. */
+  max-height: calc(100vh - 220px);
+  display: flex;
+  flex-direction: column;
+}
+
+.jb-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.jb-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 12px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink-3);
+  cursor: pointer;
+  margin-bottom: -1px;
+  white-space: nowrap;
+}
+
+.jb-tab:hover {
+  color: var(--ink);
+}
+
+.jb-tab.is-current {
+  color: var(--brand);
+  font-weight: 600;
+  border-bottom-color: var(--brand);
+}
+
+.jb-tab span {
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--paper-2);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+
+.jb-tab.is-current span {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.jb-rows {
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  overflow-y: auto;
+}
+
+.jb-row {
+  width: 100%;
+  display: flex;
+  align-items: start;
+  gap: 10px;
+  padding: 11px 11px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.13s ease;
+}
+
+.jb-row:hover {
+  background: var(--paper-2);
+}
+
+/* The one in the pane. A left bar rather than a block of colour, so a long
+   list does not turn into a stripe. */
+.jb-row.is-current {
+  position: relative;
+  background: var(--brand-soft);
+}
+
+.jb-row.is-current::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 999px;
+  background: var(--brand);
+}
+
+.jb-mark {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--paper-2);
+  color: var(--ink-2);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.jb-row.is-current .jb-mark {
+  background: var(--surface);
+  color: var(--brand);
+}
+
+.jb-row-main {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.jb-row-main b {
+  font-size: 13.5px;
+  line-height: 1.3;
+  color: var(--ink);
+}
+
+.jb-row-main em {
+  font-style: normal;
+  font-size: 12px;
+  color: var(--ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jb-row-main small {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+/* Three days or fewer, said where the eye already is. */
+.jb-row-main .is-urgent {
+  color: var(--stop);
+  font-weight: 600;
+}
+
+.jb-state {
+  flex: none;
+  margin-left: auto;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--hold) 30%, transparent);
+  background: color-mix(in srgb, var(--hold) 8%, transparent);
+  font-size: 11px;
+  color: var(--hold);
+  white-space: nowrap;
+}
+
+.jb-state.is-in {
+  border-color: color-mix(in srgb, var(--pass) 30%, transparent);
+  background: color-mix(in srgb, var(--pass) 8%, transparent);
+  color: var(--pass);
+  font-weight: 600;
+}
+
+/* --- the pane ------------------------------------------------------------- */
+
+.jb-pane {
+  min-width: 0;
+  border-radius: 16px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  padding: 20px 22px 24px;
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+}
+
+/*
+  Inside the pane the role is already on a card, so its own cards lose their
+  box and become sections divided by a rule. A card inside a card is a border
+  nobody reads and a gutter everybody loses.
+*/
+.jb-pane .card {
+  padding: 0;
+  margin: 0 0 18px;
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding-bottom: 18px;
+}
+
+.jb-pane .card:last-of-type {
+  border-bottom: 0;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.jb-pane .page-head {
+  margin-bottom: 14px;
+}
+
+.jb-pane .page-head h1 {
+  font-size: 20px;
+}
+
+.jb-none {
+  display: grid;
+  place-content: center;
+  gap: 4px;
+  padding: 44px 24px;
+  text-align: center;
+}
+
+.jb-none p {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+/* Below this the two columns would each be too narrow to read, so the list
+   goes back to being a list and the pane follows it. */
+@media (max-width: 1040px) {
+  .jb-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .jb-list,
+  .jb-pane {
+    max-height: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jb-row {
+    transition: none;
+  }
+}
+
+/* --- the sections inside the pane ----------------------------------------- */
+
+/*
+  A role is long, and a pane is narrow. Splitting it means a student can look
+  at eligibility without scrolling past the whole description to reach it -
+  and it puts the four questions they actually have in front of them as four
+  words.
+*/
+.pane-tabs {
+  display: flex;
+  gap: 2px;
+  margin: 0 0 16px;
+  border-bottom: 1px solid var(--rule);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.pane-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.pane-tab {
+  padding: 9px 13px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--ink-3);
+  cursor: pointer;
+  white-space: nowrap;
+  margin-bottom: -1px;
+}
+
+.pane-tab:hover {
+  color: var(--ink);
+}
+
+.pane-tab.is-current {
+  color: var(--brand);
+  font-weight: 600;
+  border-bottom-color: var(--brand);
+}
+
+/* --- what the role asks for ----------------------------------------------- */
+
+.elig {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.elig li {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.8fr) minmax(0, 1.2fr);
+  gap: 12px;
+  padding: 10px 13px;
+  background: var(--surface);
+}
+
+.elig-k {
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+.elig-v {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* Said once, at the end: they cleared all of it, which is why they can read
+   it at all. */
+.elig-ok {
+  display: flex;
+  align-items: start;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 10px 13px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--pass) 8%, transparent);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--pass);
+}
+
+.elig-ok::before {
+  content: '✓';
+  font-weight: 700;
+}

@@ -1,0 +1,760 @@
+/* ---------------------------------------------------------------------------
+   The landing canvas.
+
+   The page used to alternate: a dark hero, then sand, then white, then dark
+   again. Alternating sounds like variety and reads as indecision - five of
+   the twelve sections were near-white, they were the long ones, and the whole
+   page went pale in the middle exactly where the argument is being made.
+
+   So the page is now one surface, lit unevenly. Every section is dark; what
+   changes between them is depth - how far a band sits above the base, how
+   much brand light falls on it, whether it is a plate or a hole. That is the
+   difference between a page with atmosphere and a page with stripes.
+
+   The mechanism is the same one as before and it is worth restating, because
+   it is why this file is short for what it does: no component knows any of
+   this. The tokens are redefined on .landing, and every card, pill, rule,
+   demo and button inside picks the new values up. Nothing below this file
+   needed editing to go dark.
+
+   Layering, base upwards:
+       backdrop     grid, aurora, spine, grain - fixed, inert
+       band         the base canvas
+       plate        .band-alt, raised a step, hairline lit
+       surface      cards, glass, with a lit top edge
+       accent       brand light, used sparingly and never behind text
+
+   All of it is decoration in the strict sense: delete this file and the
+   words, demos and links are untouched. Everything stops under
+   prefers-reduced-motion.
+--------------------------------------------------------------------------- */
+
+/* ===========================================================================
+   1. The palette
+   ======================================================================== */
+
+.landing {
+  /* Deeper and cooler than the app's own dark mode. This is a page somebody
+     looks at once, not a screen they work in for eight hours. */
+  --paper: #070b14;
+  --paper-2: #0d1423;
+  --surface: #131c2e;
+
+  --ink: #f4f7fd;
+  --ink-2: #b9c4da;
+  --ink-3: #8593ac;
+
+  --rule: #1f2a40;
+  --rule-2: #32405f;
+
+  /* Two accents and no more. Indigo carries the brand, mint carries anything
+     that has gone right; everything else is neutral, which is what keeps the
+     two of them meaning something. */
+  --brand: #7c9cff;
+  --brand-hover: #9db3ff;
+  --brand-soft: #16203a;
+  --brand-deep: #3d5bd9;
+  --violet: #a78bfa;
+  --on-brand: #060912;
+
+  --pass: #3ddc97;
+  --pass-soft: #0d2b20;
+  --hold: #f0b429;
+  --hold-soft: #2c2210;
+  --stop: #f2867f;
+  --stop-soft: #331d1c;
+
+  /* Glass, as one value rather than twelve slightly different rgba()s. */
+  --glass: color-mix(in srgb, var(--surface) 72%, transparent);
+  --glass-edge: color-mix(in srgb, #fff 10%, transparent);
+  --lift: 0 30px 60px -34px rgb(0 0 0 / 85%);
+
+  background: var(--paper);
+  color: var(--ink);
+}
+
+/* ===========================================================================
+   2. The backdrop - what the whole page sits on
+   ======================================================================== */
+
+.landing .backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.landing main,
+.landing .site-header,
+.landing .site-footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* A ruled grid, faint enough to be felt rather than seen, faded out at the
+   edges so it never looks like a table. */
+.landing .backdrop-grid {
+  position: absolute;
+  inset: -10%;
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 3.5%) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 3.5%) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(120% 90% at 50% 0%, #000 25%, transparent 78%);
+}
+
+/* Slow brand weather. Three blooms on one element, drifting on a long cycle
+   so the page is never quite static and never obviously moving. */
+.landing .backdrop-aurora {
+  position: absolute;
+  inset: -25%;
+  background:
+    radial-gradient(38% 42% at 18% 12%, color-mix(in srgb, var(--brand-deep) 42%, transparent), transparent 70%),
+    radial-gradient(34% 40% at 86% 28%, color-mix(in srgb, var(--violet) 30%, transparent), transparent 72%),
+    radial-gradient(40% 44% at 60% 88%, color-mix(in srgb, var(--pass) 16%, transparent), transparent 74%);
+  filter: blur(30px);
+  opacity: 0.55;
+  animation: drift 44s ease-in-out infinite alternate;
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(-3%, -2%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(3%, 2%, 0) scale(1.12);
+  }
+}
+
+/* Grain. The one thing that stops large flat darks from banding on a cheap
+   panel, which is most panels a student opens this on. */
+.landing .backdrop-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.22;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+/* ===========================================================================
+   3. Type
+   ======================================================================== */
+
+/* The display headings pick up a little light at their top edge - the same
+   trick as a lit object, applied to letterforms. Kept to headings: gradient
+   body text is a legibility problem pretending to be a style. */
+.landing .hero h1,
+.landing .section-head h2,
+.landing .cta-said h2 {
+  background: linear-gradient(176deg, #ffffff 8%, #c9d6f5 62%, #9fb2da 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.landing .hero h1 em {
+  font-style: normal;
+  background: linear-gradient(100deg, var(--brand) 0%, var(--violet) 52%, var(--pass) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.landing .eyebrow {
+  color: var(--brand);
+  letter-spacing: 0.14em;
+}
+
+.landing .eyebrow-rule,
+.landing .hero-ask-rule {
+  background: linear-gradient(90deg, var(--brand), transparent);
+}
+
+.landing .section-sub,
+.landing .hero-lede {
+  color: var(--ink-2);
+}
+
+/* ===========================================================================
+   4. Header
+   ======================================================================== */
+
+.landing .site-header {
+  background: transparent;
+  backdrop-filter: none;
+  border-bottom: 1px solid transparent;
+}
+
+.landing .site-header.is-scrolled {
+  background: color-mix(in srgb, #070b14 78%, transparent);
+  backdrop-filter: blur(16px) saturate(140%);
+  border-bottom-color: var(--rule);
+  box-shadow: 0 12px 30px -24px rgb(0 0 0 / 90%);
+}
+
+/* The reading-progress bar, which is the only place the two accents meet. */
+.landing .site-progress {
+  background: linear-gradient(90deg, var(--brand), var(--violet) 55%, var(--pass));
+  transform-origin: 0 50%;
+  height: 2px;
+}
+
+.landing .site-header .brand-name,
+.landing .site-header .site-nav a {
+  color: var(--ink);
+}
+
+.landing .site-header .site-nav a:hover {
+  color: #fff;
+}
+
+.landing .site-header .brand-mark::after {
+  background: var(--paper);
+}
+
+.landing .btn-ghost {
+  color: var(--ink);
+  border-color: color-mix(in srgb, #fff 18%, transparent);
+}
+
+.landing .btn-ghost:hover {
+  background: color-mix(in srgb, #fff 8%, transparent);
+  border-color: color-mix(in srgb, #fff 30%, transparent);
+}
+
+/* ===========================================================================
+   5. Buttons
+   ======================================================================== */
+
+/* The primary action is the brightest thing on the page and the only one
+   that glows. If a second element ever earns a glow, this one has stopped
+   working. */
+.landing .btn-primary {
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-deep) 100%);
+  border-color: transparent;
+  color: #fff;
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 22%) inset,
+    0 14px 34px -16px color-mix(in srgb, var(--brand) 75%, transparent);
+}
+
+.landing .btn-primary:hover {
+  background: linear-gradient(135deg, var(--brand-hover) 0%, var(--brand) 100%);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 28%) inset,
+    0 18px 40px -14px color-mix(in srgb, var(--brand) 85%, transparent);
+}
+
+.landing .btn-secondary {
+  background: color-mix(in srgb, #fff 5%, transparent);
+  border-color: color-mix(in srgb, #fff 16%, transparent);
+  color: var(--ink);
+  backdrop-filter: blur(8px);
+}
+
+.landing .btn-secondary:hover {
+  background: color-mix(in srgb, #fff 11%, transparent);
+  border-color: color-mix(in srgb, var(--brand) 55%, transparent);
+}
+
+/* ===========================================================================
+   6. Bands - depth, not lightness
+   ======================================================================== */
+
+.landing .band {
+  position: relative;
+  background: transparent;
+  border-block: 0;
+}
+
+/* A plate: raised off the base, lit along its top edge, shadowed below it.
+   This is what replaces the sand and white bands. */
+.landing .band-alt {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--paper-2) 92%, transparent),
+    color-mix(in srgb, var(--paper-2) 62%, transparent)
+  );
+  border-block: 1px solid var(--rule);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 4%) inset,
+    0 -40px 80px -60px rgb(0 0 0 / 90%);
+}
+
+/* A hole rather than a plate: the two sections about silence and doubt sit
+   below the base, not above it. */
+.landing .band-dark {
+  background:
+    radial-gradient(58% 60% at 82% 4%, color-mix(in srgb, var(--brand-deep) 24%, transparent), transparent 68%),
+    linear-gradient(180deg, #050810, #070b14 55%, #050810);
+  box-shadow: 0 40px 90px -70px rgb(0 0 0 / 100%) inset;
+}
+
+/* Hairlines, so a band begins and ends on purpose. */
+.landing .band-dark::before,
+.landing .band-dark::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--brand) 60%, transparent), transparent);
+}
+
+.landing .band-dark::before {
+  top: 0;
+}
+
+.landing .band-dark::after {
+  bottom: 0;
+}
+
+.landing .band-dark .sm-side.is-dark .sm-card {
+  background: rgb(255 255 255 / 2%);
+  border-color: rgb(255 255 255 / 9%);
+  filter: none;
+}
+
+.landing .band-dark .sm-days {
+  color: var(--ink-3);
+}
+
+/* ===========================================================================
+   7. Surfaces - one glass, used everywhere
+   ======================================================================== */
+
+.landing .card,
+.landing .fear-side,
+.landing .sup-card,
+.landing .pipeline,
+.landing .gate-card,
+.landing .inside-card,
+.landing .how-step {
+  background: var(--glass);
+  border-color: var(--glass-edge);
+  backdrop-filter: blur(12px);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 7%) inset,
+    var(--lift);
+}
+
+/* ===========================================================================
+   8. Hero
+   ======================================================================== */
+
+.landing .hero {
+  padding: 104px 0 112px;
+  border-bottom: 0;
+  background:
+    radial-gradient(64% 72% at 78% 6%, color-mix(in srgb, var(--brand-deep) 32%, transparent), transparent 64%),
+    radial-gradient(52% 62% at 6% 94%, color-mix(in srgb, var(--pass) 12%, transparent), transparent 70%),
+    linear-gradient(168deg, #0a1122 0%, #070b14 48%, #080d19 100%);
+}
+
+.landing .hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 4%) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 4%) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(100% 75% at 50% 25%, #000 30%, transparent 75%);
+}
+
+.landing .hero::before {
+  background: radial-gradient(
+    62% 70% at 22% 24%,
+    color-mix(in srgb, var(--brand) 16%, transparent),
+    transparent 72%
+  );
+}
+
+/* The demo is the brightest object in the hero, because it is the argument. */
+.landing .hero-stage .pipeline {
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter: blur(16px) saturate(120%);
+  border-color: color-mix(in srgb, #fff 13%, transparent);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 12%) inset,
+    0 60px 100px -44px rgb(0 0 0 / 90%);
+}
+
+.landing .hero-glow {
+  background: radial-gradient(
+    60% 60% at 50% 40%,
+    color-mix(in srgb, var(--brand) 60%, transparent),
+    transparent 72%
+  );
+}
+
+/* The persona switch, which is the first control anybody touches. */
+.landing .psw {
+  background: color-mix(in srgb, #fff 5%, transparent);
+  border-color: color-mix(in srgb, #fff 14%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+.landing .psw-lit {
+  background: linear-gradient(135deg, var(--brand), var(--brand-deep));
+  box-shadow: 0 8px 22px -12px color-mix(in srgb, var(--brand) 90%, transparent);
+}
+
+.landing .psw-opt {
+  color: var(--ink-2);
+}
+
+.landing .psw-opt.is-on {
+  color: #fff;
+}
+
+/* ===========================================================================
+   9. The ticker, which joins the hero to the page
+   ======================================================================== */
+
+.landing .ticker {
+  border-top: 0;
+  border-bottom: 1px solid var(--rule);
+  background: linear-gradient(180deg, #070b14, #0a1020);
+}
+
+.landing .ticker-item {
+  color: var(--ink-2);
+}
+
+.landing .ticker-item i {
+  background: var(--brand);
+}
+
+/* ===========================================================================
+   10. Supporters - "We are supported by"
+   ======================================================================== */
+
+.landing .supporters {
+  background:
+    radial-gradient(50% 54% at 50% 0%, color-mix(in srgb, var(--violet) 14%, transparent), transparent 70%),
+    transparent;
+}
+
+.landing .sup-label {
+  color: var(--ink-3);
+  letter-spacing: 0.16em;
+}
+
+.landing .sup-strip li {
+  background: color-mix(in srgb, #fff 4%, transparent);
+  border-color: color-mix(in srgb, #fff 11%, transparent);
+  backdrop-filter: blur(8px);
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease,
+    transform 0.25s ease;
+}
+
+.landing .sup-strip li:hover {
+  background: color-mix(in srgb, #fff 8%, transparent);
+  border-color: color-mix(in srgb, var(--brand) 50%, transparent);
+  transform: translateY(-2px);
+}
+
+.landing .sup-strip b {
+  color: var(--ink);
+}
+
+.landing .sup-strip small {
+  color: var(--ink-3);
+}
+
+.landing .sup-card::before {
+  color: color-mix(in srgb, var(--brand) 26%, transparent);
+}
+
+.landing .sup-arrow {
+  background: color-mix(in srgb, #fff 5%, transparent);
+  border-color: color-mix(in srgb, #fff 14%, transparent);
+  color: var(--ink);
+}
+
+.landing .sup-arrow:hover {
+  background: color-mix(in srgb, #fff 10%, transparent);
+  border-color: color-mix(in srgb, var(--brand) 55%, transparent);
+}
+
+.landing .sup-dots button {
+  background: color-mix(in srgb, #fff 20%, transparent);
+}
+
+.landing .sup-dots button.is-on {
+  background: var(--brand);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--brand) 70%, transparent);
+}
+
+/* ===========================================================================
+   11. The close
+   ======================================================================== */
+
+/* The one saturated surface on the page, and the last thing read. It is a
+   band of brand light rather than a flat fill, so it reads as the page
+   brightening into its ending rather than a coloured box stuck on the end. */
+.landing .cta {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  background:
+    radial-gradient(60% 120% at 12% 0%, color-mix(in srgb, var(--violet) 55%, transparent), transparent 62%),
+    linear-gradient(120deg, var(--brand-deep) 0%, #2b3fae 46%, #1b2a7a 100%);
+  border-block: 1px solid color-mix(in srgb, #fff 16%, transparent);
+  padding: 76px 0;
+}
+
+.landing .cta::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 6%) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 6%) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(90% 100% at 80% 50%, #000, transparent 72%);
+}
+
+.landing .cta-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.landing .cta-said h2 {
+  background: none;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  color: #fff;
+}
+
+.landing .cta-said p {
+  color: rgb(255 255 255 / 82%);
+}
+
+/* On the brand band the primary button must invert - a blue button on blue
+   is the commonest way a call to action disappears. */
+.landing .cta .btn-primary {
+  background: #fff;
+  color: var(--brand-deep);
+  box-shadow: 0 16px 36px -18px rgb(0 0 0 / 70%);
+}
+
+.landing .cta .btn-primary:hover {
+  background: #eef2ff;
+}
+
+.landing .cta .btn-secondary {
+  background: rgb(255 255 255 / 10%);
+  border-color: rgb(255 255 255 / 40%);
+  color: #fff;
+}
+
+.landing .cta .btn-secondary:hover {
+  background: rgb(255 255 255 / 18%);
+}
+
+/* ===========================================================================
+   12. Footer
+   ======================================================================== */
+
+.landing .site-footer {
+  border-top: 1px solid var(--rule);
+  background:
+    radial-gradient(50% 60% at 15% 0%, color-mix(in srgb, var(--brand-deep) 16%, transparent), transparent 70%),
+    #050810;
+  padding-top: 56px;
+}
+
+.landing .site-footer .brand-mark::after {
+  background: #050810;
+}
+
+.landing .foot-col a,
+.landing .foot-about a {
+  color: var(--ink-2);
+}
+
+.landing .foot-col a:hover,
+.landing .foot-about a:hover {
+  color: var(--brand);
+}
+
+.landing .foot-demo {
+  color: var(--ink-3);
+}
+
+/* ===========================================================================
+   13. Fixes
+   ======================================================================== */
+
+/* The turning cards used to be two absolutely positioned faces inside a fixed
+   height, so a longer answer ran out of the bottom and over whatever was
+   below it. Both faces now sit in the same grid cell, which means the card is
+   as tall as its tallest side and nothing can overflow. */
+.fear-inner {
+  display: grid;
+  min-height: 0;
+}
+
+.fear-side {
+  position: relative;
+  inset: auto;
+  grid-area: 1 / 1;
+  min-height: 244px;
+}
+
+/* The big numeral is a watermark, so it belongs behind the words rather than
+   in front of them. */
+.fear-num {
+  z-index: 0;
+  top: 6px;
+  right: 14px;
+  font-size: 54px;
+}
+
+.fear-text,
+.fear-hint,
+.fear-answer,
+.fear-proof {
+  position: relative;
+  z-index: 1;
+}
+
+/* The oversized quote mark had the same problem on a narrow card. */
+.sup-card {
+  overflow: hidden;
+}
+
+.sup-card::before {
+  top: -18px;
+  left: 14px;
+  z-index: 0;
+}
+
+.sup-kind,
+.sup-card blockquote,
+.sup-card figcaption {
+  position: relative;
+  z-index: 1;
+}
+
+/* The scroll hint sat in the middle of the hero, which on a short viewport is
+   on top of the words. It is now pinned clear of the copy. */
+.hero-scroll {
+  left: auto;
+  right: 26px;
+  bottom: 26px;
+}
+
+/* Section headings are set tight; without this the descenders of one line can
+   touch the ascenders of the next at the largest clamp. A clipped background
+   needs the padding too, or the gradient cuts the descenders off. */
+.section-head h2 {
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+.landing .hero h1,
+.landing .section-head h2 {
+  padding-bottom: 0.08em;
+}
+
+/* The floating pins hang outside the demo by design - that is what makes them
+   read as annotations on it rather than labels in it. But they were pinned at
+   a negative offset with nowrap text and no width, so once the hero stacked
+   into one column the longer ones ("Nothing reaches a student without you")
+   ran past the stage and sat over the copy above and below. They are now
+   held inside the container, allowed to wrap, and dropped entirely on a
+   phone, where there is no room beside the demo for an aside. */
+.pin {
+  max-width: min(14rem, 42vw);
+  white-space: normal;
+  text-wrap: balance;
+}
+
+.pin.at-tl {
+  top: -12px;
+  left: clamp(-18px, -1.2vw, 0px);
+}
+
+.pin.at-br {
+  right: clamp(-16px, -1.2vw, 0px);
+  bottom: -14px;
+}
+
+@media (max-width: 720px) {
+  .pin {
+    display: none;
+  }
+}
+
+/* The season's mood words are outline-only - drawn as a 1px stroke with no
+   fill, so they sit behind the month like a watermark. The stroke was 28% of
+   --ink, which on the old near-white band was a legible grey line and on this
+   one is a whisper: "Hope", "Noise" and "Silence" had all but vanished. Dark
+   needs more of the ink, not less, because a hairline loses far more contrast
+   against black than against white. */
+.landing .sl-when em {
+  -webkit-text-stroke-color: color-mix(in srgb, var(--ink) 46%, transparent);
+}
+
+.landing .sl-beat.is-lit .sl-when em {
+  color: color-mix(in srgb, var(--brand) 30%, transparent);
+  -webkit-text-stroke-color: var(--brand-hover);
+}
+
+/* The bottom-right pin hangs 14px below the stage and is about 32px tall, so
+   it needs roughly 46px of clearance beneath it. The caption allowed 22px,
+   which is why "4 days left to answer you" was sitting on the sentence under
+   the demo. */
+.hero-caption {
+  margin-top: 52px;
+}
+
+@media (max-width: 720px) {
+  /* No pin to clear down here. */
+  .hero-caption {
+    margin-top: 22px;
+  }
+}
+
+/* ===========================================================================
+   14. Responsive
+   ======================================================================== */
+
+@media (max-width: 980px) {
+  .landing .hero {
+    padding: 68px 0 76px;
+  }
+
+  .landing .cta {
+    padding: 56px 0;
+  }
+}
+
+/* ===========================================================================
+   15. Motion, switched off on request
+   ======================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .landing .backdrop-aurora {
+    animation: none;
+  }
+
+  .landing .hero-stage .pipeline,
+  .landing .site-header.is-scrolled,
+  .landing .psw,
+  .landing .btn-secondary {
+    backdrop-filter: none;
+  }
+
+  .landing .sup-strip li:hover {
+    transform: none;
+  }
+}

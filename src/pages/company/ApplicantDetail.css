@@ -1,0 +1,543 @@
+/* ==========================================================================
+   One applicant, read properly
+
+   This is where a recruiter decides about a person rather than sorting a
+   queue, so the page is allowed to be long - but everything on it has to be
+   something the decision rests on. Namespaced `ad-`; the rest of the page
+   borrows the shared card, facts-grid and entry-list from JobEditor.css.
+   ========================================================================== */
+
+/* --- reading on the left, deciding on the right --------------------------- */
+
+/*
+  The record is long - marks, education, four jobs, six projects - and with
+  the buttons stacked above it a recruiter had to scroll back up to act on
+  what they had just read, or decide from the top of the page without
+  reading at all. Splitting the two puts the decision beside its evidence.
+
+  The record reads first, on the left, and the decision waits at the end of
+  the line - which is the order the work actually happens in.
+*/
+.ad-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(290px, 360px);
+  gap: 16px;
+  align-items: start;
+}
+
+/*
+  Placed rather than reordered in the markup.
+
+  The rail is written first so that when the columns collapse on a narrow
+  screen the decision is on top rather than buried under six projects - and
+  so anybody reading the page with a screen reader meets it in that order
+  too. Only the eye sees it on the right.
+*/
+.ad-main {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.ad-rail {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+}
+
+/*
+  The rail follows the scroll, so the buttons are always one movement from
+  whatever is being read. It keeps its own scrollbar: with a stepper, a
+  waiting note and a history in it the rail can outgrow the window, and a
+  sticky element taller than the viewport sticks to nothing.
+*/
+.ad-rail-in {
+  position: sticky;
+  top: 16px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  display: grid;
+  gap: 12px;
+  /* Room for the scrollbar, so a card edge is never under it. */
+  padding-right: 2px;
+}
+
+.ad-main {
+  min-width: 0;
+  display: grid;
+  gap: 12px;
+}
+
+/* The cards in both columns already carry their own margin from the shared
+   stylesheet; the grid gap is doing that job now. */
+.ad-split .card {
+  margin: 0;
+}
+
+/* --- the decision panel --------------------------------------------------- */
+
+/*
+  Where they are and what to do about it, in one card, because they are one
+  thought. The shared `.decide` draws a 3px ring outside its own box; inside
+  a rail that scrolls, that ring is clipped down one side, so here the
+  emphasis comes from the border and a wash instead.
+*/
+.ad-decide {
+  box-shadow: none;
+  border-color: color-mix(in srgb, var(--brand) 40%, transparent);
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--brand) 7%, var(--surface)),
+    var(--surface) 62%
+  );
+  display: grid;
+  gap: 12px;
+}
+
+/* Closed: still shown, because a recruiter checks what they decided - but it
+   is no longer an instruction, so it stops looking like one. */
+.ad-decide.is-closed {
+  border-color: var(--rule);
+  background: var(--paper-2);
+}
+
+/* The first thing the panel has to answer, before it asks for anything. */
+.ad-now {
+  display: grid;
+  gap: 1px;
+  margin: 0;
+}
+
+.ad-now > span {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.ad-now > b {
+  font-size: 16px;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+/* --- the rounds, small ---------------------------------------------------- */
+
+/*
+  Read in a glance to answer one question - where have they got to - and
+  placed directly above the button that moves them, so the answer and the act
+  are never more than an eye movement apart.
+*/
+.ad-rounds {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.ad-round {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 9px;
+  align-items: start;
+  padding: 5px 0;
+}
+
+.ad-round-n {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid var(--rule-2);
+  background: var(--surface);
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-3);
+}
+
+.ad-round-main {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.ad-round-main b {
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ink-2);
+}
+
+.ad-round-main small {
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+/* What the interviewer wrote: the reason the next decision goes the way it
+   goes, so it is quoted rather than truncated into the line above. */
+.ad-round-main em {
+  margin-top: 3px;
+  font-style: normal;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--ink-2);
+  padding-left: 8px;
+  border-left: 2px solid var(--rule-2);
+}
+
+.ad-round.is-pass .ad-round-n {
+  border-color: transparent;
+  background: var(--pass);
+  color: #fff;
+}
+
+.ad-round.is-fail .ad-round-n {
+  border-color: transparent;
+  background: var(--stop);
+  color: #fff;
+}
+
+/* Where they are. The only round that gets the ink. */
+.ad-round.is-now .ad-round-n {
+  border-color: transparent;
+  background: var(--brand);
+  color: #fff;
+}
+
+.ad-round.is-now .ad-round-main b {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.ad-round.is-now .ad-round-main small {
+  color: var(--brand);
+  font-weight: 600;
+}
+
+.ad-round.is-todo .ad-round-main b {
+  color: var(--ink-3);
+}
+
+.ad-none,
+.ad-shut {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+/* --- score and feedback --------------------------------------------------- */
+
+/* Stacked, because the rail is narrow and these two are read as a pair. */
+.ad-mark {
+  display: grid;
+  gap: 8px;
+  padding: 11px 12px;
+  border-radius: 12px;
+  background: var(--paper-2);
+}
+
+.ad-mark label {
+  display: grid;
+  gap: 3px;
+}
+
+.ad-mark span {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+
+.ad-mark input {
+  width: 100%;
+  padding: 7px 10px;
+  font: inherit;
+  font-size: 13px;
+  border: 1px solid var(--rule-2);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.ad-mark-hint {
+  margin: 0;
+  font-size: 10.5px;
+  line-height: 1.4;
+  color: var(--ink-3);
+}
+
+/* --- the moves ------------------------------------------------------------ */
+
+/*
+  Stacked and full width, not strung across a page-wide row. In a rail this
+  narrow a wrapped row of buttons puts "Reject" directly under "Pass", which
+  is the one pair that must never be a slip of the hand.
+*/
+.ad-decide .btn-row {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+}
+
+.ad-decide .btn-row .btn {
+  width: 100%;
+  justify-content: center;
+  padding: 10px 14px;
+  font-size: 13.5px;
+}
+
+/* The way out, set apart from the moves forward by a rule and by being the
+   only thing here that is not a button. */
+.ad-decide .btn-row .link-btn {
+  justify-self: center;
+  margin-top: 3px;
+  padding-top: 9px;
+  font-size: 12.5px;
+}
+
+/* The waiting note is a fact about the clock, not part of the form. */
+.ad-decide .tk-wait {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/*
+  Below this the rail would be too narrow to hold a stepper, so the two
+  columns become one - and the decision goes back on top, where it is at
+  least visible without a scroll.
+*/
+@media (max-width: 980px) {
+  .ad-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Back to source order: the decision on top, the record under it. */
+  .ad-main,
+  .ad-rail {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .ad-rail-in {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+/* --- what somebody else stands behind ------------------------------------- */
+
+/*
+  The one part of the passport that is not already written out below. Self
+  reported claims are dropped from it, so this list is short by design - and
+  short is the point: a recruiter reading it knows every line was checked by
+  somebody who is not the candidate.
+*/
+.ad-vouched {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.ad-vouched li {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding: 9px 11px;
+  border-radius: 11px;
+  border: 1px solid var(--rule);
+  background: var(--paper-2);
+}
+
+/* Who checked it, which is the whole reason the line is here. */
+.ad-vouch-by {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.ad-vouched .is-COLLEGE_VERIFIED {
+  border-color: color-mix(in srgb, var(--brand) 28%, transparent);
+}
+
+.ad-vouched .is-COLLEGE_VERIFIED .ad-vouch-by {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.ad-vouched .is-EMPLOYER_VERIFIED {
+  border-color: color-mix(in srgb, var(--pass) 30%, transparent);
+}
+
+.ad-vouched .is-EMPLOYER_VERIFIED .ad-vouch-by {
+  background: color-mix(in srgb, var(--pass) 12%, transparent);
+  color: var(--pass);
+}
+
+.ad-vouch-what {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.ad-vouch-what b {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.ad-vouch-what small {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+/* --- skills --------------------------------------------------------------- */
+
+.ad-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/*
+  A skill the student typed, and a skill somebody watched them use, are not
+  the same claim - so they do not look the same. The tick is the only mark on
+  this page that means "checked", and it is used nowhere else.
+*/
+.ad-skill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  border: 1px dashed var(--rule-2);
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.ad-skill.is-shown {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--pass) 35%, transparent);
+  background: color-mix(in srgb, var(--pass) 8%, transparent);
+  color: var(--pass);
+  font-weight: 600;
+  cursor: help;
+}
+
+.ad-skill i {
+  font-style: normal;
+  font-size: 11px;
+}
+
+/* The status, written the way it is said rather than the way it is stored. */
+.ad-pill {
+  text-transform: capitalize;
+}
+
+/* What the student calls themselves. Sits under the name, above the facts,
+   because it is the sentence the marks are evidence for. */
+.ad-headline {
+  margin: 4px 0 0;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+/* How to reach them. Live links: a recruiter who has decided to talk to
+   somebody should not be copying a number out of a PDF. */
+.ad-reach {
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+.ad-reach a {
+  color: var(--brand);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.ad-reach a:hover {
+  text-decoration: underline;
+}
+
+.ad-prn {
+  margin-left: 10px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--paper-2);
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+/* Their own summary, given room to be read rather than squeezed into a
+   caption. */
+.ad-about {
+  margin: 0;
+  max-width: 72ch;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  white-space: pre-wrap;
+}
+
+/* What they actually did in a job or a project - a paragraph, not a label. */
+.ad-body {
+  display: block;
+  margin-top: 4px;
+  max-width: 72ch;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  white-space: pre-wrap;
+}
+
+/* Every place a project can be seen, as chips rather than a stack of raw
+   URLs - four links under one project should read as four places, not as a
+   wall of text a recruiter skips. */
+.ad-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.ad-links a {
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--rule-2);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  text-decoration: none;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ad-links a:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+/* An outgoing link, marked as one. */
+.ad-links a::after {
+  content: ' ↗';
+  color: var(--ink-3);
+}
+
+.ad-links a:hover::after {
+  color: var(--brand);
+}

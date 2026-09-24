@@ -1,0 +1,502 @@
+/* Group discussion - a lobby, a room, and a debrief. */
+
+.gd-lobby,
+.gd-history,
+.gd-room,
+.gd-feedback {
+  margin-bottom: 16px;
+}
+
+.gd-lobby h2,
+.gd-history h2 {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.gd-people {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.gd-people li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+.gd-people strong {
+  display: block;
+  font-size: 14px;
+}
+
+.gd-people small {
+  color: var(--ink-3);
+  font-size: 12.5px;
+}
+
+/* Each participant has a colour, so a busy log is easy to follow. */
+.gd-avatar {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
+  background: var(--ink-3);
+}
+
+.gd-av-dominant {
+  background: #c2410c;
+}
+
+.gd-av-quiet {
+  background: #7c3aed;
+}
+
+.gd-av-offtopic {
+  background: #0e7490;
+}
+
+.gd-av-data {
+  background: #15803d;
+}
+
+.gd-av-you {
+  background: var(--brand);
+}
+
+.gd-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 560px;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.gd-start {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+}
+
+.gd-privacy {
+  flex: 1;
+  min-width: 240px;
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+/* The room */
+
+.gd-room-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.gd-kicker {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+
+.gd-topic {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 21px;
+  line-height: 1.3;
+}
+
+.gd-timer {
+  flex: none;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--paper-2);
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.gd-timer.is-low {
+  background: var(--hold-soft);
+  color: var(--hold);
+}
+
+.gd-seats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gd-seats li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 4px;
+  border-radius: 999px;
+  border: 1px solid var(--rule);
+  font-size: 13px;
+  transition: box-shadow 0.2s ease;
+}
+
+.gd-seats .gd-avatar {
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
+}
+
+.gd-seats li.is-speaking {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+
+.gd-log {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 440px;
+  overflow-y: auto;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--paper-2);
+}
+
+.gd-turn {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: 82%;
+}
+
+.gd-turn-you {
+  align-self: flex-end;
+}
+
+.gd-turn-mod {
+  align-self: center;
+  max-width: 92%;
+}
+
+.gd-bubble {
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+}
+
+.gd-turn-them .gd-bubble {
+  border-bottom-left-radius: 4px;
+}
+
+.gd-turn-you .gd-bubble {
+  background: var(--brand-soft);
+  border-color: transparent;
+  border-bottom-right-radius: 4px;
+}
+
+.gd-turn-mod .gd-bubble {
+  background: transparent;
+  border-style: dashed;
+  text-align: center;
+  font-style: italic;
+}
+
+.gd-who {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-3);
+}
+
+.gd-bubble p {
+  margin: 2px 0 0;
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+
+.gd-cue {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--pass-soft);
+  font-size: 14px;
+}
+
+.gd-cue-soft {
+  background: var(--brand-soft);
+}
+
+.gd-input {
+  width: 100%;
+  margin-top: 12px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.gd-problem {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--stop);
+}
+
+.gd-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.gd-spacer {
+  flex: 1;
+}
+
+.gd-mic {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gd-mic-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ink-3);
+}
+
+.gd-mic.is-on .gd-mic-dot {
+  background: var(--stop);
+  animation: gd-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes gd-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* Debrief */
+
+.gd-fb-head {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.gd-fb-head h2 {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+
+.gd-ring {
+  width: 64px;
+  height: 64px;
+  flex: none;
+}
+
+.gd-ring-bg {
+  fill: none;
+  stroke: var(--rule);
+  stroke-width: 6;
+}
+
+.gd-ring-fg {
+  fill: none;
+  stroke: var(--brand);
+  stroke-width: 6;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: 32px 32px;
+}
+
+.gd-ring text {
+  font-size: 17px;
+  font-weight: 700;
+  fill: var(--ink);
+}
+
+.gd-note {
+  color: var(--ink-3);
+}
+
+.gd-h {
+  margin: 18px 0 8px;
+  font-size: 14px;
+}
+
+.gd-list {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 6px;
+  font-size: 14.5px;
+}
+
+.gd-good li::marker {
+  color: var(--pass);
+}
+
+.gd-next li::marker {
+  color: var(--brand);
+}
+
+.gd-signals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gd-signals li {
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--paper-2);
+  color: var(--ink-3);
+  font-size: 13px;
+}
+
+.gd-signals li.is-ok {
+  background: var(--pass-soft);
+  color: var(--ink);
+}
+
+.gd-signals li.is-ok span {
+  color: var(--pass);
+  font-weight: 700;
+}
+
+.gd-share {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+}
+
+.gd-share-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13.5px;
+}
+
+.gd-share-bar {
+  position: relative;
+  height: 10px;
+  margin: 8px 0 6px;
+  border-radius: 999px;
+  background: var(--rule);
+  overflow: hidden;
+}
+
+/* The comfortable band, 15-35%, drawn behind the student's own share. */
+.gd-share-zone {
+  position: absolute;
+  left: 15%;
+  width: 20%;
+  top: 0;
+  bottom: 0;
+  background: var(--pass-soft);
+}
+
+.gd-share-you {
+  position: absolute;
+  left: 0;
+  top: 3px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--brand);
+}
+
+.gd-share small {
+  color: var(--ink-3);
+}
+
+.gd-transcript {
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+.gd-transcript summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.gd-transcript p {
+  margin: 6px 0;
+}
+
+/* History */
+
+.gd-history ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.gd-history li + li {
+  border-top: 1px solid var(--rule);
+}
+
+.gd-history button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+  padding: 10px 2px;
+  background: none;
+  border: 0;
+  text-align: left;
+  color: inherit;
+}
+
+.gd-history strong {
+  display: block;
+  font-size: 14px;
+}
+
+.gd-history small {
+  color: var(--ink-3);
+}
+
+.gd-history-score {
+  font-family: var(--mono);
+  font-weight: 700;
+  color: var(--brand);
+}
+
+@media (max-width: 720px) {
+  .gd-people {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gd-turn {
+    max-width: 100%;
+  }
+}

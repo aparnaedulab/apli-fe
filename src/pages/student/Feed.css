@@ -1,0 +1,432 @@
+/* ==========================================================================
+   The campus feed
+
+   One college, talking to itself. Narrow on purpose - a column somebody
+   reads down, not a grid they scan - and quiet, because the loud thing on
+   any given post should be what somebody wrote.
+
+   Namespaced `fd-`: these stylesheets are bundled app wide.
+   ========================================================================== */
+
+.fd {
+  max-width: 620px;
+}
+
+.fd-head {
+  margin-bottom: 16px;
+}
+
+.fd-head h1 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+
+/* Who can see this is said once, plainly, where somebody about to write can
+   read it - not buried in a policy nobody opens. */
+.fd-head p {
+  margin: 4px 0 0;
+  max-width: 58ch;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-3);
+}
+
+.fd-face {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+/* --- writing one ---------------------------------------------------------- */
+
+.fd-write {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+.fd-write-top {
+  display: flex;
+  gap: 12px;
+  align-items: start;
+}
+
+.fd-write-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+}
+
+.fd-write-foot .btn-sm {
+  margin-left: auto;
+  padding: 7px 16px;
+  font-size: 13px;
+}
+
+/* Only the cell ever sees this. */
+.fd-as {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.fd-as input {
+  accent-color: var(--brand);
+}
+
+/* What is about to go up, small enough to check and large enough to see. */
+.fd-picked {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fd-picked li {
+  position: relative;
+  width: 84px;
+  height: 84px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--paper-2);
+}
+
+.fd-picked img,
+.fd-picked video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fd-picked button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 0.55);
+  color: #fff;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* --- one post ------------------------------------------------------------- */
+
+.fd-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+
+.fd-post {
+  padding: 14px 16px 12px;
+  border-radius: 16px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+/* The college speaking as itself. Marked, because an announcement carries
+   different weight from a classmate's opinion. */
+.fd-post.is-cell {
+  border-color: color-mix(in srgb, var(--brand) 32%, transparent);
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--brand) 5%, var(--surface)),
+    var(--surface) 62%
+  );
+}
+
+.fd-post.is-cell .fd-face {
+  background: var(--brand);
+  color: #fff;
+}
+
+.fd-post > header {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 9px;
+}
+
+.fd-who {
+  display: grid;
+  gap: 0;
+  min-width: 0;
+}
+
+.fd-who b {
+  font-size: 13.5px;
+  color: var(--ink);
+}
+
+.fd-who small {
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+.fd-x {
+  margin-left: auto;
+  font-size: 11.5px;
+}
+
+/* The post's own HTML, from the allowlist the server permits: paragraphs,
+   emphasis, a heading, lists, links. Sized here so the same markup reads the
+   same whichever screen it is on. */
+.fd-body {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.fd-body > :first-child {
+  margin-top: 0;
+}
+
+.fd-body > :last-child {
+  margin-bottom: 0;
+}
+
+.fd-body p {
+  margin: 0 0 8px;
+}
+
+.fd-body h3 {
+  margin: 12px 0 6px;
+  font-size: 15px;
+}
+
+.fd-body ul,
+.fd-body ol {
+  margin: 0 0 8px;
+  padding-left: 20px;
+}
+
+.fd-body li {
+  margin-bottom: 3px;
+}
+
+.fd-body blockquote {
+  margin: 0 0 8px;
+  padding-left: 12px;
+  border-left: 3px solid var(--rule-2);
+  color: var(--ink-2);
+}
+
+.fd-body a {
+  color: var(--brand);
+}
+
+/* The editor sits where the textarea was, and fills the row beside the face. */
+.fd-editor {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* --- photographs and clips ------------------------------------------------ */
+
+.fd-media {
+  display: grid;
+  gap: 4px;
+  margin-top: 11px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.fd-media img,
+.fd-media video {
+  width: 100%;
+  display: block;
+  background: var(--paper-2);
+}
+
+/* One fills the width; two sit side by side; more make a grid. Cropping is
+   square from two upward so a mixed set does not stagger. */
+.fd-media.is-1 img,
+.fd-media.is-1 video {
+  max-height: 460px;
+  object-fit: cover;
+}
+
+.fd-media.is-2,
+.fd-media.is-3,
+.fd-media.is-4 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.fd-media.is-2 img,
+.fd-media.is-2 video,
+.fd-media.is-3 img,
+.fd-media.is-3 video,
+.fd-media.is-4 img,
+.fd-media.is-4 video {
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+/* Three: the first one takes the full width above the other two. */
+.fd-media.is-3 > *:first-child {
+  grid-column: 1 / -1;
+  aspect-ratio: 16 / 9;
+}
+
+/* --- liking and replying -------------------------------------------------- */
+
+.fd-acts {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 11px;
+  padding-top: 9px;
+  border-top: 1px solid var(--rule);
+}
+
+.fd-like {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--rule-2);
+  background: var(--surface);
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition:
+    border-color 0.13s ease,
+    color 0.13s ease;
+}
+
+.fd-like:hover {
+  border-color: var(--stop);
+  color: var(--stop);
+}
+
+.fd-like.is-on {
+  border-color: var(--stop);
+  background: color-mix(in srgb, var(--stop) 8%, transparent);
+  color: var(--stop);
+  font-weight: 600;
+}
+
+.fd-count {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.fd-more {
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+.fd-comments {
+  margin: 9px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 7px;
+}
+
+/* A reply is a line, not a card. Threads on a campus feed become arguments
+   nobody can follow, so there is one level and no nesting. */
+.fd-comments li {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+
+.fd-comments b {
+  color: var(--ink);
+  margin-right: 6px;
+}
+
+.fd-comments small {
+  margin-left: 6px;
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+
+.fd-reply {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.fd-reply input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 8px 13px;
+  font: inherit;
+  font-size: 13px;
+  border: 1px solid var(--rule-2);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.fd-reply .link-btn {
+  font-size: 12.5px;
+}
+
+/* --- nothing yet ---------------------------------------------------------- */
+
+.fd-empty {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 48px 24px;
+  border-radius: 18px;
+  border: 1px dashed var(--rule-2);
+  background: var(--surface);
+  text-align: center;
+}
+
+.fd-empty .apli-face {
+  color: var(--brand);
+}
+
+.fd-empty h2 {
+  margin: 4px 0 0;
+  font-size: 17px;
+}
+
+.fd-empty p {
+  margin: 0;
+  max-width: 44ch;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fd-like {
+    transition: none;
+  }
+}

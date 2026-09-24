@@ -1,0 +1,86 @@
+/* A dropdown you can add to without leaving the form. */
+
+.growable {
+  display: grid;
+  gap: 4px;
+}
+
+.growable-add {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.growable-add input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 8px 11px;
+  font: inherit;
+  font-size: 14px;
+  border: 1px solid var(--brand);
+  border-radius: 7px;
+  background: var(--paper-2);
+  color: inherit;
+}
+
+/* Tight enough to sit inside a form row without pushing its neighbours. */
+.growable-add .btn {
+  flex: none;
+  padding: 7px 12px;
+  font-size: 13.5px;
+}
+
+.growable-add .link-btn {
+  flex: none;
+  font-size: 13px;
+}
+
+.growable-error {
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--stop);
+}
+
+/* Questions a new choice has to answer, where the form behaves differently
+   depending on the answer. */
+.growable-intro {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+
+.growable-traits {
+  display: grid;
+  gap: 7px;
+  padding: 2px 0 0;
+}
+
+.growable-traits label {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  align-items: start;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.growable-traits input {
+  margin-top: 2px;
+  width: 15px;
+  height: 15px;
+  accent-color: var(--brand);
+}
+
+.growable-hint {
+  display: block;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ink-3);
+}
+
+/* A trait that only makes sense once another is ticked. */
+.growable-traits label.is-blocked {
+  opacity: 0.5;
+  cursor: default;
+}

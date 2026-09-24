@@ -1,0 +1,307 @@
+/* ==========================================================================
+   Assessments
+
+   One list of what is owed, what is waiting on somebody else, and what has
+   already gone by. Grouped by that, because it is the only distinction a
+   student cares about when they open it.
+
+   Namespaced `as-`: these stylesheets are bundled app wide.
+   ========================================================================== */
+
+.as-head {
+  margin-bottom: 14px;
+}
+
+.as-head h1 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+
+.as-head p {
+  margin: 4px 0 0;
+  max-width: 66ch;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.as-apli {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin: 0 0 18px;
+  padding: 11px 15px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--brand) 22%, transparent);
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--brand) 8%, var(--surface)),
+    var(--surface) 65%
+  );
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.as-apli .apli-face {
+  flex: none;
+  color: var(--brand);
+}
+
+/* --- grouped by what it wants from them ----------------------------------- */
+
+.as-group {
+  margin-bottom: 22px;
+}
+
+.as-group h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 9px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.as-group h2 span {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--paper-2);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0;
+}
+
+.as-group ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+/* --- one test ------------------------------------------------------------- */
+
+.as-row {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+/* Owed. The only state that is a call to act, so the only one with an edge. */
+.as-row.is-assigned {
+  border-left: 3px solid var(--brand);
+}
+
+.as-row.is-passed {
+  border-left: 3px solid var(--pass);
+}
+
+.as-row.is-failed,
+.as-row.is-missed {
+  background: var(--paper-2);
+}
+
+.as-row-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.as-what {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.as-what b {
+  font-size: 14.5px;
+  color: var(--ink);
+}
+
+.as-what small {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+/*
+  Whether anybody watched it being taken.
+
+  The label, not proctoring - and it sits on the row because a recruiter
+  reading the score weighs it by exactly this. An unsupervised score taken at
+  home is worth something quite different from one sat in a college lab, and
+  saying which is nearly free.
+*/
+.as-watch {
+  flex: none;
+  padding: 2px 9px;
+  border-radius: 999px;
+  border: 1px dashed var(--rule-2);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.as-watch.is-on {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--pass) 40%, transparent);
+  background: color-mix(in srgb, var(--pass) 8%, transparent);
+  color: var(--pass);
+}
+
+.as-due {
+  flex: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.as-due.is-soon {
+  color: var(--hold);
+}
+
+.as-due.is-late {
+  color: var(--stop);
+}
+
+.as-note {
+  margin: 0;
+  max-width: 78ch;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  white-space: pre-wrap;
+}
+
+/* A score with no words beside it is a number nobody can argue with, so the
+   two are shown as one thing. */
+.as-result {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin: 0;
+  padding: 9px 12px;
+  border-radius: 11px;
+  background: var(--paper-2);
+}
+
+.as-result b {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.as-result span {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.as-sent {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+.as-sent code {
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: var(--paper-2);
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-2);
+}
+
+/* --- what they can do about it -------------------------------------------- */
+
+.as-do {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+}
+
+.as-do .btn-sm {
+  padding: 7px 14px;
+  font-size: 12.5px;
+}
+
+/*
+  Free text on purpose: every external platform names its own reference
+  differently, and asking a student to produce a format nobody told them is
+  how a required test quietly goes unsubmitted.
+*/
+.as-ref {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1 1 320px;
+}
+
+.as-ref input {
+  flex: 1 1 200px;
+  min-width: 0;
+  padding: 7px 12px;
+  font: inherit;
+  font-size: 12.5px;
+  border: 1px solid var(--rule-2);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.as-open {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  text-decoration: none;
+}
+
+.as-open:hover {
+  color: var(--brand);
+  text-decoration: underline;
+}
+
+/* --- nothing set ---------------------------------------------------------- */
+
+.as-empty {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 56px 24px;
+  border-radius: 18px;
+  border: 1px dashed var(--rule-2);
+  background: var(--surface);
+  text-align: center;
+}
+
+.as-empty .apli-face {
+  color: var(--brand);
+}
+
+.as-empty h2 {
+  margin: 4px 0 0;
+  font-size: 18px;
+}
+
+.as-empty p {
+  margin: 0;
+  max-width: 46ch;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+.as-empty .btn {
+  margin-top: 8px;
+}

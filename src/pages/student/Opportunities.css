@@ -1,0 +1,391 @@
+/* Micro-internships and campus weeks - shared by the student, company and
+   placement-cell pages, so the same thing looks the same wherever it appears. */
+
+.opp-money {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--paper-2);
+  border: 1px dashed var(--rule-2);
+  color: var(--ink-2);
+  font-size: 13.5px;
+  margin-bottom: 18px;
+}
+
+.opp-money strong {
+  color: var(--ink);
+}
+
+.opp-tabs {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  margin-bottom: 18px;
+}
+
+.opp-tabs button {
+  border: 0;
+  background: transparent;
+  padding: 7px 14px;
+  border-radius: 7px;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.opp-tabs button.is-on {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgb(20 22 28 / 0.12);
+}
+
+.opp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+}
+
+.opp-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  border-radius: 12px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+.opp-card.is-muted {
+  opacity: 0.75;
+}
+
+.opp-card h3 {
+  margin: 0;
+  font-size: 16.5px;
+}
+
+.opp-card p {
+  margin: 0;
+}
+
+.opp-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.opp-company {
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.opp-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.opp-facts b {
+  color: var(--ink);
+}
+
+.opp-brief {
+  font-size: 14px;
+  color: var(--ink-2);
+  white-space: pre-line;
+}
+
+.opp-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.opp-skill {
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.opp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: auto;
+}
+
+.opp-next {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--paper-2);
+  font-size: 14px;
+}
+
+.opp-form textarea,
+.opp-form select,
+.opp-form input[type='number'],
+.opp-form input[type='date'],
+.opp-form input[type='datetime-local'] {
+  width: 100%;
+  padding: 11px 13px;
+  font: inherit;
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius);
+}
+
+.opp-form textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+.opp-form .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.opp-count {
+  font-size: 12.5px;
+  color: var(--ink-3);
+  text-align: right;
+  margin-top: 4px;
+}
+
+.opp-apps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.opp-app {
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.opp-app-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.opp-app-head small {
+  display: block;
+  color: var(--ink-3);
+  font-size: 12.5px;
+}
+
+.opp-quote {
+  margin: 0;
+  padding: 8px 12px;
+  border-left: 3px solid var(--rule-2);
+  color: var(--ink-2);
+  font-size: 14px;
+  white-space: pre-line;
+}
+
+.opp-stars {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.opp-stars button {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-2);
+  background: var(--surface);
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.opp-stars button.is-on {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--on-brand);
+}
+
+/* Campus weeks */
+
+.week-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.week-events {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.week-event {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--paper-2);
+}
+
+.week-kind {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+
+.week-event strong {
+  display: block;
+  font-size: 14.5px;
+}
+
+.week-event small {
+  color: var(--ink-3);
+  font-size: 12.5px;
+}
+
+.week-people {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.week-person {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--rule-2);
+  background: var(--surface);
+  font-size: 13px;
+}
+
+.week-person input {
+  accent-color: var(--brand);
+}
+
+.week-plan-row {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr) 200px 90px 32px;
+  gap: 8px;
+  align-items: end;
+  margin-bottom: 8px;
+}
+
+.week-plan-row .field {
+  margin-bottom: 0;
+}
+
+@media (max-width: 760px) {
+  .week-event {
+    grid-template-columns: 1fr;
+  }
+
+  .week-plan-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Invitations to a session.
+
+   At the top, because an invitation is a question somebody asked you and it
+   should not have to be found among the things nobody asked you about.
+--------------------------------------------------------------------------- */
+
+.ev-asked {
+  margin: 0 0 22px;
+  padding: 14px 16px;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--brand);
+  border-radius: var(--radius);
+  background: var(--brand-soft);
+}
+
+.ev-asked h2 {
+  margin: 0 0 10px;
+  font-family: var(--display);
+  font-size: 16px;
+}
+
+.ev-asked ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ev-asked li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+}
+
+.ev-asked small {
+  display: block;
+  color: var(--ink-3);
+}
+
+.ev-asked-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* A session on the main list that this student was asked to. */
+.ev-tag {
+  display: inline-block;
+  margin-top: 3px;
+  color: var(--brand);
+  font-weight: 600;
+}
+
+/* A company inviting the applicants of one of its roles, from the session row. */
+.week-invite {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.week-invite select {
+  min-width: 180px;
+}

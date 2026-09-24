@@ -1,0 +1,145 @@
+/* Placement reports - shared by the placement cell and the institution admin. */
+
+.rp-picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0 18px;
+}
+
+.rp-seg {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+}
+
+.rp-seg button {
+  border: 0;
+  background: transparent;
+  color: var(--ink-2);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 7px 14px;
+  border-radius: 7px;
+}
+
+.rp-seg button.is-on {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgb(20 22 28 / 0.12);
+}
+
+.rp-seg button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.rp-picker select {
+  font: inherit;
+  font-size: 14.5px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-2);
+  background: var(--surface);
+  color: var(--ink);
+  min-width: 220px;
+}
+
+.rp-hero {
+  padding: 20px 22px;
+  margin-bottom: 16px;
+  border-radius: 14px;
+  border: 1px solid var(--rule);
+  background:
+    radial-gradient(120% 120% at 100% 0%, var(--brand-soft), transparent 60%),
+    var(--surface);
+}
+
+.rp-headline {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  color: var(--ink-2);
+  font-size: 16px;
+}
+
+.rp-big {
+  font-family: var(--display);
+  font-size: 46px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--brand);
+}
+
+.rp-bar {
+  margin-top: 14px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--rule);
+  overflow: hidden;
+}
+
+.rp-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--pass), var(--brand));
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.rp-intern {
+  margin: -4px 0 18px;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.rp-meter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.rp-meter-track {
+  width: 56px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--rule);
+  overflow: hidden;
+}
+
+.rp-meter-track span {
+  display: block;
+  height: 100%;
+  background: var(--brand);
+}
+
+.rp-notes ul {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.rp-gap strong {
+  color: var(--hold);
+}
+
+@media (max-width: 640px) {
+  .rp-big {
+    font-size: 38px;
+  }
+
+  .rp-meter-track {
+    display: none;
+  }
+}

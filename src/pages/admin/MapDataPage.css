@@ -1,0 +1,169 @@
+.mdp-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.mdp-tile {
+  padding: 12px 16px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.mdp-tile.is-warn {
+  border-color: var(--hold);
+  background: var(--hold-soft);
+}
+
+.mdp-tile-value {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.mdp-tile-label {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+
+.mdp {
+  display: grid;
+  grid-template-columns: 272px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.mdp-rail {
+  display: grid;
+  gap: 4px;
+  position: sticky;
+  top: 16px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.mdp-filter {
+  margin-bottom: 6px;
+}
+
+.mdp-college {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mdp-college:hover:not(.is-current) {
+  background: var(--paper-2);
+}
+
+.mdp-college.is-current {
+  background: var(--surface);
+  border-color: var(--brand);
+}
+
+.mdp-college.is-unplaced {
+  background: var(--hold-soft);
+  border-color: var(--hold);
+  margin-bottom: 6px;
+}
+
+.mdp-college-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.mdp-code {
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.mdp-college-meta {
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+
+.mdp-bar {
+  display: block;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--rule);
+  overflow: hidden;
+}
+
+.mdp-bar span {
+  display: block;
+  height: 100%;
+  background: var(--pass);
+}
+
+.mdp-main {
+  min-width: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.mdp-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.mdp-head h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.mdp-open {
+  font-size: 13.5px;
+}
+
+.mdp-empty {
+  padding: 40px 24px;
+  border: 1px dashed var(--rule-2);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.mdp-empty h2 {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+
+.mdp-target {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.mdp-target label {
+  display: grid;
+  gap: 2px;
+  min-width: 220px;
+}
+
+@media (max-width: 900px) {
+  .mdp {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mdp-rail {
+    position: static;
+    max-height: 280px;
+  }
+}

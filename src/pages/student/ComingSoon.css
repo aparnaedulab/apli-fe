@@ -1,0 +1,89 @@
+/*
+  A section on the menu that is not built yet.
+
+  Quiet on purpose. A placeholder dressed up like a feature is a small lie
+  told every time somebody opens it, so this reads as a note rather than a
+  screen: it says what is coming, and points somewhere that works.
+*/
+
+.soon {
+  max-width: 62ch;
+  padding: 26px 28px 28px;
+  border: 1px dashed var(--rule-2);
+  border-radius: var(--radius);
+  background: var(--paper-2);
+}
+
+.soon-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--hold) 40%, transparent);
+  background: color-mix(in srgb, var(--hold) 10%, transparent);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--hold);
+}
+
+.soon h2 {
+  margin: 12px 0 6px;
+  font-size: 18px;
+}
+
+.soon-lede {
+  margin: 0 0 18px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+.soon-label {
+  margin: 0 0 8px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.soon-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 7px;
+}
+
+.soon-list li {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 8px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.soon-list li::before {
+  content: '→';
+  color: var(--ink-3);
+}
+
+.soon-instead {
+  margin: 20px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+  font-size: 13.5px;
+  color: var(--ink-3);
+}
+
+.soon-instead a {
+  color: var(--brand);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.soon-instead a:hover {
+  text-decoration: underline;
+}

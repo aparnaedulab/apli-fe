@@ -1,0 +1,171 @@
+/* Skill demand: gaps first, then the grid. */
+
+.sk-year {
+  font: inherit;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-2);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.sk-gaps {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sk-gaps li {
+  display: grid;
+  grid-template-columns: minmax(0, 180px) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+}
+
+.sk-gap-name {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sk-gap-name small,
+.sk-gap-nums {
+  color: var(--ink-3);
+  font-size: 12.5px;
+}
+
+.sk-gap-nums {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  white-space: nowrap;
+}
+
+.sk-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sk-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--paper-2);
+  overflow: hidden;
+}
+
+.sk-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.sk-bar-demand,
+.sk-key-demand {
+  background: var(--brand);
+}
+
+.sk-bar-cover,
+.sk-key-cover {
+  background: var(--pass);
+}
+
+.sk-legend {
+  margin: 14px 0 0;
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+.sk-key {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  vertical-align: -1px;
+}
+
+.sk-grid {
+  border-collapse: separate;
+  border-spacing: 3px;
+  font-size: 13px;
+}
+
+.sk-grid th {
+  text-align: left;
+  font-weight: 600;
+  padding: 6px 8px;
+  white-space: nowrap;
+}
+
+.sk-grid thead th small {
+  display: block;
+  font-weight: 400;
+  color: var(--ink-3);
+}
+
+.sk-grid td {
+  min-width: 72px;
+  padding: 8px;
+  text-align: center;
+  border-radius: 6px;
+  color: #14161c;
+  font-variant-numeric: tabular-nums;
+}
+
+.sk-two {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.sk-rising {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sk-rising li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.sk-rising em {
+  font-style: normal;
+  color: var(--pass);
+  font-weight: 600;
+}
+
+.sk-gap-score {
+  display: inline-block;
+  min-width: 34px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  text-align: center;
+  color: #14161c;
+  font-weight: 600;
+}
+
+.sk-notes ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--ink-2);
+  font-size: 13.5px;
+}
+
+@media (max-width: 640px) {
+  .sk-gaps li {
+    grid-template-columns: 1fr;
+  }
+
+  .sk-gap-nums {
+    align-items: flex-start;
+  }
+}

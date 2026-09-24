@@ -1,0 +1,105 @@
+/*
+ * Styles for the shared company field set, so any screen that renders it gets
+ * them. They used to live in the registration page's stylesheet, which meant
+ * the admin form rendered the same markup unstyled.
+ */
+
+/* Fields that belong together sit together. */
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0 16px;
+}
+
+.field-group {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 16px 16px 0;
+  margin: 0 0 20px;
+}
+
+.field-group legend {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-2);
+  padding: 0 6px;
+}
+
+.field-group legend .field-hint {
+  display: block;
+  max-width: 44ch;
+  margin-top: 4px;
+  font-weight: 400;
+}
+
+.field-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-3);
+}
+
+.field-error {
+  display: block;
+  margin-top: 6px;
+  font-size: 12.5px;
+  color: var(--stop);
+}
+
+/* Selects and textareas were only styled as inputs before. */
+.field textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.field select,
+.field textarea {
+  width: 100%;
+  font: inherit;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+}
+
+.field select:focus,
+.field textarea:focus {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
+  border-color: var(--brand);
+}
+
+.field input.mono {
+  font-family: var(--mono);
+  letter-spacing: 0.02em;
+}
+
+/*
+  Which answers are actually needed, said on the field itself rather than in a
+  note above the form that nobody reads twice. Quiet by design: the labels are
+  what a person scans, and "Optional" is the exception to it.
+*/
+.field-opt,
+.field-need {
+  font-style: normal;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 999px;
+  margin-left: 6px;
+  vertical-align: 1px;
+}
+
+.field-opt {
+  color: var(--ink-3);
+  background: var(--paper-2);
+}
+
+.field-need {
+  color: var(--brand);
+  background: color-mix(in srgb, var(--brand) 12%, transparent);
+}

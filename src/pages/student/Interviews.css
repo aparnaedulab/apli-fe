@@ -1,0 +1,349 @@
+/* ==========================================================================
+   Interviews
+
+   Short on purpose. Everything here is something the student has to turn up
+   to, so the date and the time are the biggest thing on the page and the
+   rest of each card is what they need in order to be there.
+
+   Namespaced `iv-`: these stylesheets are bundled app wide.
+   ========================================================================== */
+
+.iv-head {
+  margin-bottom: 14px;
+}
+
+.iv-head h1 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+
+.iv-head p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--ink-3);
+  max-width: 64ch;
+}
+
+.iv-apli {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin: 0 0 16px;
+  padding: 11px 15px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--brand) 22%, transparent);
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--brand) 8%, var(--surface)),
+    var(--surface) 65%
+  );
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.iv-apli .apli-face {
+  flex: none;
+  color: var(--brand);
+}
+
+.iv-band {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.iv-band + .iv-list,
+.iv-band + .iv-past {
+  margin-bottom: 26px;
+}
+
+/* --- one appointment ------------------------------------------------------ */
+
+.iv-list {
+  display: grid;
+  gap: 12px;
+}
+
+.iv-card {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 18px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+/* Today or tomorrow. The only thing on this page allowed to raise its
+   voice, and only ever when it is true. */
+.iv-card.is-soon {
+  border-color: color-mix(in srgb, var(--brand) 45%, transparent);
+  background: linear-gradient(
+    150deg,
+    color-mix(in srgb, var(--brand) 6%, var(--surface)),
+    var(--surface) 60%
+  );
+}
+
+/*
+  The date and the time, at the size of the thing a student came to check.
+  Everything else on the card exists to get them to this.
+*/
+.iv-when {
+  display: grid;
+  gap: 1px;
+  align-content: start;
+  padding-right: 18px;
+  border-right: 1px solid var(--rule);
+}
+
+.iv-when b {
+  font-size: 15px;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.iv-when > span {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--brand);
+  font-variant-numeric: tabular-nums;
+}
+
+.iv-when small {
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+/* No date yet. Said plainly rather than left blank: the student is waiting
+   on the company, and that is a fact worth stating. */
+.iv-tbc {
+  font-size: 13px !important;
+  font-weight: 600;
+  color: var(--ink-3) !important;
+  line-height: 1.4;
+}
+
+.iv-what {
+  display: grid;
+  gap: 7px;
+  align-content: start;
+  min-width: 0;
+}
+
+.iv-what h3 {
+  margin: 0;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.iv-role {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+.iv-role a {
+  color: var(--ink-2);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.iv-role a:hover {
+  color: var(--brand);
+  text-decoration: underline;
+}
+
+.iv-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.iv-mode,
+.iv-of,
+.iv-left {
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.iv-mode {
+  border: 1px solid var(--rule-2);
+  background: var(--surface);
+  font-weight: 600;
+  color: var(--ink-3);
+}
+
+.iv-mode.is-online {
+  border-color: color-mix(in srgb, var(--pass) 35%, transparent);
+  color: var(--pass);
+}
+
+.iv-of {
+  background: var(--paper-2);
+  color: var(--ink-3);
+  font-family: var(--mono);
+  font-size: 10.5px;
+}
+
+/* What is still ahead, so a student can pace themselves rather than treat
+   every round as the last hurdle. */
+.iv-left {
+  color: var(--ink-3);
+}
+
+.iv-at {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.iv-go {
+  justify-self: start;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--brand);
+  background: var(--surface);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--brand);
+  text-decoration: none;
+}
+
+.iv-go:hover {
+  background: var(--brand);
+  color: #fff;
+}
+
+/* A student finding a campus they have never been to at nine in the morning
+   does not want an address to retype into a phone. */
+.iv-map {
+  width: 100%;
+  height: 190px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--paper-2);
+}
+
+.iv-app {
+  justify-self: start;
+  font-size: 11.5px;
+  color: var(--ink-3);
+  text-decoration: none;
+}
+
+.iv-app:hover {
+  color: var(--brand);
+  text-decoration: underline;
+}
+
+/* --- what has already happened -------------------------------------------- */
+
+/* A record rather than a thing to do, so it is small. */
+.iv-past {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 2px;
+}
+
+.iv-past li {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: var(--paper-2);
+}
+
+.iv-past time {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.iv-past span {
+  display: grid;
+  gap: 0;
+  min-width: 0;
+}
+
+.iv-past b {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.iv-past small {
+  font-size: 11px;
+  color: var(--ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --- nothing booked ------------------------------------------------------- */
+
+.iv-empty {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 56px 24px;
+  border-radius: 18px;
+  border: 1px dashed var(--rule-2);
+  background: var(--surface);
+  text-align: center;
+}
+
+.iv-empty .apli-face {
+  color: var(--brand);
+}
+
+.iv-empty h2 {
+  margin: 4px 0 0;
+  font-size: 18px;
+}
+
+.iv-empty p {
+  margin: 0;
+  max-width: 46ch;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+.iv-empty .btn {
+  margin-top: 8px;
+}
+
+/* Below this the date column and the detail cannot both hold their width,
+   so the date goes above rather than beside. */
+@media (max-width: 720px) {
+  .iv-card {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .iv-when {
+    padding-right: 0;
+    padding-bottom: 12px;
+    border-right: 0;
+    border-bottom: 1px solid var(--rule);
+  }
+}

@@ -1,0 +1,258 @@
+/* The role as a student will see it, beside the form that writes it. */
+
+.preview {
+  position: sticky;
+  top: 18px;
+  align-self: start;
+  display: grid;
+  gap: 8px;
+}
+
+.preview-tag {
+  margin: 0;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.preview-card {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface);
+  /* Lifted, because it is the thing being made rather than another panel. */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+.preview-card header {
+  display: grid;
+  gap: 3px;
+}
+
+.preview-company {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+
+.preview-card h3 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+.preview-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+.preview-facts > span::after {
+  content: '·';
+  margin-left: 8px;
+  opacity: 0.5;
+}
+
+.preview-facts > span:last-child::after {
+  content: '';
+}
+
+.preview-pay {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.preview-fixed {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+
+.preview-body {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  /* Long descriptions are trimmed: this is a card, not the whole page. */
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Anything not filled in reads as missing rather than quietly absent. */
+.preview-gap,
+.is-gap {
+  color: var(--ink-3);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.preview-rows {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+}
+
+.preview-rows dt {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-3);
+}
+
+.preview-rows dd {
+  margin: 2px 0 0;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.preview-block {
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+}
+
+.preview-block h4 {
+  margin: 0 0 6px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-3);
+}
+
+.preview-block ul {
+  margin: 0;
+  padding-left: 16px;
+  display: grid;
+  gap: 3px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.preview-rounds {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.preview-rounds b {
+  display: block;
+}
+
+.preview-rounds span {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.preview-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 0;
+}
+
+.preview-skills > span {
+  padding: 3px 9px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+/* The ones the role actually asks for, rather than merely welcomes. */
+.preview-skills > span.is-asked {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 600;
+}
+
+.preview-reach {
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  background: var(--pass-soft);
+  color: var(--pass);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.preview-reach.is-none {
+  background: var(--stop-soft);
+  color: var(--stop);
+}
+
+/* Where a round happens - the line that decides a train ticket. */
+.preview-where {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+.preview-rounds li {
+  display: grid;
+  gap: 1px;
+}
+
+/* A role with no bar, said rather than left blank. */
+.preview-open {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--pass);
+}
+
+.preview-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 0;
+}
+
+.preview-badges span {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--pass-soft);
+  color: var(--pass);
+}
+
+.preview-badges span.is-restricted {
+  background: var(--hold-soft);
+  color: var(--hold);
+}
+
+.preview-block p {
+  margin: 4px 0;
+}
+
+.preview-note {
+  color: var(--ink-2);
+  font-style: italic;
+}
+
+.preview-employer {
+  color: var(--hold);
+  font-weight: 500;
+}
+
+.preview-designation {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--ink-2);
+}

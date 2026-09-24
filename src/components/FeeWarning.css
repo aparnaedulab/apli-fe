@@ -1,0 +1,62 @@
+.fee-warning {
+  margin: 12px 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--stop);
+  background: var(--stop-soft);
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.fee-warning-title {
+  margin: 0;
+  font-weight: 700;
+  color: var(--stop);
+}
+
+.fee-warning-body {
+  margin: 4px 0 0;
+  color: var(--ink-2);
+}
+
+.fee-warning ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--ink-2);
+}
+
+.fee-warning mark {
+  background: transparent;
+  color: var(--stop);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+}
+
+/* Student reports on a role, as the college reads them. */
+.report-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.report-list li {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--rule);
+}
+
+.report-list p {
+  margin: 0 0 4px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}

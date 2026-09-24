@@ -1,0 +1,68 @@
+/* ==========================================================================
+   The rich-text box
+
+   Shared by every screen that lets somebody write HTML for somebody else to
+   read. The classes keep their `cpost-` names: they were the company post's
+   first, and renaming them would touch a stylesheet that is loaded app wide
+   for no gain a reader would notice.
+   ========================================================================== */
+
+
+.cpost-editor.is-off {
+  opacity: 0.6;
+}
+
+.cpost-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 6px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper-2);
+}
+
+.cpost-tools button {
+  min-width: 30px;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cpost-tools button:hover:not(:disabled) {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.cpost-input {
+  min-height: 120px;
+  padding: 12px;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink);
+  outline: none;
+}
+
+.cpost-input:focus {
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+
+.cpost-input p,
+.cpost-input ul,
+.cpost-input ol {
+  margin: 8px 0 0;
+}
+
+.cpost-input ul,
+.cpost-input ol {
+  padding-left: 20px;
+}
+
+.cpost-input h3 {
+  margin: 10px 0 0;
+  font-size: 15px;
+}

@@ -1,0 +1,107 @@
+.tl-search {
+  width: 240px;
+}
+
+.tl-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+}
+
+.tl-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+.tl-card header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+}
+
+.tl-meta {
+  margin: 0;
+  font-size: 13px;
+}
+
+.tl-pitch {
+  margin: 0;
+  font-size: 14px;
+  white-space: pre-line;
+}
+
+.tl-projects {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13.5px;
+}
+
+.tl-projects a {
+  color: var(--brand);
+}
+
+.tl-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.tl-skills span {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--paper-2);
+  color: var(--ink-2);
+}
+
+.tl-card footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 6px;
+}
+
+.tl-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgb(14 17 22 / 0.45);
+}
+
+.tl-dialog {
+  width: min(520px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 22px;
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: 0 24px 60px -20px rgb(0 0 0 / 0.4);
+}
+
+.tl-dialog h2 {
+  margin: 0;
+}
+
+.tl-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tl-field .st-select {
+  width: 100%;
+}

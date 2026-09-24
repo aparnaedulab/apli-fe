@@ -1,0 +1,335 @@
+/* The readiness check and its result. */
+
+.rd-check {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rd-progress {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--rule);
+  overflow: hidden;
+}
+
+.rd-progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--pass), var(--brand));
+  transition: width 0.3s ease;
+}
+
+.rd-area h2 {
+  margin: 0 0 6px;
+}
+
+.rd-q {
+  padding: 12px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.rd-q:first-of-type {
+  border-top: 0;
+}
+
+.rd-q p {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+
+.rd-scale {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.rd-scale button {
+  flex: 1 1 90px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-2);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 13.5px;
+  font-weight: 500;
+  transition: all 0.12s ease;
+}
+
+.rd-scale button:hover {
+  border-color: var(--ink-3);
+  color: var(--ink);
+}
+
+.rd-scale button.is-on {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--on-brand);
+}
+
+.rd-foot {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+  background: linear-gradient(180deg, transparent, var(--paper) 35%);
+}
+
+.rd-foot-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* --- result ------------------------------------------------------------ */
+
+.rd-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.rd-score {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.rd-ring {
+  flex: none;
+  width: 132px;
+  height: 132px;
+}
+
+.rd-ring circle {
+  fill: none;
+  stroke-width: 10;
+}
+
+.rd-ring-bg {
+  stroke: var(--rule);
+}
+
+.rd-ring-fg {
+  stroke: var(--brand);
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: 60px 60px;
+  transition: stroke-dashoffset 0.6s ease;
+}
+
+.rd-ring-num {
+  font-family: var(--display);
+  font-size: 34px;
+  font-weight: 700;
+  fill: var(--ink);
+}
+
+.rd-ring-sub {
+  font-size: 10px;
+  fill: var(--ink-3);
+}
+
+.rd-note {
+  margin: 8px 0 0;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.rd-progress-line svg {
+  width: 100%;
+  max-width: 260px;
+  height: 64px;
+}
+
+.rd-progress-line polyline {
+  fill: none;
+  stroke: var(--pass);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.rd-progress-line p {
+  margin: 4px 0 0;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.rd-areas ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rd-areas li {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr) 36px;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.rd-areas li strong {
+  text-align: right;
+  font-family: var(--mono);
+}
+
+.rd-areas li.is-focus span:first-child {
+  font-weight: 600;
+  color: var(--hold);
+}
+
+.rd-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--rule);
+  overflow: hidden;
+}
+
+.rd-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--brand);
+}
+
+.rd-areas li.is-focus .rd-bar span {
+  background: var(--hold);
+}
+
+.rd-plan ul {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rd-plan li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--rule);
+}
+
+.rd-plan li div {
+  display: flex;
+  flex-direction: column;
+}
+
+.rd-plan li span {
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+/* --- coming up ---------------------------------------------------------- */
+
+.rd-upcoming {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.rd-countdown {
+  padding: 18px 20px;
+  border-radius: 14px;
+  border: 1px solid var(--brand);
+  background: var(--brand-soft);
+}
+
+.rd-countdown-head {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.rd-countdown h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.rd-countdown .eyebrow {
+  margin: 0 0 2px;
+}
+
+.rd-days {
+  flex: none;
+  width: 72px;
+  height: 72px;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand);
+  color: var(--on-brand);
+  font-size: 12px;
+}
+
+.rd-days strong {
+  font-family: var(--display);
+  font-size: 28px;
+  line-height: 1;
+}
+
+.rd-desc {
+  margin: 12px 0 0;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.rd-steps {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rd-steps li {
+  display: flex;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.rd-when {
+  flex: none;
+  width: 150px;
+  color: var(--ink-3);
+}
+
+.rd-steps a {
+  color: var(--brand);
+  font-weight: 600;
+}
+
+@media (max-width: 820px) {
+  .rd-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rd-areas li {
+    grid-template-columns: 120px minmax(0, 1fr) 32px;
+  }
+
+  .rd-steps li {
+    flex-direction: column;
+    gap: 0;
+  }
+}

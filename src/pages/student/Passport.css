@@ -1,0 +1,182 @@
+/* The skills passport - shared by the student page and the recruiter's view. */
+
+.pp {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.pp-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.pp-tally {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--rule);
+  background: var(--paper-2);
+}
+
+.pp-tally strong {
+  font-family: var(--display);
+  font-size: 26px;
+  line-height: 1.1;
+}
+
+.pp-tally span {
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+
+.pp-tally.ev-COLLEGE_VERIFIED {
+  border-color: var(--pass);
+  background: var(--pass-soft);
+}
+
+.pp-tally.ev-EMPLOYER_VERIFIED {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.pp-group h3 {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+.pp-group h3 small {
+  font-weight: 400;
+  color: var(--ink-3);
+  font-size: 12.5px;
+}
+
+.pp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pp-badge.ev-COLLEGE_VERIFIED {
+  background: var(--pass-soft);
+  color: var(--pass);
+}
+
+.pp-badge.ev-EMPLOYER_VERIFIED {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.pp-badge.ev-SELF_REPORTED {
+  background: var(--paper-2);
+  color: var(--ink-3);
+  border: 1px dashed var(--rule-2);
+}
+
+.pp-badge.ev-COLLEGE_VERIFIED::before,
+.pp-badge.ev-EMPLOYER_VERIFIED::before {
+  content: '✓';
+}
+
+.pp-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pp-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--rule);
+}
+
+.pp-kind {
+  flex: none;
+  width: 118px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding-top: 2px;
+}
+
+.pp-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pp-main strong {
+  font-size: 14.5px;
+}
+
+.pp-main em {
+  font-style: normal;
+  font-weight: 400;
+  color: var(--ink-2);
+}
+
+.pp-main small {
+  color: var(--ink-3);
+  font-size: 12.5px;
+}
+
+.pp-main a {
+  color: var(--brand);
+}
+
+.pp-how ul {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.pp-how a {
+  color: var(--brand);
+  font-weight: 600;
+}
+
+/* On a recruiter's applicant page: tighter, same meaning. */
+.pp.is-compact .pp-tally {
+  padding: 8px 10px;
+}
+
+.pp.is-compact .pp-tally strong {
+  font-size: 20px;
+}
+
+.pp.is-compact .pp-kind {
+  width: 96px;
+}
+
+@media (max-width: 640px) {
+  .pp-list li {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .pp-kind {
+    width: auto;
+  }
+}
