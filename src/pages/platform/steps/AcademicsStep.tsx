@@ -39,6 +39,8 @@ export default function AcademicsStep({ state, catalogue, onSaved, goto, updateC
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const branchesRef = useRef<HTMLElement>(null);
+  /** The shared branch list, folded away until somebody needs it. */
+  const [showBranches, setShowBranches] = useState(false);
 
   const courses = catalogue.courses;
   const byId = useMemo(() => new Map(courses.map((c) => [c.id, c])), [courses]);
@@ -123,47 +125,31 @@ export default function AcademicsStep({ state, catalogue, onSaved, goto, updateC
 
   return (
     <form onSubmit={submit} noValidate>
-      <section className="blk" ref={branchesRef}>
-        <h2 className="blk-title">
-          <span className="step-num">1</span> Branches
-        </h2>
-        <p className="blk-sub">
-          One list for every course and every institution, so each branch has exactly one spelling. Add any that are
-          missing here - courses then pick from this list.
-        </p>
-        <BranchManager branches={catalogue.branches} courses={courses} onAdded={putBranch} />
-      </section>
+      {/*
+        One block, one job: pick the courses.
 
+        This used to open with a section for managing the shared branch
+        list - a global catalogue, before you had chosen a single course to
+        put a branch in. It was the first thing on the step and almost never
+        the first thing anybody needed, so it is now at the foot, folded,
+        where somebody goes when a branch is actually missing.
+      */}
       <section className="blk">
         <div className="blk-head">
           <div>
-            <h2 className="blk-title">
-              <span className="step-num">2</span> Courses they run
-            </h2>
-            <p className="blk-sub">Pick the courses, then narrow each to the branches this institution offers.</p>
+            <h2 className="blk-title">Courses they run</h2>
+            <p className="blk-sub">
+              Search for a course and add it. Then tick which of its branches this institution
+              offers — leave them all unticked and it runs all of them.
+            </p>
           </div>
-          <span className="blk-actions">
-            {available.length > 0 && (
-              <button
-                type="button"
-                className={`btn btn-sm ${browse ? 'btn-secondary' : 'btn-ghost'}`}
-                onClick={() => setBrowse((v) => !v)}
-                aria-expanded={browse}
-              >
-                {browse ? 'Hide the catalogue' : `Browse all ${available.length}`}
-              </button>
-            )}
-            {!bulkCourses && (
-              <button type="button" className="btn btn-ghost btn-sm" onClick={() => setBulkCourses(true)}>
-                Bulk upload (Excel)
-              </button>
-            )}
-            {!addingCourse && (
+          {!addingCourse && (
+            <span className="blk-actions">
               <button type="button" className="btn btn-secondary btn-sm" onClick={() => setAddingCourse(true)}>
                 + Add a course
               </button>
-            )}
-          </span>
+            </span>
+          )}
         </div>
 
         {bulkCourses && (
@@ -190,7 +176,10 @@ export default function AcademicsStep({ state, catalogue, onSaved, goto, updateC
           <NewCourse
             initialName={exact ? '' : query.trim()}
             branches={catalogue.branches}
-            onFindBranch={() => branchesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            onFindBranch={() => {
+              setShowBranches(true);
+              branchesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }}
             onCancel={() => setAddingCourse(false)}
             onAdded={(course) => {
               putCourse(course);
@@ -241,6 +230,22 @@ export default function AcademicsStep({ state, catalogue, onSaved, goto, updateC
               )}
             </div>
           )}
+
+          {/* The other two ways in, kept quiet: most institutions need
+              neither, and as buttons beside the heading they competed with
+              the search that nearly everybody wants. */}
+          <p className="picker-alts">
+            {available.length > 0 && (
+              <button type="button" className="linkish" onClick={() => setBrowse((v) => !v)} aria-expanded={browse}>
+                {browse ? 'Hide the full catalogue' : `Browse all ${available.length} courses`}
+              </button>
+            )}
+            {!bulkCourses && (
+              <button type="button" className="linkish" onClick={() => setBulkCourses(true)}>
+                Upload a list from Excel
+              </button>
+            )}
+          </p>
         </div>
 
         {picked.size > 0 && (
@@ -302,6 +307,30 @@ export default function AcademicsStep({ state, catalogue, onSaved, goto, updateC
               );
             })}
           </ul>
+        )}
+      </section>
+
+      {/*
+        The shared branch list.
+
+        Every institution picks branches from one catalogue, so each branch
+        has exactly one spelling. Managing it is a rare job and a confusing
+        way to open the step, so it lives here - and opens itself when
+        somebody adding a course goes looking for a branch that is missing.
+      */}
+      <section className="blk blk-quiet" ref={branchesRef}>
+        <button
+          type="button"
+          className="blk-fold"
+          onClick={() => setShowBranches((v) => !v)}
+          aria-expanded={showBranches}
+        >
+          Branch list
+          <small>Shared by every institution, so each branch has one spelling</small>
+        </button>
+
+        {showBranches && (
+          <BranchManager branches={catalogue.branches} courses={courses} onAdded={putBranch} />
         )}
       </section>
 

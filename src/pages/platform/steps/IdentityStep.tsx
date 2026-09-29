@@ -96,7 +96,7 @@ type SlugStatus =
   | { state: 'taken'; suggestion: string | null }
   | { state: 'invalid'; message: string };
 
-export default function IdentityStep({ state, catalogue, onSaved, setPreview }: StepProps) {
+export default function IdentityStep({ state, catalogue, onSaved }: StepProps) {
   const t = state?.tenant;
   const [form, setForm] = useState<IdentityInput>(() =>
     t
@@ -149,19 +149,6 @@ export default function IdentityStep({ state, catalogue, onSaved, setPreview }: 
     });
     setErrors((e) => ({ ...e, [key]: '' }));
   }
-
-  // Keep the preview painting what is on screen.
-  useEffect(() => {
-    setPreview({
-      name: form.name,
-      shortName: form.shortName,
-      brandColor: form.brandColor,
-      logoUrl: form.logoUrl,
-      faviconUrl: form.faviconUrl,
-      kind: form.kind,
-      tagline: form.tagline,
-    });
-  }, [form.name, form.shortName, form.brandColor, form.logoUrl, form.faviconUrl, form.kind, form.tagline, setPreview]);
 
   // Address availability, checked as it is typed rather than on submit.
   useEffect(() => {

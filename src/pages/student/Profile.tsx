@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import StudentLayout from './StudentLayout';
 import {
@@ -11,11 +11,12 @@ import {
   type ResumeSection,
   type Profile as ProfileData,
   type ProjectLink,
+  type StudentPrograms,
 } from '../../api/candidate';
 import { catalogueApi, type FullCatalogue } from '../../api/catalogue';
 import { ShowcasePanel, ShowcaseStatus } from './Showcase';
 import { ApiError } from '../../api/client';
-import { useT } from '../../i18n';
+import { useT, type MessageKey } from '../../i18n';
 import './Profile.css';
 
 /**
@@ -37,6 +38,27 @@ export default function Profile({ focus }: { focus?: 'resume' | 'showcase' } = {
   const [error, setError] = useState<string | null>(null);
 
   /*
+   * Which batch is open, kept in the address rather than in state.
+   *
+   * The profile is nine sections long and a student only ever fills one of
+   * them at a sitting. Holding the open one in `?s=` means a reload, a back
+   * button and a link from somewhere else ("finish your academics") all land
+   * on the same batch, and nothing has to be synced with the query the
+   * layout already puts there.
+   */
+  const [params, setParams] = useSearchParams();
+  const top = useRef<HTMLDivElement>(null);
+  /*
+   * Which batch to open when the address does not say - worked out once,
+   * from the profile as it first arrived, and then left alone.
+   *
+   * Re-deciding it on every render would move the page out from under the
+   * student: finishing the About batch would tick it, and the next render
+   * would helpfully send them to Academics mid-sentence.
+   */
+  const landed = useRef<BatchKey | null>(null);
+
+  /*
    * The lists operations keeps under Setup, fetched once for the whole page.
    *
    * A student typing "femail", or "B-Tech" where the catalogue says "B.Tech",
@@ -45,6 +67,16 @@ export default function Profile({ focus }: { focus?: 'resume' | 'showcase' } = {
    * dropdowns nobody can get past.
    */
   const [lists, setLists] = useState<FullCatalogue | null>(null);
+
+  /*
+   * The courses this student may be on, which is not the same list.
+   *
+   * The catalogue above is every course the platform knows; this is their own
+   * college's programmes. A student offered the first can record a course
+   * nobody at their college studies, which then matches no role's criteria
+   * and tells them nothing about why.
+   */
+  const [programs, setPrograms] = useState<StudentPrograms | null>(null);
 
   useEffect(() => {
     candidateApi
@@ -57,6 +89,11 @@ export default function Profile({ focus }: { focus?: 'resume' | 'showcase' } = {
       .all()
       .then(setLists)
       .catch(() => setLists(null));
+
+    candidateApi
+      .programs()
+      .then(setPrograms)
+      .catch(() => setPrograms(null));
   }, []);
 
   if (error !== null) {
@@ -83,6 +120,40 @@ export default function Profile({ focus }: { focus?: 'resume' | 'showcase' } = {
    * college fills in.
    */
   const locked = profile.batch?.isFrozen ?? false;
+
+  /*
+   * The batches, with the completion sections each one answers for.
+   *
+   * A tick on a batch is the server's own verdict on those sections, not a
+   * second count kept here - the two would drift the first time the rule
+   * behind one of them changed.
+   */
+  const done = (key: string) => profile.completion.sections.find((s) => s.key === key)?.done ?? false;
+  const batches = BATCHES.map((b) => ({
+    ...b,
+    label: t(b.labelKey),
+    hint: t(b.hintKey),
+    done: b.needs.length > 0 && b.needs.every(done),
+  }));
+
+  // The one they asked for, else the first that still wants something.
+  if (landed.current === null) {
+    landed.current = (batches.find((b) => b.needs.length > 0 && !b.done) ?? batches[0]!).key;
+  }
+  const asked = params.get('s');
+  const active = batches.find((b) => b.key === asked)?.key ?? landed.current;
+
+  function go(key: BatchKey) {
+    const next = new URLSearchParams(params);
+    next.set('s', key);
+    setParams(next, { replace: true });
+    // The panel is taller than the strip, so the strip is what to come back to.
+    top.current?.scrollIntoView({ block: 'start' });
+  }
+
+  const at = batches.findIndex((b) => b.key === active);
+  const prev = at > 0 ? batches[at - 1]! : null;
+  const next = at < batches.length - 1 ? batches[at + 1]! : null;
 
   return (
     <StudentLayout>
@@ -140,19 +211,83 @@ export default function Profile({ focus }: { focus?: 'resume' | 'showcase' } = {
             </p>
           )}
 
-          <CompletionCard profile={profile} />
+          <CompletionCard profile={profile} onJump={(key) => go(key)} />
 
-          <DetailsForm profile={profile} locked={locked} lists={lists} onSaved={setProfile} />
-          <SavedResumes profile={profile} onChanged={setProfile} />
-          <ResumeBuilder profile={profile} onBuilt={setProfile} />
-          {/* A student's own account of themselves, verified or not. */}
-          <SkillsCard profile={profile} lists={lists} onSaved={setProfile} />
-          <EducationCard profile={profile} lists={lists} onSaved={setProfile} />
-          <ExperienceCard profile={profile} lists={lists} onSaved={setProfile} />
-          <ProjectsCard profile={profile} onSaved={setProfile} />
-          {/* Whether any of the above can be found by a company, said plainly
-              at the foot of the thing it is about. */}
-          <ShowcaseStatus />
+          <div ref={top} className="batch-anchor" />
+          <BatchNav items={batches} active={active} onPick={go} />
+
+          {/*
+            One batch at a time. Everything below used to sit on one scroll -
+            nine sections, most of them already answered - and the fields a
+            student actually came to fill in were somewhere in the middle of
+            it. They are grouped by the question they answer instead, and the
+            strip above says which groups are still short of something.
+          */}
+          <div
+            className="batch-panel"
+            id={`batch-panel-${active}`}
+            role="tabpanel"
+            aria-labelledby={`batch-tab-${active}`}
+            tabIndex={-1}
+          >
+            {active === 'about' && (
+              <AboutBand profile={profile} locked={locked} lists={lists} onSaved={setProfile} />
+            )}
+
+            {active === 'academics' && (
+              <>
+                <AcademicsBand
+                  profile={profile}
+                  locked={locked}
+                  lists={lists}
+                  programs={programs}
+                  onSaved={setProfile}
+                />
+                <EducationCard profile={profile} lists={lists} onSaved={setProfile} />
+              </>
+            )}
+
+            {active === 'proof' && (
+              <>
+                {/* A student's own account of themselves, verified or not. */}
+                <SkillsCard profile={profile} lists={lists} onSaved={setProfile} />
+                <ExperienceCard profile={profile} lists={lists} onSaved={setProfile} />
+                <ProjectsCard profile={profile} onSaved={setProfile} />
+              </>
+            )}
+
+            {active === 'prefs' && (
+              <AccessBand profile={profile} locked={locked} lists={lists} onSaved={setProfile} />
+            )}
+
+            {active === 'resume' && (
+              <>
+                <ResumeCard profile={profile} onSaved={setProfile} />
+                <SavedResumes profile={profile} onChanged={setProfile} />
+                <ResumeBuilder profile={profile} onBuilt={setProfile} />
+                {/* Whether any of the above can be found by a company, said
+                    plainly at the foot of the thing it is about. */}
+                <ShowcaseStatus />
+              </>
+            )}
+          </div>
+
+          <nav className="batch-move" aria-label={t('batch.moveLabel')}>
+            {prev ? (
+              <button type="button" className="batch-step is-prev" onClick={() => go(prev.key)}>
+                <small>{t('batch.prev')}</small>
+                <b>{prev.label}</b>
+              </button>
+            ) : (
+              <span />
+            )}
+            {next && (
+              <button type="button" className="batch-step is-next" onClick={() => go(next.key)}>
+                <small>{t('batch.next')}</small>
+                <b>{next.label}</b>
+              </button>
+            )}
+          </nav>
         </>
       )}
     </StudentLayout>
@@ -161,44 +296,162 @@ export default function Profile({ focus }: { focus?: 'resume' | 'showcase' } = {
 
 /* -------------------------------------------------------------------------- */
 
-function CompletionCard({ profile }: { profile: ProfileData }) {
+type BatchKey = 'about' | 'academics' | 'proof' | 'prefs' | 'resume';
+
+/**
+ * The profile in five sittings.
+ *
+ * `needs` is the completion sections a batch is responsible for, which is
+ * what draws its tick. A batch with none - preferences, which nothing is
+ * scored on - simply never claims to be finished.
+ */
+const BATCHES: {
+  key: BatchKey;
+  labelKey: MessageKey;
+  hintKey: MessageKey;
+  /** Completion sections this batch holds the fields for. */
+  needs: string[];
+}[] = [
+  { key: 'about', labelKey: 'batch.about', hintKey: 'batch.aboutHint', needs: ['basics'] },
+  {
+    key: 'academics',
+    labelKey: 'batch.academics',
+    hintKey: 'batch.academicsHint',
+    needs: ['academics', 'education'],
+  },
+  { key: 'proof', labelKey: 'batch.proof', hintKey: 'batch.proofHint', needs: ['skills', 'evidence'] },
+  { key: 'prefs', labelKey: 'batch.prefs', hintKey: 'batch.prefsHint', needs: [] },
+  { key: 'resume', labelKey: 'batch.resume', hintKey: 'batch.resumeHint', needs: ['resume'] },
+];
+
+/** Which batch a completion section is filled in on, for the chips above. */
+const BATCH_OF: Record<string, BatchKey> = {
+  basics: 'about',
+  academics: 'academics',
+  education: 'academics',
+  skills: 'proof',
+  evidence: 'proof',
+  resume: 'resume',
+};
+
+type Batch = { key: BatchKey; label: string; hint: string; done: boolean };
+
+/**
+ * The strip that switches batches.
+ *
+ * A row of tabs rather than a stepper: these are five places to go, not five
+ * steps in an order, and a student who only wants to change their phone
+ * number should not have to walk past their marks to reach it.
+ */
+function BatchNav({
+  items,
+  active,
+  onPick,
+}: {
+  items: Batch[];
+  active: BatchKey;
+  onPick: (key: BatchKey) => void;
+}) {
+  const { t } = useT();
+
+  // Left and right walk the strip, as a tab list is expected to.
+  function onKey(e: React.KeyboardEvent, i: number) {
+    const by = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+    if (!by) return;
+    e.preventDefault();
+    onPick(items[(i + by + items.length) % items.length]!.key);
+  }
+
+  return (
+    <div className="batch-nav" role="tablist" aria-label={t('batch.navLabel')}>
+      {items.map((b, i) => {
+        const on = b.key === active;
+        return (
+          <button
+            key={b.key}
+            type="button"
+            role="tab"
+            id={`batch-tab-${b.key}`}
+            aria-selected={on}
+            aria-controls={`batch-panel-${b.key}`}
+            tabIndex={on ? 0 : -1}
+            className={`batch-tab ${on ? 'is-on' : ''} ${b.done ? 'is-done' : ''}`}
+            onClick={() => onPick(b.key)}
+            onKeyDown={(e) => onKey(e, i)}
+          >
+            <span className="batch-no" aria-hidden="true">
+              {b.done ? '✓' : i + 1}
+            </span>
+            <span className="batch-text">
+              <b>{b.label}</b>
+              <small>{b.hint}</small>
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+
+/**
+ * How far along they are, in one line.
+ *
+ * This used to tick off all six sections underneath, which meant the first
+ * screen of the profile was a list of things the student had already done.
+ * The finished ones are now a number; what is left is a row of chips that
+ * open the batch the missing field is on, so the summary is also the way in.
+ */
+function CompletionCard({
+  profile,
+  onJump,
+}: {
+  profile: ProfileData;
+  onJump: (key: BatchKey) => void;
+}) {
   const { t } = useT();
   const { percent, sections } = profile.completion;
   const outstanding = sections.filter((s) => !s.done);
 
   return (
     <section className="card completion">
-      <div className="completion-head">
-        <div>
-          <h2>{t('completion.percent', { n: percent })}</h2>
-          <p className="muted">
-            {outstanding.length === 0
-              ? t('completion.allDone')
-              : outstanding.length === 1
-                ? t('completion.leftOne')
-                : t('completion.leftMany', { n: outstanding.length })}
-          </p>
-        </div>
-        <p className="completion-figure">{percent}%</p>
+      <div
+        className="completion-ring"
+        style={{ '--pct': `${percent}` } as React.CSSProperties}
+        role="img"
+        aria-label={t('completion.percent', { n: percent })}
+      >
+        <span aria-hidden="true">{percent}%</span>
       </div>
 
-      <div className="completion-bar" aria-hidden="true">
-        <span style={{ width: `${percent}%` }} />
-      </div>
+      <div className="completion-say">
+        <h2>{t('completion.percent', { n: percent })}</h2>
+        <p className="muted">
+          {outstanding.length === 0
+            ? t('completion.allDone')
+            : outstanding.length === 1
+              ? t('completion.leftOne')
+              : t('completion.leftMany', { n: outstanding.length })}
+        </p>
 
-      <ul className="completion-list">
-        {sections.map((s) => (
-          <li key={s.key} className={s.done ? 'is-done' : ''}>
-            <span className="completion-tick" aria-hidden="true">
-              {s.done ? '✓' : ''}
-            </span>
-            <span>
-              <b>{s.label}</b>
-              {!s.done && <span className="completion-hint">{s.hint}</span>}
-            </span>
-          </li>
-        ))}
-      </ul>
+        {outstanding.length > 0 && (
+          <div className="completion-chips">
+            {outstanding.map((s) => (
+              <button
+                key={s.key}
+                type="button"
+                className="completion-chip"
+                title={s.hint}
+                onClick={() => onJump(BATCH_OF[s.key] ?? 'about')}
+              >
+                {s.label}
+                <span aria-hidden="true">→</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </section>
   );
 }
@@ -708,6 +961,50 @@ function ResumeField({
 }
 
 /**
+ * Bringing a resume they already have: the PDF, or a link to it.
+ *
+ * This lived among the contact fields, which put an upload and a file link
+ * on the first thing a student saw and left the batch actually called Resume
+ * able to build one but not to receive one. It is one card here with the
+ * list it feeds and the builder that writes the alternative.
+ *
+ * It saves on its own rather than as part of a block: nothing else on this
+ * batch is a field, so there was no block left to belong to.
+ */
+function ResumeCard({ profile, onSaved }: OwnCardProps) {
+  const { t } = useT();
+  const { busy, error, run } = useSaver(onSaved);
+  const [saved, flag] = useSavedFlag();
+  const [url, setUrl] = useState(profile.resumeUrl ?? '');
+
+  return (
+    <section className="card">
+      <h2>{t('resume.addTitle')}</h2>
+      <p className="muted">{t('resume.addLede')}</p>
+
+      <form
+        onSubmit={async (e) => {
+          e.preventDefault();
+          if (await run(() => candidateApi.saveBasics({ resumeUrl: url }))) flag();
+        }}
+        noValidate
+      >
+        <ResumeField
+          value={url}
+          onChange={setUrl}
+          disabled={busy}
+          /* An upload mints an address and joins the saved list; the profile
+             itself only changes when this is saved, so a file chosen and
+             then thought better of leaves the old resume where it was. */
+          onUploaded={onSaved}
+        />
+        <SaveRow busy={busy} saved={saved} error={error} />
+      </form>
+    </section>
+  );
+}
+
+/**
  * A box that offers the list but still takes a typed answer.
  *
  * Used where the list is the usual answer and not the only one - a school is
@@ -795,48 +1092,40 @@ function Select({
 }
 
 /**
- * One band of the form, shut until it is wanted.
+ * One band of the form.
  *
- * Twenty-odd fields on one scroll is not a form, it is a wall - and most of
- * them are answered once and never touched again. Each band says whether it
- * still wants anything, so "what is left" is readable without opening any of
- * them, and the first unfinished one opens itself.
+ * It used to be an accordion, shut until it was wanted, because twenty-odd
+ * fields on one scroll is a wall rather than a form. The batches above do
+ * that job now and do it better, so what is left here is the heading and the
+ * count of what is still blank - which updates as it is typed, rather than
+ * waiting for a save to tell them.
  */
 function Band({
   title,
   hint,
   todo,
-  defaultOpen,
   children,
 }: {
   title: string;
   hint?: string;
   /** How many fields here are still blank. 0 draws a tick. */
   todo: number;
-  defaultOpen?: boolean;
   children: ReactNode;
 }) {
   const { t } = useT();
-  const [open, setOpen] = useState(defaultOpen ?? todo > 0);
 
   return (
-    <section className={`band ${open ? 'is-open' : ''}`}>
-      <button
-        type="button"
-        className="band-head"
-        aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
-      >
-        <span className="band-caret" aria-hidden="true" />
-        <span className="band-title">
+    <section className="card band">
+      <div className="band-head">
+        <h2 className="band-title">
           {title}
           {hint && <span className="band-hint">{hint}</span>}
-        </span>
+        </h2>
         <span className={`band-todo ${todo === 0 ? 'is-done' : ''}`}>
           {todo === 0 ? t('band.done') : t('band.todo', { n: todo })}
         </span>
-      </button>
-      {open && <div className="band-body">{children}</div>}
+      </div>
+      <div className="band-body">{children}</div>
     </section>
   );
 }
@@ -946,7 +1235,28 @@ const str = (v: string | number | null | undefined) => (v === null || v === unde
 const num = (v: string) => (v.trim() === '' ? undefined : Number(v));
 
 /**
- * Everything a role reads, in three bands.
+ * A `<input type="month">` value as the instant the API stores.
+ *
+ * Noon rather than midnight, so a browser in IST and a server reading UTC
+ * cannot disagree about which month it was.
+ */
+const monthStart = (v: string) => (v ? new Date(`${v}-01T12:00:00`).toISOString() : '');
+
+/** When a project ran, in the words its card has room for. */
+function projectWhen(p: { startDate: string | null; endDate: string | null }): string {
+  const month = (d: string) =>
+    new Date(d).toLocaleDateString(undefined, { month: 'short', year: 'numeric' });
+  if (p.startDate && p.endDate) {
+    const from = month(p.startDate);
+    const to = month(p.endDate);
+    return from === to ? from : `${from} – ${to}`;
+  }
+  return p.startDate ? month(p.startDate) : p.endDate ? month(p.endDate) : '';
+}
+
+/*
+ * Everything a role reads, across three bands - About, Academics and
+ * Preferences - each on the batch it belongs to.
  *
  * This was one card of six fields, which was the whole problem: a company can
  * set a bar on eleven different numbers and the profile offered four of them,
@@ -957,15 +1267,6 @@ const num = (v: string) => (v.trim() === '' ? undefined : Number(v));
  * absent field as "not mentioned" - so a student fixing their phone number
  * does not rewrite their marks.
  */
-function DetailsForm({ profile, locked, lists, onSaved }: CardProps) {
-  return (
-    <div className="bands">
-      <AboutBand profile={profile} locked={locked} lists={lists} onSaved={onSaved} />
-      <AcademicsBand profile={profile} locked={locked} lists={lists} onSaved={onSaved} />
-      <AccessBand profile={profile} locked={locked} lists={lists} onSaved={onSaved} />
-    </div>
-  );
-}
 
 /** The save button every band ends with, and the state behind it. */
 function SaveRow({ busy, saved, error }: { busy: boolean; saved: boolean; error: string | null }) {
@@ -1000,12 +1301,11 @@ function AboutBand({ profile, lists, onSaved }: CardProps) {
     gender: profile.gender ?? '',
     headline: profile.headline ?? '',
     about: profile.about ?? '',
-    resumeUrl: profile.resumeUrl ?? '',
   });
   const set = (k: keyof typeof f) => (e: { target: { value: string } }) =>
     setF((p) => ({ ...p, [k]: e.target.value }));
 
-  const todo = [f.phone, f.gender, f.headline, f.resumeUrl].filter((v) => !v).length;
+  const todo = [f.phone, f.gender, f.headline].filter((v) => !v).length;
 
   return (
     <Band title={t('band.about')} hint={t('band.aboutHint')} todo={todo}>
@@ -1052,12 +1352,6 @@ function AboutBand({ profile, lists, onSaved }: CardProps) {
             />
             <span className="field-hint">{t('basics.genderHint')}</span>
           </div>
-          <ResumeField
-            value={f.resumeUrl}
-            onChange={(resumeUrl) => setF((p) => ({ ...p, resumeUrl }))}
-            disabled={busy}
-            onUploaded={onSaved}
-          />
         </div>
 
         <label className="field">
@@ -1072,13 +1366,59 @@ function AboutBand({ profile, lists, onSaved }: CardProps) {
 
         <SaveRow busy={busy} saved={saved} error={error} />
       </form>
+
+      <OnRecord profile={profile} />
     </Band>
+  );
+}
+
+/**
+ * The numbers the college holds them by.
+ *
+ * A PRN, a roll number and a division are all typed in by somebody else,
+ * during an import the student never sees, and all three appear on a hall
+ * ticket, a result and every list a placement cell circulates. Showing them
+ * is not a courtesy: it is the only chance a student gets to notice the digit
+ * that was mistyped, and it is why this sits outside the form - nothing here
+ * is theirs to correct, only to report.
+ */
+function OnRecord({ profile }: { profile: ProfileData }) {
+  const { t } = useT();
+  const rows: [string, string | null][] = [
+    [t('record.prn'), profile.prn],
+    [t('record.rollNo'), profile.batch?.rollNo ?? null],
+    [t('record.division'), profile.batch?.division ?? null],
+    [t('record.batch'), profile.batch?.name ?? null],
+  ];
+  const shown = rows.filter(([, v]) => v);
+  if (shown.length === 0) return null;
+
+  return (
+    <>
+      <hr className="band-rule" />
+      <p className="field-label">{t('record.title')}</p>
+      <dl className="record">
+        {shown.map(([label, value]) => (
+          <div key={label}>
+            <dt>{label}</dt>
+            <dd className="mono">{value}</dd>
+          </div>
+        ))}
+      </dl>
+      <p className="field-hint">{t('record.hint')}</p>
+    </>
   );
 }
 
 /* --- Band 2: what a marks bar reads --------------------------------------- */
 
-function AcademicsBand({ profile, locked, lists, onSaved }: CardProps) {
+function AcademicsBand({
+  profile,
+  locked,
+  lists,
+  programs,
+  onSaved,
+}: CardProps & { programs: StudentPrograms | null }) {
   const { t } = useT();
   const { busy, error, run } = useSaver(onSaved);
   const [saved, flag] = useSavedFlag();
@@ -1101,12 +1441,31 @@ function AcademicsBand({ profile, locked, lists, onSaved }: CardProps) {
   const set = (k: keyof typeof f) => (e: { target: { value: string } }) =>
     setF((p) => ({ ...p, [k]: e.target.value }));
 
+  /*
+   * The courses to offer, and whether anything else may be typed.
+   *
+   * Their college's programmes when it has mapped any, the university's when
+   * it has not, and only then the whole platform catalogue. The first two are
+   * somebody's deliberate selection, so the list is closed: a course the
+   * college does not run is a course that fails every role's criterion, and a
+   * free-text box is how a student gets there without being told.
+   */
+  const offered: { name: string; branches: { name: string }[] }[] =
+    programs?.courses ??
+    // The catalogue states branches as bare names; the same shape, so one
+    // reader below serves whichever list arrived.
+    (lists?.courses ?? []).map((c) => ({ name: c.name, branches: c.branches.map((name) => ({ name })) }));
+  const closed = programs !== null && programs.source !== 'catalogue';
+
   /* Branches of the course they picked, or every loose one if it is not on
      the list - a student on an unlisted course still has a branch. */
   const branches = useMemo(() => {
-    const course = (lists?.courses ?? []).find((c) => c.name === f.course);
-    return course && course.branches.length > 0 ? course.branches : (lists?.looseBranches ?? []);
-  }, [lists, f.course]);
+    const course = offered.find((c) => c.name === f.course);
+    if (course && course.branches.length > 0) return course.branches.map((b) => b.name);
+    // A closed list offers nothing rather than everything: the branches of
+    // some other college's course are not this student's answer.
+    return closed ? [] : (lists?.looseBranches ?? []);
+  }, [offered, closed, lists, f.course]);
 
   const isPg = PG_COURSES.test(f.course);
   const todo = [f.course, f.specialisation, f.graduationYear, f.cgpa || f.degreePct, f.tenthPct, f.twelfthPct]
@@ -1119,8 +1478,10 @@ function AcademicsBand({ profile, locked, lists, onSaved }: CardProps) {
           e.preventDefault();
           const ok = await run(() =>
             candidateApi.saveBasics({
-              course: f.course,
-              specialisation: f.specialisation,
+              // Off the roster once the college has verified it, so it is not
+              // restated here - a field nobody can edit should not be posted
+              // back as though they had.
+              ...(locked ? {} : { course: f.course, specialisation: f.specialisation }),
               graduationYear: num(f.graduationYear),
               cgpa: num(f.cgpa),
               degreePct: num(f.degreePct),
@@ -1143,13 +1504,23 @@ function AcademicsBand({ profile, locked, lists, onSaved }: CardProps) {
         <div className="grid">
           <div className="field">
             <span className="field-label">{t('acad.course')}</span>
+            {/* Locked with the marks once the college has verified them: the
+                course is off the same roster, and it is what a role's course
+                criterion and the college's own reports both read. */}
             <Select
-              options={(lists?.courses ?? []).map((c) => c.name)}
+              options={offered.map((c) => c.name)}
               value={f.course}
               onChange={(course) => setF((p) => ({ ...p, course, specialisation: '' }))}
-              otherLabel={t('common.otherEnter')}
-              disabled={busy}
+              otherLabel={closed ? undefined : t('common.otherEnter')}
+              disabled={locked || busy}
             />
+            {/* Why it cannot be changed, said where it cannot be changed -
+                a greyed-out box with no reason reads as a broken one. */}
+            {locked ? (
+              <span className="field-hint">{t('acad.courseLocked')}</span>
+            ) : (
+              closed && <span className="field-hint">{t('acad.courseFromCollege')}</span>
+            )}
           </div>
           <div className="field">
             <span className="field-label">{t('acad.branch')}</span>
@@ -1157,9 +1528,12 @@ function AcademicsBand({ profile, locked, lists, onSaved }: CardProps) {
               options={branches}
               value={f.specialisation}
               onChange={(specialisation) => setF((p) => ({ ...p, specialisation }))}
-              otherLabel={t('common.otherEnter')}
-              disabled={busy}
+              otherLabel={closed ? undefined : t('common.otherEnter')}
+              disabled={locked || busy}
             />
+            {closed && f.course && branches.length === 0 && (
+              <span className="field-hint">{t('acad.branchNone')}</span>
+            )}
           </div>
           <label className="field">
             <span className="field-label">{t('basics.gradYear')}</span>
@@ -1507,10 +1881,48 @@ function ListCard({
   );
 }
 
+/**
+ * What a student finished before their degree.
+ *
+ * The degree list on its own could not say it: the first two rows anybody
+ * adds are their 10th and 12th, and neither is a course a university runs.
+ * Fixed here rather than kept in Setup for the same reason the RPwD groups
+ * are - these are the qualifications the Indian school system awards, not a
+ * list any one university gets to edit.
+ */
+const SCHOOL_QUALIFICATIONS = [
+  'Secondary (10th / SSC)',
+  'Higher Secondary (12th / HSC)',
+  'Diploma',
+];
+
+const BLANK_EDUCATION = {
+  degree: '',
+  institution: '',
+  board: '',
+  startYear: '',
+  endYear: '',
+  cgpa: '',
+  percentage: '',
+};
+
 function EducationCard({ profile, lists, onSaved }: OwnCardProps) {
   const { t } = useT();
   const { busy, error, run } = useSaver(onSaved);
-  const [f, setF] = useState({ degree: '', institution: '', startYear: '', endYear: '', cgpa: '' });
+  const [f, setF] = useState(BLANK_EDUCATION);
+  /*
+   * Which college-entered row they just tried to remove.
+   *
+   * The button stays where it is and answers instead of disappearing: a row
+   * that quietly has no Remove where every other row has one reads as a bug,
+   * and the student is left guessing. The server refuses it too - this is
+   * the explanation, not the enforcement.
+   */
+  const [refused, setRefused] = useState<string | null>(null);
+
+  // A school row has a board; a degree has a university, which the college
+  // field already names. Asked only where it is a real question.
+  const isSchool = SCHOOL_QUALIFICATIONS.includes(f.degree);
 
   return (
     <ListCard
@@ -1526,18 +1938,22 @@ function EducationCard({ profile, lists, onSaved }: OwnCardProps) {
               candidateApi.addEducation({
                 degree: f.degree,
                 institution: f.institution,
+                ...(isSchool ? { board: f.board } : {}),
                 startYear: Number(f.startYear),
                 endYear: f.endYear ? Number(f.endYear) : undefined,
                 cgpa: f.cgpa ? Number(f.cgpa) : undefined,
+                percentage: f.percentage ? Number(f.percentage) : undefined,
               }),
             );
-            setF({ degree: '', institution: '', startYear: '', endYear: '', cgpa: '' });
+            setF(BLANK_EDUCATION);
           }}
         >
           <div className="field">
             <span className="field-label">{t('education.degree')}</span>
+            {/* School first, because that is the row a student adds first and
+                the one the degree catalogue could never offer. */}
             <Select
-              options={(lists?.courses ?? []).map((c) => c.name)}
+              options={[...SCHOOL_QUALIFICATIONS, ...(lists?.courses ?? []).map((c) => c.name)]}
               value={f.degree}
               onChange={(degree) => setF({ ...f, degree })}
               otherLabel={t('common.otherEnter')}
@@ -1559,6 +1975,16 @@ function EducationCard({ profile, lists, onSaved }: OwnCardProps) {
               required
             />
           </div>
+          {isSchool && (
+            <label className="field">
+              <span className="field-label">{t('education.board')}</span>
+              <input
+                value={f.board}
+                onChange={(e) => setF({ ...f, board: e.target.value })}
+                placeholder={t('education.boardPlaceholder')}
+              />
+            </label>
+          )}
           <label className="field">
             <span className="field-label">{t('education.started')}</span>
             <input
@@ -1579,13 +2005,27 @@ function EducationCard({ profile, lists, onSaved }: OwnCardProps) {
             />
             <span className="field-hint">{t('education.finishedHint')}</span>
           </label>
+          {/* Both, because Indian boards and universities are split between
+              them and converting one into the other needs a factor that
+              differs by university. A guessed number is worse than none. */}
           <label className="field">
             <span className="field-label">CGPA</span>
             <input
               type="number"
               step="0.01"
+              max="10"
               value={f.cgpa}
               onChange={(e) => setF({ ...f, cgpa: e.target.value })}
+            />
+          </label>
+          <label className="field">
+            <span className="field-label">{t('education.percentage')}</span>
+            <input
+              type="number"
+              step="0.01"
+              max="100"
+              value={f.percentage}
+              onChange={(e) => setF({ ...f, percentage: e.target.value })}
             />
           </label>
           <button type="submit" className="btn btn-primary" disabled={busy}>
@@ -1596,24 +2036,39 @@ function EducationCard({ profile, lists, onSaved }: OwnCardProps) {
     >
       {profile.educations.length > 0 ? (
         <ul className="entry-list">
-          {profile.educations.map((ed) => (
-            <li key={ed.id}>
-              <div>
-                <b>{ed.degree}</b>
-                <span className="entry-meta">
-                  {ed.institution} · {ed.startYear}–{ed.endYear ?? t('common.present')}
-                  {ed.cgpa ? ` · CGPA ${ed.cgpa}` : ''}
-                </span>
-              </div>
-              <button
+          {profile.educations.map((ed) => {
+            const theirs = ed.source === 'COLLEGE';
+            return (
+              <li key={ed.id}>
+                <div>
+                  <b>{ed.degree}</b>
+                  {theirs && <span className="pill entry-pill">{t('education.fromCollege')}</span>}
+                  <span className="entry-meta">
+                    {ed.institution}
+                    {ed.board ? ` · ${ed.board}` : ''} · {ed.startYear}–
+                    {ed.endYear ?? t('common.present')}
+                    {ed.cgpa ? ` · CGPA ${ed.cgpa}` : ''}
+                    {ed.percentage ? ` · ${ed.percentage}%` : ''}
+                  </span>
+                  {refused === ed.id && (
+                    <span className="entry-locked">{t('education.cannotRemove')}</span>
+                  )}
+                </div>
+                <button
                   type="button"
-                  className="link-btn is-danger"
-                  onClick={() => run(() => candidateApi.removeEducation(ed.id))}
+                  className={`link-btn ${theirs ? 'is-locked' : 'is-danger'}`}
+                  aria-disabled={theirs}
+                  onClick={() =>
+                    theirs
+                      ? setRefused(refused === ed.id ? null : ed.id)
+                      : run(() => candidateApi.removeEducation(ed.id))
+                  }
                 >
                   {t('common.remove')}
                 </button>
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ul>
       ) : null}
     </ListCard>
@@ -1623,7 +2078,8 @@ function EducationCard({ profile, lists, onSaved }: OwnCardProps) {
 function ExperienceCard({ profile, lists, onSaved }: OwnCardProps) {
   const { t } = useT();
   const { busy, error, run } = useSaver(onSaved);
-  const [f, setF] = useState({ title: '', organisation: '', location: '', startDate: '', endDate: '' });
+  const blank = { title: '', organisation: '', location: '', startDate: '', endDate: '', description: '' };
+  const [f, setF] = useState(blank);
 
   return (
     <ListCard
@@ -1643,9 +2099,10 @@ function ExperienceCard({ profile, lists, onSaved }: OwnCardProps) {
                 startDate: new Date(f.startDate).toISOString(),
                 endDate: f.endDate ? new Date(f.endDate).toISOString() : '',
                 isCurrent: !f.endDate,
+                description: f.description,
               }),
             );
-            setF({ title: '', organisation: '', location: '', startDate: '', endDate: '' });
+            setF(blank);
           }}
         >
           <label className="field">
@@ -1695,6 +2152,19 @@ function ExperienceCard({ profile, lists, onSaved }: OwnCardProps) {
             />
             <span className="field-hint">{t('experience.finishedHint')}</span>
           </label>
+          {/* What they actually did. Without it an internship on a resume is
+              a company name and two dates, which is the line a recruiter
+              skips. The builder prints this under the row. */}
+          <label className="field is-wide">
+            <span className="field-label">{t('experience.description')}</span>
+            <textarea
+              rows={2}
+              value={f.description}
+              onChange={(e) => setF({ ...f, description: e.target.value })}
+              placeholder={t('experience.descriptionPlaceholder')}
+              maxLength={2000}
+            />
+          </label>
           <button type="submit" className="btn btn-primary" disabled={busy}>
             {t('common.add')}
           </button>
@@ -1711,6 +2181,7 @@ function ExperienceCard({ profile, lists, onSaved }: OwnCardProps) {
                   {ex.organisation} · {new Date(ex.startDate).getFullYear()}–
                   {ex.isCurrent || !ex.endDate ? t('common.present') : new Date(ex.endDate).getFullYear()}
                 </span>
+                {ex.description && <span className="entry-meta">{ex.description}</span>}
               </div>
               <button
                   type="button"
@@ -1730,7 +2201,7 @@ function ExperienceCard({ profile, lists, onSaved }: OwnCardProps) {
 function ProjectsCard({ profile, onSaved }: OwnCardProps) {
   const { t } = useT();
   const { busy, error, run } = useSaver(onSaved);
-  const blank = { title: '', description: '' };
+  const blank = { title: '', description: '', startDate: '', endDate: '' };
   const [f, setF] = useState(blank);
 
   /*
@@ -1763,6 +2234,10 @@ function ProjectsCard({ profile, onSaved }: OwnCardProps) {
             const ok = await run(() =>
               candidateApi.addProject({
                 ...f,
+                // A month input gives a month; the API wants an instant. The
+                // first of it, since nobody dates a project to the day.
+                startDate: monthStart(f.startDate),
+                endDate: monthStart(f.endDate),
                 // Empty rows are not links; a label nobody typed is dropped.
                 links: links
                   .filter((l) => l.url.trim())
@@ -1788,6 +2263,27 @@ function ProjectsCard({ profile, onSaved }: OwnCardProps) {
               onChange={(e) => setF({ ...f, description: e.target.value })}
               placeholder={t('projects.descriptionPlaceholder')}
             />
+          </label>
+
+          {/* When, so a reader can tell last month's work from first year's.
+              Months rather than days: nobody remembers the day, and the
+              resume prints the month anyway. */}
+          <label className="field">
+            <span className="field-label">{t('projects.started')}</span>
+            <input
+              type="month"
+              value={f.startDate}
+              onChange={(e) => setF({ ...f, startDate: e.target.value })}
+            />
+          </label>
+          <label className="field">
+            <span className="field-label">{t('projects.finished')}</span>
+            <input
+              type="month"
+              value={f.endDate}
+              onChange={(e) => setF({ ...f, endDate: e.target.value })}
+            />
+            <span className="field-hint">{t('projects.finishedHint')}</span>
           </label>
 
           <div className="field proj-links">
@@ -1841,6 +2337,7 @@ function ProjectsCard({ profile, onSaved }: OwnCardProps) {
             <li key={p.id}>
               <div>
                 <b>{p.title}</b>
+                {projectWhen(p) && <span className="entry-meta">{projectWhen(p)}</span>}
                 {p.description && <span className="entry-meta">{p.description}</span>}
                 {p.links.length > 0 && (
                   <span className="proj-link-list">

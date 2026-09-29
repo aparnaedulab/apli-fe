@@ -9,6 +9,12 @@ export interface Education {
   endYear: number | null;
   cgpa: string | null;
   percentage: string | null;
+  /**
+   * Who entered it. A row the college entered is the evidence behind the
+   * verified marks, so it is read-only to the student in the same way they
+   * are - the API refuses to change or remove one.
+   */
+  source: 'STUDENT' | 'COLLEGE';
 }
 
 export interface Experience {
@@ -135,12 +141,21 @@ export interface Profile {
   experiences: Experience[];
   projects: Project[];
   skills: string[];
+  /**
+   * The university's registration number, typed into the roster by the
+   * college. Read-only here: a student cannot set it, but until now could
+   * not see it either, so a digit mistyped at import surfaced at result time.
+   */
+  prn: string | null;
   batch: {
     id: string;
     name: string;
     course: string;
     graduationYear: number;
     college: string;
+    /** The college's own number for them, and the division they sit in. */
+    rollNo: string | null;
+    division: string | null;
     isFrozen: boolean;
     verifiedAt: string | null;
   } | null;
@@ -151,8 +166,24 @@ export interface Profile {
 
 type P = { profile: Profile };
 
+/**
+ * The courses and branches one student may say they are on.
+ *
+ * Not the platform catalogue, which is every course anywhere: a student is on
+ * one of their own college's programmes, and offering them the rest is
+ * offering a course that matches no role's criteria and says nothing about
+ * why. `source` says whose list this is - anything but `catalogue` is
+ * somebody's deliberate selection, so the form closes the list.
+ */
+export interface StudentPrograms {
+  courses: { id: string; name: string; branches: { id: string; name: string }[] }[];
+  source: 'college' | 'university' | 'catalogue';
+}
+
 export const candidateApi = {
   getProfile: () => api.get<P>('/candidate/profile').then((r) => r.profile),
+
+  programs: () => api.get<StudentPrograms>('/candidate/programs'),
 
   saveBasics: (data: Record<string, unknown>) =>
     api.patch<P>('/candidate/profile', data).then((r) => r.profile),

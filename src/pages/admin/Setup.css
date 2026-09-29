@@ -103,17 +103,17 @@
 
 .setup-pane {
   display: grid;
-  gap: 24px;
+  gap: 18px;
   background: var(--surface);
   border: 1px solid var(--rule);
   border-radius: 10px;
-  padding: 28px;
+  padding: 22px 24px;
   min-width: 0;
 }
 
 .pane-head {
   display: grid;
-  gap: 6px;
+  gap: 5px;
 }
 
 /* Which college, and which batch, this step is currently about. */
@@ -129,7 +129,7 @@
 .pane-head h2 {
   margin: 0;
   font-family: var(--display);
-  font-size: 21px;
+  font-size: 18px;
   font-weight: 600;
   letter-spacing: -0.018em;
   color: var(--ink);
@@ -416,4 +416,57 @@
 .pane-body > .scope-choice > legend {
   padding: 0;
   margin-bottom: 10px;
+}
+
+
+/* --- what to do here -------------------------------------------------------
+
+   The step's own instructions, under its heading.
+
+   Set-up is worked through once, by somebody who has not done it before,
+   and the question they have is never "what is this screen for" - it is
+   "so what do I type". Quiet styling, because it is read once and then
+   skipped: a rule down the left rather than a card of its own.
+*/
+
+.pane-guide {
+  margin-top: 8px;
+  padding-left: 13px;
+  border-left: 2px solid var(--brand-soft);
+}
+
+.pane-guide-tag {
+  margin: 0;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+
+.pane-guide ol {
+  margin: 7px 0 0;
+  padding-left: 17px;
+  display: grid;
+  gap: 4px;
+}
+
+.pane-guide li {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 72ch;
+}
+
+.pane-guide li::marker {
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.pane-guide-note {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ink-3);
+  max-width: 72ch;
 }

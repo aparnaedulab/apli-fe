@@ -53,6 +53,8 @@ export default function BatchesStep({ state, catalogue, onSaved, goto }: StepPro
   });
   const [nameTouched, setNameTouched] = useState(false);
   const [busy, setBusy] = useState(false);
+  /** The by-hand route, folded until somebody wants it. */
+  const [byHand, setByHand] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -173,8 +175,17 @@ export default function BatchesStep({ state, catalogue, onSaved, goto }: StepPro
 
   return (
     <form onSubmit={next} noValidate>
+      {/*
+        One way in at a time.
+
+        Two creation blocks used to sit open on top of each other - "from
+        your mapping" and "by hand" - each with its own fields, and the
+        reader had to work out which one they were in before they could do
+        anything. The mapped route is right for nearly everybody, so it is
+        the one that is open; the other is a line underneath.
+      */}
       <section className="blk">
-        <h2 className="blk-title">Create from your mapping <span className="pill pill-pass">Recommended</span></h2>
+        <h2 className="blk-title">Create the batches</h2>
         <p className="blk-sub">
           One batch for each college, course, branch and passing year - e.g. “PICT · B.E. Computer Engineering{' '}
           {academicYear(thisYear + 1)}”. That is the level drives, eligibility and reports work at, and students
@@ -244,12 +255,21 @@ export default function BatchesStep({ state, catalogue, onSaved, goto }: StepPro
         )}
       </section>
 
-      <section className="blk">
-        <h2 className="blk-title">Create a batch by hand</h2>
-        <p className="blk-sub">
-          For any other group - a whole-university year, or the same batch in every college. Optional; placement
-          cells can always add their own later.
-        </p>
+      <section className={`blk ${byHand ? '' : 'blk-quiet'}`}>
+        <button
+          type="button"
+          className="blk-fold"
+          onClick={() => setByHand((v) => !v)}
+          aria-expanded={byHand}
+        >
+          Or make one by hand
+          <small>
+            For any other group — a whole-university year, or the same batch in every college
+          </small>
+        </button>
+
+        {byHand && (
+          <>
 
         <div className="presets">
           <span className="muted">Quick start:</span>
@@ -419,10 +439,12 @@ export default function BatchesStep({ state, catalogue, onSaved, goto }: StepPro
           </button>
         </div>
 
-        {notice && (
-          <p className="notice ob-in" role="status">
-            {notice}
-          </p>
+            {notice && (
+              <p className="notice ob-in" role="status">
+                {notice}
+              </p>
+            )}
+          </>
         )}
       </section>
 

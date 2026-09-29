@@ -3,6 +3,7 @@ import CampusLayout from './CampusLayout';
 import { ApiError } from '../../api/client';
 import { placementApi } from '../../api/campus';
 import {
+  barsOf,
   campusDrivesApi,
   type Drive,
   type EligibilityReport,
@@ -100,6 +101,7 @@ export default function CampusDrives() {
 }
 
 function DriveCard({ drive: d, act }: { drive: Drive; act: (fn: () => Promise<unknown>) => void }) {
+  const bars = barsOf(d);
   const [report, setReport] = useState<EligibilityReport | null>(null);
   const [scheduling, setScheduling] = useState(false);
   const [panel, setPanel] = useState<'roles' | 'names' | null>(null);
@@ -159,14 +161,21 @@ function DriveCard({ drive: d, act }: { drive: Drive; act: (fn: () => Promise<un
         <div>
           <dt>Who can come</dt>
           <dd>
-            {[
-              d.minCgpa && `CGPA ${d.minCgpa}+`,
-              d.maxBacklogs !== null && `backlogs ${d.maxBacklogs} or fewer`,
-              d.gradYears.length > 0 && `graduating ${d.gradYears.map((g) => g.year).join(', ')}`,
-              d.branches.length > 0 && `${d.branches.length} branches`,
-            ]
-              .filter(Boolean)
-              .join(' · ') || 'Anyone verified in the season — the company has not set a bar'}
+            {/* Off the roles, which is where the bar now lives and where it
+                is actually enforced. A drive with no roles has no bar to
+                show - and saying "anyone" there would promise a day nobody
+                can yet apply to. */}
+            {bars.length === 0 ? (
+              <span className="muted">No roles on the day yet, so there is no bar.</span>
+            ) : (
+              <ul className="drive-bars">
+                {bars.map((b) => (
+                  <li key={b.title}>
+                    <b>{b.title}</b> — {b.bar}
+                  </li>
+                ))}
+              </ul>
+            )}
           </dd>
         </div>
         <div>
@@ -436,6 +445,21 @@ function Report({ report: r }: { report: EligibilityReport }) {
           strong
         />
       </div>
+
+      {/* Per role, because a student clears one role to attend, not all of
+          them - so the headline above is the union and this says which
+          opening the campus actually answers. Only worth printing when
+          there is more than one role to tell apart. */}
+      {r.roles.length > 1 && (
+        <ul className="drive-roles">
+          {r.roles.map((role) => (
+            <li key={role.jobId}>
+              <b>{role.title}</b>
+              <span>{role.eligible} clear it</span>
+            </li>
+          ))}
+        </ul>
+      )}
 
       {r.byBranch.length > 0 && (
         <p className="drive-split">

@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import StudentLayout from './StudentLayout';
-import Apli, { type ApliSays } from './Apli';
+import { ApliFace, type Mood } from './Apli';
+import { refreshMe } from './me';
 import {
   candidateApi,
   studentJobsApi,
@@ -18,27 +19,33 @@ import './Dashboard.css';
 /**
  * The first screen a student sees.
  *
- * A dashboard earns its place only by doing what the pages under it cannot.
- * Summarising them is not that: a panel of live applications beside a panel
- * of open roles is a table of contents, and a student who has used the portal
- * twice stops reading it.
+ * Not a dashboard. A dashboard is a wall of panels that each summarise a
+ * page under it, and a student who has used the portal twice stops reading
+ * it - they know what is on the jobs page, they came here to find out
+ * whether anything has changed.
  *
- * So this page keeps only what is true of everything at once:
+ * So this is a home screen. Three movements, in the order somebody would
+ * actually ask them:
  *
- *   This week   - interviews, closing dates and an offer waiting on them, in
- *                 one dated list. Every other screen holds one kind of these;
- *                 nothing but the overview can put them in time order.
- *   How it works- the five stages with their own figures in them, each one
- *                 opening in place to show the actual roles behind the number.
- *   Asked for   - the skills the open roles keep wanting, counted across all
- *                 of them. No single job page can see this, and it is the one
- *                 thing here that changes what they can reach.
+ *   Your name, and one line       - said plainly, in type big enough that it
+ *                                   is the answer rather than a header.
+ *   Anything with a clock on it   - a deck of cards you push sideways. An
+ *                                   interview lives on one page, a closing
+ *                                   date on another, an unanswered offer on
+ *                                   a third; nothing but this screen can put
+ *                                   the three in time order, and time order
+ *                                   is the only order that says what to do
+ *                                   today.
+ *   Everything else, as tiles     - different sizes, different weights, one
+ *                                   of them dark. A grid where every tile is
+ *                                   the same white rectangle is read as a
+ *                                   form; a grid with a hierarchy is read.
  *
- * It is also built around what the waiting does to somebody. A placement
- * portal judges a person repeatedly, by strangers, on a timetable they do not
- * control, and most of what it has to say is a refusal. So nothing here ranks
- * them against their cohort, and the stages are named as a process running
- * rather than as a verdict being passed.
+ * It is built around what the waiting does to somebody. A placement portal
+ * judges a person repeatedly, by strangers, on a timetable they do not
+ * control, and most of what it has to say is a refusal. So nothing here
+ * ranks them against their cohort, and the stages are named as a process
+ * running rather than as a verdict being passed.
  */
 
 /** The statuses that still have somewhere to go. */
@@ -68,14 +75,6 @@ const WHERE: Record<string, string> = {
 
 const daysTo = (iso: string) => Math.ceil((new Date(iso).getTime() - Date.now()) / 86_400_000);
 
-/** Two letters for the corner, from whatever name we were given. */
-function initialsOf(name: string): string {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  const first = parts[0]?.[0] ?? '';
-  const last = parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? '') : '';
-  return (first + last).toUpperCase() || '?';
-}
-
 /** "Today", "Tomorrow", or a short date - the form the answer is needed in. */
 function dayOf(at: number): string {
   const midnight = new Date();
@@ -83,11 +82,22 @@ function dayOf(at: number): string {
   const d = Math.floor((at - midnight.getTime()) / 86_400_000);
   if (d <= 0) return 'Today';
   if (d === 1) return 'Tomorrow';
-  return new Date(at).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+  return new Date(at).toLocaleDateString('en-IN', { weekday: 'long' });
 }
 
 const timeOf = (at: number) =>
   new Date(at).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' });
+
+const dateOf = (at: number) =>
+  new Date(at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+
+/** "Good morning" and the rest, which is the one thing a clock is good for. */
+function partOfDay(): string {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 17) return 'Good afternoon';
+  return 'Good evening';
+}
 
 /**
  * A number that counts up to its figure the first time it arrives.
@@ -97,7 +107,7 @@ const timeOf = (at: number) =>
  * rather than an arrival - and jumps straight to the figure for anybody who
  * has asked for less motion.
  */
-function useCountUp(to: number, ms = 750): number {
+function useCountUp(to: number, ms = 800): number {
   const [n, setN] = useState(0);
   const done = useRef(false);
 
@@ -171,8 +181,6 @@ export default function StudentDashboard() {
 
   const open = useMemo(() => (jobs ?? []).filter((j) => !j.applicationStatus), [jobs]);
   const live = useMemo(() => (apps ?? []).filter((a) => LIVE.has(a.status)), [apps]);
-
-  const sent = apps?.length ?? 0;
   const shortlisted = useMemo(
     () => (apps ?? []).filter((a) => a.status === 'SHORTLISTED'),
     [apps],
@@ -183,12 +191,17 @@ export default function StudentDashboard() {
     [apps],
   );
 
+  /** The best of the open roles first, since only four of them are shown. */
+  const best = useMemo(
+    () => [...open].sort((a, b) => b.match.score - a.match.score).slice(0, 4),
+    [open],
+  );
+
   /**
    * Everything with a clock on it, in one list.
    *
    * Interviews live on one page, closing dates on another and an unanswered
-   * offer on a third. Nothing but the overview can put them in time order,
-   * and time order is the only order that tells a student what to do today.
+   * offer on a third. Nothing but this screen can put them in time order.
    */
   const due = useMemo<Due[]>(() => {
     const out: Due[] = [];
@@ -212,7 +225,7 @@ export default function StudentDashboard() {
         }
       }
       // An offer has no clock of its own, but it is the most urgent thing a
-      // student can be holding, so it sits at the top of the list.
+      // student can be holding, so it sits at the head of the deck.
       if (a.status === 'OFFERED') {
         out.push({
           key: `of-${a.id}`,
@@ -239,15 +252,15 @@ export default function StudentDashboard() {
       }
     }
 
-    return out.sort((a, b) => a.at - b.at).slice(0, 5);
+    return out.sort((a, b) => a.at - b.at).slice(0, 8);
   }, [apps, open]);
 
   /**
    * What the open roles keep asking for and this student has not listed.
    *
-   * Counted across every role at once, which no single job page can do. It is
-   * the one thing on this screen that changes what they can reach rather than
-   * reporting on it.
+   * Counted across every role at once, which no single job page can do. It
+   * is the one thing on this screen that changes what they can reach rather
+   * than reporting on it.
    */
   const asked = useMemo(() => {
     const count = new Map<string, number>();
@@ -258,53 +271,48 @@ export default function StudentDashboard() {
     }
     return [...count.entries()]
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 6)
+      .slice(0, 7)
       .map(([name, n]) => ({ name, n }));
   }, [open]);
 
-  function whatApliSays(): ApliSays {
+  /** One line under the name. The whole state of play, said once. */
+  function theLine(): { mood: Mood; text: string } {
     if (!verified) {
       return {
         mood: 'think',
-        text: 'Your college has not verified your record yet, so applying is closed for now. None of the work below is wasted — have it finished for the day they unlock it.',
-        action: { to: '/student/profile', label: 'Get it ready' },
+        text: 'Your college has not verified your record yet, so applying is closed. None of the work below is wasted — have it finished for the day they unlock it.',
       };
     }
     if (offers.some((a) => a.status === 'OFFERED')) {
-      return {
-        mood: 'cheer',
-        text: 'You have an offer waiting for an answer. Take the time you need, but do not leave them without one.',
-        action: { to: '/student/applications', label: 'Answer it' },
-      };
+      return { mood: 'proud', text: 'You have an offer waiting for an answer. That is the only thing on this page that matters today.' };
     }
     if (percent < 60) {
       return {
         mood: 'nudge',
         text: `Your profile is ${percent}% done, and the missing parts are the ones a recruiter reads first. Ten minutes changes what you can reach.`,
-        action: {
-          to: '/student/profile',
-          label: nextUp ? `Add your ${nextUp.label.toLowerCase()}` : 'Finish it',
-        },
+      };
+    }
+    if (live.length > 0 && open.length > 0) {
+      return {
+        mood: 'cheer',
+        text: `${live.length} application${live.length === 1 ? ' is' : 's are'} with a company, and ${open.length} more role${open.length === 1 ? ' is' : 's are'} open to you.`,
       };
     }
     if (live.length > 0) {
       return {
         mood: 'cheer',
-        text: `${live.length} application${live.length === 1 ? ' is' : 's are'} with a company now. That part is out of your hands — the useful thing is to keep going while you wait.`,
-        action: { to: '/student/applications', label: 'See where they are' },
+        text: `${live.length} application${live.length === 1 ? ' is' : 's are'} with a company now. That part is out of your hands — keep going while you wait.`,
       };
     }
     if (open.length > 0) {
       return {
         mood: 'cheer',
-        text: `${open.length} role${open.length === 1 ? '' : 's'} are open to you, and every one already matches your course, your marks and your batch.`,
-        action: { to: '/student/jobs', label: 'Have a look' },
+        text: `${open.length} role${open.length === 1 ? '' : 's'} open to you, every one already matching your course, your marks and your batch.`,
       };
     }
     return {
       mood: 'hello',
       text: 'Nothing is open this minute. That changes as companies arrive, and how ready your profile is decides how much of it you can reach.',
-      action: { to: '/student/profile', label: 'Keep it sharp' },
     };
   }
 
@@ -314,309 +322,378 @@ export default function StudentDashboard() {
     <StudentLayout>
       <NoticeBoard />
       <StudentDrives />
-      {/*
-        Who they are, before anything is asked of them. Every fact here is one
-        a recruiter filters on, so a student can see what is read about them.
-      */}
-      {profile && (
-        <header className="ov-me">
-          <span className="ov-face" aria-hidden="true">
-            {initialsOf(profile.fullName)}
-          </span>
-
-          <div className="ov-who">
-            <h1>{t('dash.hello', { name: profile.fullName.split(' ')[0]! })}</h1>
-            {profile.headline && <p className="ov-headline">{profile.headline}</p>}
-            <p className="ov-where">
-              {profile.batch
-                ? [
-                    profile.batch.college,
-                    profile.batch.course,
-                    profile.batch.name,
-                    `Class of ${profile.batch.graduationYear}`,
-                  ]
-                    .filter(Boolean)
-                    .join(' · ')
-                : t('dash.noBatch')}
-            </p>
-
-            <p className="ov-seal">
-              <span className={`ov-pill ${verified ? 'is-on' : ''}`}>
-                {verified ? 'Verified by your college' : 'Not verified yet'}
-              </span>
-              {profile.cgpa && <span className="ov-fact">CGPA {profile.cgpa}</span>}
-              <span className="ov-fact">
-                {profile.skills.length} skill{profile.skills.length === 1 ? '' : 's'}
-              </span>
-              <Link className="ov-fact is-link" to="/student/resume">
-                {profile.resumeUrl ? 'Resume on file' : 'No resume yet'}
-              </Link>
-            </p>
-          </div>
-        </header>
-      )}
-
-      {!profile && (
-        <header className="page-head">
-          <div>
-            <p className="eyebrow">{t('common.student')}</p>
-            <h1>{t('dash.overview')}</h1>
-          </div>
-        </header>
-      )}
 
       {error !== null && <p className="alert alert-error">{error || t('dash.loadError')}</p>}
 
       {loading && (
         <>
-          <div className="sk sk-apli" />
-          <div className="sk sk-split" />
+          <div className="sk ov-sk-hail" />
+          <div className="ov-sk-rail">
+            <div className="sk" />
+            <div className="sk" />
+            <div className="sk" />
+          </div>
+          <div className="ov-sk-bento">
+            <div className="sk" />
+            <div className="sk" />
+          </div>
         </>
       )}
 
       {profile && (
         <>
-          <Apli says={whatApliSays()} name={profile.fullName.split(' ')[0]} />
+          <Hail profile={profile} verified={verified} says={theLine()} />
 
-          <Week due={due} />
+          <Deck due={due} />
 
-          <Path
-            percent={percent}
-            nextUp={nextUp?.label ?? null}
-            openRoles={open}
-            live={live}
-            shortlisted={shortlisted}
-            inRounds={inRounds}
-            offers={offers}
-          />
+          <div className="ov-bento">
+            <Ready percent={percent} nextUp={nextUp?.label ?? null} verified={verified} />
 
-          {asked.length > 0 && (
-            <SkillGap
-              asked={asked}
-              held={profile.skills}
-              total={open.length}
-              onAdded={load}
+            <Roles roles={best} total={open.length} />
+
+            <Journey
+              percent={percent}
+              openCount={open.length}
+              live={live.length}
+              rounds={shortlisted.length + inRounds.length}
+              offers={offers.length}
             />
-          )}
+
+            <Sent live={live} />
+
+            {asked.length > 0 && (
+              <Skills asked={asked} held={profile.skills} total={open.length} onAdded={() => {
+                load();
+                refreshMe();
+              }} />
+            )}
+          </div>
         </>
       )}
     </StudentLayout>
   );
 }
 
+/* ==========================================================================
+   Their name, and one line
+   ========================================================================== */
+
 /**
- * Everything with a clock on it, in time order.
+ * Bare on the canvas, not in a card.
  *
- * The one list the portal can only build here: an interview lives on one
- * page, a closing date on another, an unanswered offer on a third.
+ * The first thing on the screen should be the answer, not a container for
+ * the answer. A heading inside a bordered panel is a document; a name in
+ * 46px type with one sentence under it is somebody being spoken to.
  */
-function Week({ due }: { due: Due[] }) {
+function Hail({
+  profile,
+  verified,
+  says,
+}: {
+  profile: Profile;
+  verified: boolean;
+  says: { mood: Mood; text: string };
+}) {
+  const name = profile.fullName.split(' ')[0] ?? '';
+
+  return (
+    <header className="ov-hail">
+      <div className="ov-hail-said">
+        <p className="ov-hail-when">{partOfDay()}</p>
+        <h1>
+          {name}
+          <span aria-hidden="true">.</span>
+        </h1>
+        <p className="ov-hail-line">{says.text}</p>
+
+        <p className="ov-hail-facts">
+          <span className={`ov-chip ${verified ? 'is-on' : ''}`}>
+            {verified ? 'Verified by your college' : 'Not verified yet'}
+          </span>
+          {profile.batch && (
+            <span className="ov-chip">
+              {profile.batch.course} · {profile.batch.graduationYear}
+            </span>
+          )}
+          {profile.cgpa && <span className="ov-chip">CGPA {profile.cgpa}</span>}
+          <Link className="ov-chip is-link" to="/student/resume">
+            {profile.resumeUrl ? 'Resume on file' : 'Add a resume'}
+          </Link>
+        </p>
+      </div>
+
+      {/* Apli, at the size a character deserves on the one screen that is
+          about the person rather than about a role. */}
+      <div className="ov-hail-apli" aria-hidden="true">
+        <ApliFace mood={says.mood} size={132} idle />
+      </div>
+    </header>
+  );
+}
+
+/* ==========================================================================
+   Anything with a clock on it
+   ========================================================================== */
+
+/**
+ * A deck you push sideways, not a list you scroll past.
+ *
+ * These are the three or four facts that decide what somebody does today, so
+ * they get the whole width, real colour and type big enough to read from
+ * across a lecture hall. A row of table rows would say the same thing and be
+ * skipped.
+ */
+function Deck({ due }: { due: Due[] }) {
   if (due.length === 0) {
     return (
-      <section className="ov-week is-quiet">
-        <p className="ov-week-tag">This week</p>
-        <p className="ov-week-none">
-          Nothing dated. That is not a setback — it is the part that has not started yet.
+      <section className="ov-deck is-quiet">
+        <p className="ov-tag">On your clock</p>
+        <p className="ov-deck-none">
+          Nothing dated this week. That is not a setback — it is the part that has not started yet.
         </p>
       </section>
     );
   }
 
   return (
-    <section className="ov-week">
-      <p className="ov-week-tag">This week</p>
-      <ul>
+    <section className="ov-deck">
+      <p className="ov-tag">
+        On your clock
+        <b>{due.length}</b>
+      </p>
+
+      <div className="rail">
         {due.map((d) => (
-          <li key={d.key} className={`is-${d.kind}`}>
-            <Link to={d.to}>
-              <span className="ov-due-when">
-                {d.kind === 'offer' ? (
-                  <b>Now</b>
-                ) : (
-                  <>
-                    <b>{dayOf(d.at)}</b>
-                    {d.kind === 'interview' && <small>{timeOf(d.at)}</small>}
-                    {d.kind === 'closes' && (
-                      <small>
-                        {Math.max(0, Math.ceil((d.at - Date.now()) / 86_400_000))}d left
-                      </small>
-                    )}
-                  </>
-                )}
-              </span>
-              <span className="ov-due-what">
-                <b>{d.title}</b>
-                <small>{d.sub}</small>
-              </span>
-            </Link>
-          </li>
+          <Link key={d.key} to={d.to} className={`ov-due is-${d.kind}`}>
+            <span className="ov-due-kind">
+              {d.kind === 'offer' ? 'Offer' : d.kind === 'interview' ? 'Interview' : 'Closing'}
+            </span>
+
+            <span className="ov-due-when">
+              {d.kind === 'offer' ? (
+                'Waiting on you'
+              ) : (
+                <>
+                  {dayOf(d.at)}
+                  <i>
+                    {d.kind === 'interview'
+                      ? timeOf(d.at)
+                      : `${Math.max(0, Math.ceil((d.at - Date.now()) / 86_400_000))} days left`}
+                  </i>
+                </>
+              )}
+            </span>
+
+            <span className="ov-due-what">{d.title}</span>
+            <span className="ov-due-sub">{d.sub}</span>
+            {d.kind !== 'offer' && <span className="ov-due-date">{dateOf(d.at)}</span>}
+          </Link>
         ))}
-      </ul>
+      </div>
+    </section>
+  );
+}
+
+/* ==========================================================================
+   The bento
+   ========================================================================== */
+
+/**
+ * How ready their own record is - the one dark tile on the screen.
+ *
+ * Dark on purpose. It is the only number here a student can move by
+ * themselves this afternoon, and one tile that does not look like the others
+ * is worth more than any amount of colour spread evenly across all of them.
+ */
+function Ready({
+  percent,
+  nextUp,
+  verified,
+}: {
+  percent: number;
+  nextUp: string | null;
+  verified: boolean;
+}) {
+  const n = useCountUp(percent);
+  const r = 46;
+  const c = 2 * Math.PI * r;
+
+  return (
+    <Link className="bx bx-ready" to="/student/profile">
+      <p className="ov-tag is-inverse">Your record</p>
+
+      <div className="ov-ready-ring">
+        <svg viewBox="0 0 110 110" aria-hidden="true">
+          <defs>
+            {/* The stops are coloured from CSS: a `var()` in a presentation
+                attribute is not resolved, so the ring came out black. */}
+            <linearGradient id="ov-ready-grad" x1="0" y1="0" x2="1" y2="1">
+              <stop className="ov-ring-a" offset="0%" />
+              <stop className="ov-ring-b" offset="100%" />
+            </linearGradient>
+          </defs>
+          <circle className="ov-ready-track" cx="55" cy="55" r={r} />
+          <circle
+            className="ov-ready-value"
+            cx="55"
+            cy="55"
+            r={r}
+            strokeDasharray={c}
+            strokeDashoffset={c * (1 - n / 100)}
+          />
+        </svg>
+        <b>
+          {n}
+          <i>%</i>
+        </b>
+      </div>
+
+      <p className="ov-ready-say">
+        {percent === 100
+          ? verified
+            ? 'Complete, and verified. Every filter a recruiter sets, you clear on paper.'
+            : 'Complete. Your college verifies it next — that is what unlocks applying.'
+          : `Next up: ${nextUp ?? 'a few details'}.`}
+      </p>
+      <span className="ov-go">{percent === 100 ? 'Look it over' : 'Finish it'}</span>
+    </Link>
+  );
+}
+
+/** The roles that fit best, as a short list rather than a page of cards. */
+function Roles({ roles, total }: { roles: JobCard[]; total: number }) {
+  return (
+    <section className="bx bx-roles">
+      <p className="ov-tag">
+        Open to you
+        {total > 0 && <b>{total}</b>}
+      </p>
+
+      {roles.length === 0 ? (
+        <p className="ov-none">
+          Nothing open this minute. It changes as companies arrive — your profile decides how much
+          of it you can reach.
+        </p>
+      ) : (
+        <ul className="ov-roles">
+          {roles.map((j) => (
+            <li key={j.id}>
+              <Link to={`/student/jobs/${j.id}`}>
+                <span
+                  className="ov-role-match"
+                  style={{ ['--p' as string]: `${j.match.score}%` }}
+                  aria-label={`${j.match.score}% match`}
+                >
+                  <i>{j.match.score}</i>
+                </span>
+                <span className="ov-role-who">
+                  <b>{j.title}</b>
+                  <small>{j.companyName}</small>
+                </span>
+                <span className="ov-role-left">
+                  {Math.max(0, daysTo(j.deadline))}d
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <Link className="ov-go" to="/student/jobs">
+        {total > roles.length ? `See all ${total}` : 'Open the jobs page'}
+      </Link>
     </section>
   );
 }
 
 /**
- * The portal, as the five things that actually happen, with the student's own
- * numbers standing in each - and each one opening in place.
+ * The five things that actually happen, with their own numbers in them.
  *
- * Drawn rather than written because a student reading "we help you get
- * placed" learns nothing. Opening a stage shows the roles behind its number,
- * which is what turns the strip from a picture into somewhere to work.
+ * Drawn rather than written, because a student reading "we help you get
+ * placed" learns nothing. Named as a process running, never as a verdict:
+ * "Sent" and "Rounds", not "Success rate".
  */
-function Path({
+function Journey({
   percent,
-  nextUp,
-  openRoles,
+  openCount,
   live,
-  shortlisted,
-  inRounds,
+  rounds,
   offers,
 }: {
   percent: number;
-  nextUp: string | null;
-  openRoles: JobCard[];
-  live: MyApplication[];
-  shortlisted: MyApplication[];
-  inRounds: MyApplication[];
-  offers: MyApplication[];
+  openCount: number;
+  live: number;
+  rounds: number;
+  offers: number;
 }) {
-  const [open, setOpen] = useState<string | null>(null);
-
   const stages = [
-    { key: 'ready', label: 'Get ready', n: percent, suffix: '%', hint: 'Your record' },
-    { key: 'apply', label: 'Apply', n: openRoles.length, hint: 'Open to you' },
-    { key: 'sent', label: 'Sent', n: live.length, hint: 'With a company' },
-    {
-      key: 'rounds',
-      label: 'Rounds',
-      n: shortlisted.length + inRounds.length,
-      hint: 'Shortlisted, called in',
-    },
-    { key: 'offer', label: 'Offer', n: offers.length, hint: 'Yours to answer' },
+    { key: 'ready', label: 'Ready', n: percent, suffix: '%', to: '/student/profile' },
+    { key: 'apply', label: 'Open', n: openCount, to: '/student/jobs' },
+    { key: 'sent', label: 'Sent', n: live, to: '/student/applications' },
+    { key: 'rounds', label: 'Rounds', n: rounds, to: '/student/interviews' },
+    { key: 'offer', label: 'Offers', n: offers, to: '/student/applications' },
   ] as const;
 
   /* The furthest stage with anything in it - the one worth lighting. */
   const at = stages.reduce((best, st, i) => (st.n > 0 ? i : best), 0);
-  const shown = stages.find((st) => st.key === open);
 
   return (
-    <section className="ov-path">
-      <p className="ov-path-tag">How this works</p>
-
+    <section className="bx bx-journey">
+      <p className="ov-tag">Where you are</p>
       <ol>
         {stages.map((st, i) => (
           <li
             key={st.key}
-            className={`${i === at ? 'is-here' : ''} ${i < at ? 'is-done' : ''} ${
-              open === st.key ? 'is-open' : ''
-            }`}
+            className={`${i === at ? 'is-here' : ''} ${i < at ? 'is-done' : ''}`}
           >
-            <button
-              type="button"
-              onClick={() => setOpen(open === st.key ? null : st.key)}
-              aria-expanded={open === st.key}
-            >
+            <Link to={st.to}>
               <b>
                 <Counted n={st.n} />
                 {'suffix' in st ? st.suffix : ''}
               </b>
               <span>{st.label}</span>
-              <small>{st.hint}</small>
-            </button>
+            </Link>
           </li>
         ))}
       </ol>
-
-      {/* What is actually behind the number, without leaving the page. */}
-      {shown && (
-        <div className="ov-drawer">
-          {shown.key === 'ready' && (
-            <p className="ov-drawer-line">
-              {percent === 100
-                ? 'Everything a recruiter filters on is on record.'
-                : `${nextUp ?? 'Some details'} is the next thing missing.`}{' '}
-              <Link to="/student/profile">Open your profile →</Link>
-            </p>
-          )}
-
-          {shown.key === 'apply' &&
-            (openRoles.length === 0 ? (
-              <p className="ov-drawer-line">
-                Nothing open this minute. <Link to="/student/jobs">See the jobs page →</Link>
-              </p>
-            ) : (
-              <ul className="ov-drawer-list">
-                {openRoles.slice(0, 4).map((j) => (
-                  <li key={j.id}>
-                    <Link to={`/student/jobs/${j.id}`}>
-                      <b>{j.title}</b>
-                      <small>
-                        {j.companyName} · {j.match.score}% match ·{' '}
-                        {Math.max(0, daysTo(j.deadline))} days left
-                      </small>
-                    </Link>
-                  </li>
-                ))}
-                {openRoles.length > 4 && (
-                  <li className="ov-drawer-more">
-                    <Link to="/student/jobs">and {openRoles.length - 4} more →</Link>
-                  </li>
-                )}
-              </ul>
-            ))}
-
-          {['sent', 'rounds', 'offer'].includes(shown.key) && (
-            <Apps
-              list={
-                shown.key === 'sent'
-                  ? live
-                  : shown.key === 'rounds'
-                    ? [...shortlisted, ...inRounds]
-                    : offers
-              }
-              empty={
-                shown.key === 'sent'
-                  ? 'Nothing with a company yet.'
-                  : shown.key === 'rounds'
-                    ? 'No rounds yet. A company shortlists first, then calls you in.'
-                    : 'No offers yet.'
-              }
-            />
-          )}
-        </div>
-      )}
     </section>
   );
 }
 
-/** Applications behind one stage of the path. */
-function Apps({ list, empty }: { list: MyApplication[]; empty: string }) {
-  if (list.length === 0) {
-    return (
-      <p className="ov-drawer-line">
-        {empty} <Link to="/student/jobs">Find a role →</Link>
-      </p>
-    );
-  }
+/** The ones already with a company, and where each has got to. */
+function Sent({ live }: { live: MyApplication[] }) {
   return (
-    <ul className="ov-drawer-list">
-      {list.slice(0, 4).map((a) => (
-        <li key={a.id}>
-          <Link to="/student/applications">
-            <b>{a.title}</b>
-            <small>
-              {a.companyName} · {WHERE[a.status] ?? a.status}
-            </small>
-          </Link>
-        </li>
-      ))}
-      {list.length > 4 && (
-        <li className="ov-drawer-more">
-          <Link to="/student/applications">and {list.length - 4} more →</Link>
-        </li>
+    <section className="bx bx-sent">
+      <p className="ov-tag">
+        With a company
+        {live.length > 0 && <b>{live.length}</b>}
+      </p>
+
+      {live.length === 0 ? (
+        <p className="ov-none">
+          Nothing sent yet. Every role you can see is one you are already eligible for.
+        </p>
+      ) : (
+        <ul className="ov-sent">
+          {live.slice(0, 4).map((a) => (
+            <li key={a.id}>
+              <Link to="/student/applications">
+                <span className={`ov-dot is-${a.status.toLowerCase()}`} aria-hidden="true" />
+                <span className="ov-sent-who">
+                  <b>{a.title}</b>
+                  <small>{a.companyName}</small>
+                </span>
+                <span className="ov-sent-at">{WHERE[a.status] ?? a.status}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
       )}
-    </ul>
+
+      <Link className="ov-go" to="/student/applications">
+        {live.length > 4 ? `All ${live.length}` : 'Track them'}
+      </Link>
+    </section>
   );
 }
 
@@ -631,7 +708,7 @@ function Apps({ list, empty }: { list: MyApplication[]; empty: string }) {
  * added because a number went up is a lie told to a recruiter, and the first
  * interview finds it.
  */
-function SkillGap({
+function Skills({
   asked,
   held,
   total,
@@ -643,6 +720,7 @@ function SkillGap({
   onAdded: () => void;
 }) {
   const [busy, setBusy] = useState<string | null>(null);
+  const [gone, setGone] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
 
   async function add(name: string) {
@@ -650,6 +728,7 @@ function SkillGap({
     setError(null);
     try {
       await candidateApi.saveSkills([...held, name]);
+      setGone((s) => new Set(s).add(name));
       onAdded();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'That did not save.');
@@ -659,34 +738,31 @@ function SkillGap({
   }
 
   return (
-    <section className="ov-gap">
-      <p className="ov-gap-tag">What the roles keep asking for</p>
-      <p className="ov-gap-lede">
-        Counted across all {total} role{total === 1 ? '' : 's'} open to you. If you already know one,
-        add it — it changes what you match. If you do not, it is a straight answer about what to
-        learn next.
+    <section className="bx bx-skills">
+      <p className="ov-tag">Asked for most</p>
+      <p className="ov-skills-lede">
+        Counted across all {total} role{total === 1 ? '' : 's'} open to you. Tap one you already
+        know and it changes what you match. If you do not know it, that is a straight answer about
+        what to learn next.
       </p>
 
       {error && <p className="alert alert-error">{error}</p>}
 
-      <ul>
+      <div className="ov-skills">
         {asked.map((s) => (
-          <li key={s.name}>
-            <span className="ov-gap-name">{s.name}</span>
-            <span className="ov-gap-n">
-              {s.n} role{s.n === 1 ? '' : 's'}
-            </span>
-            <button
-              type="button"
-              className="ov-gap-add"
-              disabled={busy !== null}
-              onClick={() => void add(s.name)}
-            >
-              {busy === s.name ? 'Adding…' : 'I know this'}
-            </button>
-          </li>
+          <button
+            key={s.name}
+            type="button"
+            className={`ov-skill ${gone.has(s.name) ? 'is-added' : ''}`}
+            disabled={busy !== null || gone.has(s.name)}
+            onClick={() => void add(s.name)}
+            title={`Asked for by ${s.n} role${s.n === 1 ? '' : 's'}`}
+          >
+            <span className="ov-skill-name">{s.name}</span>
+            <span className="ov-skill-n">{gone.has(s.name) ? 'added' : s.n}</span>
+          </button>
         ))}
-      </ul>
+      </div>
     </section>
   );
 }

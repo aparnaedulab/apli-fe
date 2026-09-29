@@ -1,85 +1,336 @@
-.completion-head {
+/* ---------------------------------------------------------------------------
+   The profile in batches.
+
+   Nine sections on one scroll made the page read as a chore: most of it was
+   already answered, and the fields a student came to fill in were somewhere
+   in the middle. The summary is one line, the sections are grouped into five
+   batches, and one batch is on screen at a time.
+--------------------------------------------------------------------------- */
+
+/* --- how far along ---------------------------------------------------------
+   A ring and a sentence, then chips for what is missing. The finished
+   sections are a number; a list of them would be a screenful of things the
+   student has already done.
+--------------------------------------------------------------------------- */
+
+.completion {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  align-items: center;
   gap: 20px;
-  margin-bottom: 14px;
 }
 
-.completion-head h2 {
-  margin: 0 0 3px;
+/* Declared so the browser knows the share is a number and can interpolate
+   it. Without this the gradient snaps to its new angle; with it the ring
+   fills, which is the one bit of movement on the page worth having. */
+@property --pct {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
 }
 
-.completion-figure {
+.completion-ring {
+  flex: none;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: conic-gradient(
+    var(--brand) calc(var(--pct) * 1%),
+    var(--rule) calc(var(--pct) * 1%)
+  );
+  transition: --pct 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* The hole in the middle, as a disc rather than a mask, so the ring keeps
+   its colour on whatever the card is sitting on. */
+.completion-ring span {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--surface);
   font-family: var(--display);
-  font-size: 34px;
+  font-size: 17px;
   font-weight: 600;
-  line-height: 1;
-  margin: 0;
   color: var(--brand);
   font-variant-numeric: tabular-nums;
 }
 
-.completion-bar {
-  height: 6px;
-  border-radius: 3px;
-  background: var(--rule);
-  overflow: hidden;
-  margin-bottom: 20px;
+.completion-say {
+  min-width: 0;
 }
 
-.completion-bar span {
-  display: block;
-  height: 100%;
-  background: var(--brand);
-  border-radius: 3px;
-  transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+.completion-say h2 {
+  margin: 0 0 2px;
 }
 
-.completion-list {
-  list-style: none;
+.completion-say p {
   margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 10px;
 }
 
-.completion-list li {
-  display: grid;
-  grid-template-columns: 20px 1fr;
-  gap: 10px;
-  align-items: start;
-  font-size: 14.5px;
-  color: var(--ink-2);
+.completion-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 10px;
 }
 
-.completion-tick {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
+/* Not a label but a way in: each one opens the batch its field is on. */
+.completion-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
   border: 1px solid var(--rule-2);
+  border-radius: 999px;
+  background: none;
+  font: inherit;
+  font-size: 0.83rem;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.completion-chip span {
+  color: var(--ink-3);
+  transition: transform 0.15s ease;
+}
+
+.completion-chip:hover {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.completion-chip:hover span {
+  color: var(--brand);
+  transform: translateX(2px);
+}
+
+.completion-chip:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* --- the batch strip -------------------------------------------------------
+   Five places to go, not five steps in an order: a student who only wants to
+   change their phone number should not have to walk past their marks.
+--------------------------------------------------------------------------- */
+
+/* Where the strip is scrolled back to when a batch changes, offset so the
+   sticky header does not land on top of it. */
+.batch-anchor {
+  scroll-margin-top: 16px;
+}
+
+.batch-nav {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+  padding-bottom: 4px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.batch-tab {
+  flex: 1 1 0;
+  min-width: 150px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 13px;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  background: var(--surface);
+  font: inherit;
+  color: var(--ink-2);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.batch-tab:hover {
+  border-color: var(--rule-2);
+  background: var(--paper-2);
+}
+
+.batch-tab:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.batch-tab.is-on {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--ink);
+}
+
+/* The number, or a tick once the sections behind this batch are answered. */
+.batch-no {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
   display: grid;
   place-items: center;
-  font-size: 11px;
-  color: transparent;
-  margin-top: 2px;
+  border: 1px solid var(--rule-2);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
 }
 
-.completion-list li.is-done .completion-tick {
-  background: var(--pass-soft);
+.batch-tab.is-on .batch-no {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: var(--on-brand);
+}
+
+.batch-tab.is-done .batch-no {
   border-color: var(--pass);
+  background: var(--pass-soft);
   color: var(--pass);
 }
 
-.completion-list b {
-  color: var(--ink);
-  font-weight: 500;
+.batch-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.35;
 }
 
-.completion-hint {
-  display: block;
-  font-size: 13px;
+.batch-text b {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.batch-text small {
+  font-size: 0.76rem;
   color: var(--ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.batch-panel:focus {
+  outline: none;
+}
+
+/* --- moving on -------------------------------------------------------------
+   The way to the next batch without going back up to the strip.
+--------------------------------------------------------------------------- */
+
+.batch-move {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.batch-step {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 10px 16px;
+  border: 1px solid var(--rule-2);
+  border-radius: 12px;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.batch-step:hover {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.batch-step:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.batch-step small {
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.batch-step b {
+  font-size: 0.93rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.batch-step.is-next {
+  text-align: right;
+  margin-left: auto;
+}
+
+.batch-step.is-prev b::before {
+  content: '← ';
+  color: var(--ink-3);
+}
+
+.batch-step.is-next b::after {
+  content: ' →';
+  color: var(--ink-3);
+}
+
+@media (max-width: 640px) {
+  .completion {
+    gap: 14px;
+  }
+
+  .completion-ring {
+    width: 62px;
+    height: 62px;
+  }
+
+  .completion-ring span {
+    width: 48px;
+    height: 48px;
+    font-size: 14px;
+  }
+
+  .batch-nav {
+    /* The strip runs off the edge on a phone; it is scrolled, not stacked,
+       so the batches stay one row and the panel starts where it always
+       does. */
+    margin-inline: -16px;
+    padding-inline: 16px;
+  }
+
+  .batch-tab {
+    flex: 0 0 auto;
+    min-width: 0;
+  }
+
+  .batch-text small {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .completion-ring,
+  .completion-chip,
+  .completion-chip span,
+  .batch-tab,
+  .batch-step {
+    transition: none;
+  }
 }
 
 .alert-ok {
@@ -108,9 +359,93 @@
   margin-bottom: 18px;
 }
 
+/*
+   The add-an-entry form, as a grid.
+
+   `.proj-links` has asked for `grid-column: 1 / -1` since it was written,
+   which was inert because nothing here was ever a grid: the fields stacked,
+   one per line, and an education form was eight lines tall before anything
+   was typed. Now they sit in rows, and the two things that want a whole row
+   say so.
+*/
 .sub-form .form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px 14px;
   align-items: end;
   margin-bottom: 0;
+}
+
+.sub-form .field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.sub-form .field.is-wide {
+  grid-column: 1 / -1;
+}
+
+.sub-form .form-row > .btn {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+
+/* A row the college entered, and why it will not go when Remove is pressed.
+   The button stays put and answers: one row quietly missing the control every
+   other row has reads as a bug rather than as a rule. */
+.entry-pill {
+  margin-left: 8px;
+  color: var(--pass);
+  background: var(--pass-soft);
+  border: 0;
+}
+
+.entry-locked {
+  display: block;
+  margin-top: 6px;
+  padding-left: 10px;
+  border-left: 2px solid var(--hold);
+  font-size: 0.83rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.link-btn.is-locked {
+  color: var(--ink-3);
+  cursor: help;
+}
+
+/* The numbers the college holds them by: read, never edited. */
+.record {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px 18px;
+  margin: 8px 0 10px;
+}
+
+.record div {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.record dt {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.record dd {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--ink);
+}
+
+@media (max-width: 640px) {
+  .sub-form .form-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 .entry-list {
@@ -882,65 +1217,19 @@
 
 /* ---------------------------------------------------------------------------
    The profile form, in bands
-   
-   Twenty-odd fields is a wall if they all sit open at once. Each band shuts
-   itself once it is answered, so the page reads as four lines and opens only
-   where there is something left to do.
+
+   A band was an accordion until the batches above took that job. What is
+   left is a card with its heading and a count of what is still blank, which
+   moves as it is typed rather than waiting for a save.
 --------------------------------------------------------------------------- */
-
-.bands {
-  display: grid;
-  gap: 10px;
-  margin-bottom: 22px;
-}
-
-.band {
-  background: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-
-.band.is-open {
-  border-color: var(--rule-2);
-}
 
 .band-head {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 14px 16px;
-  background: none;
-  border: 0;
-  font: inherit;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.band-head:hover {
-  background: var(--paper-2);
-}
-
-.band-head:focus-visible {
-  outline: 2px solid var(--brand);
-  outline-offset: -2px;
-}
-
-/* A caret that turns, rather than two different glyphs to keep in step. */
-.band-caret {
-  flex: none;
-  width: 7px;
-  height: 7px;
-  border-right: 2px solid var(--ink-3);
-  border-bottom: 2px solid var(--ink-3);
-  transform: rotate(-45deg);
-  transition: transform 0.15s ease;
-}
-
-.band.is-open .band-caret {
-  transform: rotate(45deg);
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--rule);
 }
 
 .band-title {
@@ -948,10 +1237,11 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  font-weight: 600;
+  margin: 0;
 }
 
 .band-hint {
+  font-family: var(--sans);
   font-weight: 400;
   font-size: 0.85rem;
   color: var(--ink-3);
@@ -959,6 +1249,7 @@
 
 .band-todo {
   flex: none;
+  margin-top: 2px;
   font-size: 0.8rem;
   color: var(--hold);
   background: var(--hold-soft);
@@ -973,8 +1264,7 @@
 }
 
 .band-body {
-  padding: 4px 16px 18px;
-  border-top: 1px solid var(--rule);
+  padding-top: 2px;
 }
 
 .band-note {
@@ -1117,12 +1407,6 @@
 .tri-opt:focus-visible {
   outline: 2px solid var(--brand);
   outline-offset: -2px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .band-caret {
-    transition: none;
-  }
 }
 
 @media (max-width: 640px) {

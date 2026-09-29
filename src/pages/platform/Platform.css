@@ -37,12 +37,12 @@
 .console .input {
   width: 100%;
   font: inherit;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--ink);
   background: var(--surface);
   border: 1px solid var(--rule-2);
   border-radius: 8px;
-  padding: 10px 12px;
+  padding: 8px 11px;
   transition:
     border-color 0.15s ease,
     box-shadow 0.15s ease;
@@ -170,13 +170,13 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px 20px;
+  gap: 12px 16px;
 }
 
 .f {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   min-width: 0;
 }
 
@@ -185,7 +185,7 @@
 }
 
 .f-label {
-  font-size: 13.5px;
+  font-size: 12.5px;
   font-weight: 600;
   color: var(--ink);
   display: flex;
@@ -202,8 +202,8 @@
 .f-hint,
 .f-error {
   margin: 0;
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 12px;
+  line-height: 1.45;
   color: var(--ink-3);
 }
 
@@ -384,14 +384,14 @@
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 
 .chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 4px 10px;
   border-radius: 999px;
   border: 1px solid var(--rule-2);
   background: var(--surface);
@@ -462,9 +462,21 @@
 
 /* --- the wizard frame ---------------------------------------------------------- */
 
+/*
+  Two columns: the journey, and the step.
+
+  There was a third - a live repaint of the institution's portal - and it
+  took 340px for something nobody doing this job was looking at. Between it
+  and a rail at 272 the middle column had 828px on a 1440 screen for content
+  that wanted 872, so the whole wizard only looked right zoomed out to about
+  two thirds. Which is what people did.
+
+  With the preview gone the middle column has room to spare, and everything
+  in it is sized for a screen that actually exists.
+*/
 .ob {
   display: grid;
-  grid-template-columns: 272px minmax(0, 1fr) 340px;
+  grid-template-columns: 236px minmax(0, 1fr);
 }
 
 .ob-rail {
@@ -473,8 +485,8 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  gap: 28px;
-  padding: 24px 18px;
+  gap: 20px;
+  padding: 18px 14px;
   border-right: 1px solid var(--rule);
   background:
     radial-gradient(120% 60% at 0% 0%, var(--brand-soft), transparent 60%),
@@ -496,12 +508,12 @@
 
 .ob-home strong {
   font-family: var(--display);
-  font-size: 17px;
-  letter-spacing: -0.01em;
+  font-size: 14.5px;
+  letter-spacing: -0.015em;
 }
 
 .ob-home small {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--ink-3);
 }
 
@@ -519,9 +531,9 @@
 .ob-steps::before {
   content: '';
   position: absolute;
-  left: 21px;
-  top: 22px;
-  bottom: 22px;
+  left: 19px;
+  top: 18px;
+  bottom: 18px;
   width: 2px;
   background: var(--rule);
 }
@@ -530,12 +542,12 @@
   width: 100%;
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 10px;
   text-align: left;
   border: 0;
   background: transparent;
-  padding: 10px 8px;
-  border-radius: 10px;
+  padding: 7px 8px;
+  border-radius: 9px;
   color: inherit;
   position: relative;
   transition: background 0.15s ease;
@@ -552,8 +564,8 @@
 
 .ob-step-dot {
   flex: none;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   display: grid;
   place-items: center;
@@ -583,7 +595,7 @@
   background: var(--brand);
   border-color: var(--brand);
   color: var(--on-brand);
-  box-shadow: 0 0 0 5px var(--brand-soft);
+  box-shadow: 0 0 0 4px var(--brand-soft);
 }
 
 .ob-step.is-current button {
@@ -595,16 +607,17 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
-  padding-top: 3px;
+  padding-top: 2px;
 }
 
 .ob-step-title {
   font-weight: 600;
-  font-size: 14.5px;
+  font-size: 13px;
+  line-height: 1.35;
 }
 
 .ob-step-sum {
-  font-size: 12.5px;
+  font-size: 11.5px;
   color: var(--ink-3);
   white-space: nowrap;
   overflow: hidden;
@@ -642,12 +655,12 @@
 
 .ob-main {
   min-width: 0;
-  padding: 28px clamp(20px, 4vw, 56px) 0;
+  padding: 22px clamp(18px, 2.2vw, 34px) 0;
 }
 
 .ob-head {
-  max-width: 760px;
-  margin-bottom: 24px;
+  max-width: 720px;
+  margin-bottom: 18px;
 }
 
 .ob-head-top {
@@ -675,18 +688,94 @@
 
 .ob-head h1 {
   font-family: var(--display);
-  font-weight: 600;
-  font-size: clamp(30px, 3.4vw, 40px);
+  font-weight: 650;
+  font-size: clamp(22px, 1.9vw, 27px);
   letter-spacing: -0.028em;
-  line-height: 1.1;
-  margin: 10px 0 8px;
+  line-height: 1.15;
+  margin: 6px 0 5px;
 }
 
 .ob-lede {
   margin: 0;
   color: var(--ink-2);
-  font-size: 16.5px;
-  max-width: 60ch;
+  font-size: 14px;
+  line-height: 1.6;
+  max-width: 66ch;
+}
+
+/* --- what to do here ---------------------------------------------------------
+
+   The step's own instructions, above its fields.
+
+   Kept visually quiet - no card, no shadow, a rule down the left - because
+   it is read once and then skipped. Loud enough to be found the first time,
+   quiet enough not to compete with the form every time after that.
+*/
+
+.ob-guide {
+  margin-top: 14px;
+  padding-left: 13px;
+  border-left: 2px solid var(--brand-soft);
+}
+
+.ob-guide-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--brand);
+  cursor: pointer;
+}
+
+/* A caret that turns, so the fold reads as a fold rather than as a link. */
+.ob-guide-tag::after {
+  content: '';
+  width: 5px;
+  height: 5px;
+  margin-left: 2px;
+  border-right: 1.6px solid currentColor;
+  border-bottom: 1.6px solid currentColor;
+  transform: rotate(45deg) translate(-1px, -1px);
+  transition: transform 0.18s ease;
+}
+
+.ob-guide.is-shut .ob-guide-tag::after {
+  transform: rotate(-45deg) translate(-1px, 1px);
+}
+
+.ob-guide ol {
+  margin: 7px 0 0;
+  padding-left: 17px;
+  display: grid;
+  gap: 4px;
+}
+
+.ob-guide li {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 68ch;
+}
+
+.ob-guide li::marker {
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The thing worth knowing that is not an instruction. */
+.ob-guide-note {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ink-3);
+  max-width: 68ch;
 }
 
 .saved {
@@ -705,10 +794,6 @@
   background: var(--pass);
 }
 
-.ob-preview-toggle {
-  display: none;
-}
-
 .ob-loading {
   display: flex;
   align-items: center;
@@ -718,7 +803,7 @@
 }
 
 .ob-body {
-  max-width: 760px;
+  max-width: 720px;
   animation: ob-rise 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -727,8 +812,8 @@
   background: var(--surface);
   border: 1px solid var(--rule);
   border-radius: var(--ob-radius);
-  padding: 22px 24px;
-  margin-bottom: 16px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
   box-shadow: var(--ob-shadow);
 }
 
@@ -742,17 +827,18 @@
 
 .blk-title {
   font-family: var(--display);
-  font-weight: 600;
-  font-size: 19px;
+  font-weight: 650;
+  font-size: 15.5px;
   letter-spacing: -0.012em;
-  margin: 0 0 14px;
+  margin: 0 0 10px;
 }
 
 .blk-sub {
-  margin: -8px 0 16px;
+  margin: -6px 0 12px;
   color: var(--ink-2);
-  font-size: 14.5px;
-  max-width: 62ch;
+  font-size: 13px;
+  line-height: 1.55;
+  max-width: 66ch;
 }
 
 .more {
@@ -966,7 +1052,7 @@
   border: 1px solid var(--rule);
   border-radius: 10px;
   overflow: hidden;
-  max-height: 300px;
+  max-height: 232px;
   overflow-y: auto;
 }
 
@@ -980,7 +1066,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 14px;
+  padding: 7px 12px;
   border: 0;
   border-bottom: 1px solid var(--rule);
   background: var(--surface);
@@ -1445,22 +1531,37 @@
 
 /* Review */
 
+/*
+  Nine rows, each a step and whether it is done.
+
+  It is a list somebody scans, not reads - so the rows are tight, the
+  borders are one colour, and the only thing allowed to stand out is a row
+  that is required and still missing. That is the whole question this
+  screen answers.
+*/
 .checklist {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 .checklist li {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 12px 14px;
-  border-radius: 10px;
+  gap: 11px;
+  padding: 8px 11px;
+  border-radius: 9px;
   border: 1px solid var(--rule);
+}
+
+/* Done is the common case, so it is the quiet one. */
+.checklist li.is-done,
+.checklist li.is-optional {
+  border-color: transparent;
+  background: var(--paper-2);
 }
 
 .checklist li.is-todo {
@@ -1470,13 +1571,13 @@
 
 .check-dot {
   flex: none;
-  width: 26px;
-  height: 26px;
+  width: 21px;
+  height: 21px;
   border-radius: 50%;
   display: grid;
   place-items: center;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 11.5px;
   color: #fff;
   background: var(--pass);
 }
@@ -1491,17 +1592,22 @@
   flex-direction: column;
 }
 
+.check-text {
+  font-size: 13.5px;
+}
+
 .check-text small {
-  color: var(--ink-2);
-  font-size: 13px;
+  color: var(--ink-3);
+  font-size: 12px;
+  line-height: 1.45;
 }
 
 .launched {
   position: relative;
   overflow: hidden;
   border-radius: var(--ob-radius);
-  padding: 30px 28px;
-  margin-bottom: 16px;
+  padding: 22px 22px;
+  margin-bottom: 12px;
   background: var(--brand);
   color: var(--on-brand);
   box-shadow: var(--ob-shadow-lift);
@@ -1514,7 +1620,7 @@
 
 .launched h2 {
   font-family: var(--display);
-  font-size: 30px;
+  font-size: 22px;
   letter-spacing: -0.02em;
   margin: 0 0 8px;
 }
@@ -1607,264 +1713,6 @@
   color: var(--stop);
   font-size: 14px;
   font-weight: 500;
-}
-
-/* --- the live preview ---------------------------------------------------------- */
-
-.ob-preview {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  padding: 28px 22px;
-  border-left: 1px solid var(--rule);
-  background: var(--paper);
-  overflow-y: auto;
-}
-
-.pv-caption {
-  margin: 0 0 12px;
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.pv-caption::before {
-  content: '';
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--pass);
-  box-shadow: 0 0 0 3px var(--pass-soft);
-}
-
-.pv-tabs {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 12px;
-}
-
-.pv-tabs button {
-  flex: 1;
-  border: 1px solid var(--rule);
-  background: var(--surface);
-  border-radius: 8px;
-  padding: 6px 4px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ink-3);
-}
-
-.pv-tabs button.is-on {
-  color: var(--ink);
-  border-color: var(--ink-3);
-}
-
-/* The mock window is drawn in light colours whatever the theme, because it
-   is a picture of somebody else's screen, not part of this one. */
-.pv-window {
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid #d9dde5;
-  box-shadow: var(--ob-shadow-lift);
-  background: #fff;
-  color: #14161c;
-  font-size: 11px;
-  transition: box-shadow 0.3s ease;
-}
-
-.pv-chrome {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 8px 10px;
-  background: #f1f3f6;
-  border-bottom: 1px solid #e3e6ec;
-}
-
-.pv-chrome span {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #d0d5dd;
-}
-
-.pv-chrome em {
-  margin-left: 8px;
-  font-style: normal;
-  font-family: var(--mono);
-  font-size: 10px;
-  color: #858da0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.pv-app {
-  display: grid;
-  grid-template-columns: 112px 1fr;
-  min-height: 260px;
-}
-
-.pv-side {
-  padding: 10px 8px;
-  border-right: 1px solid #eef0f4;
-  background: #fafbfc;
-}
-
-.pv-brand {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 12px;
-}
-
-.pv-brand img,
-.pv-mono {
-  flex: none;
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  object-fit: contain;
-}
-
-.pv-mono {
-  display: grid;
-  place-items: center;
-  background: var(--pv-brand);
-  color: var(--pv-on);
-  font-weight: 700;
-  font-size: 9px;
-  transition: background 0.3s ease;
-}
-
-.pv-brand-name {
-  font-weight: 700;
-  font-size: 11px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.pv-menu {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.pv-menu li {
-  padding: 4px 6px;
-  border-radius: 5px;
-  color: #52596a;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.pv-menu li.is-on {
-  background: var(--pv-soft);
-  color: var(--pv-brand);
-  font-weight: 700;
-}
-
-.pv-extra {
-  animation: ob-rise 0.3s ease both;
-}
-
-.pv-soon {
-  flex: none;
-  font-size: 7.5px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 1px 3px;
-  border-radius: 3px;
-  background: #f8eed8;
-  color: #8a5a00;
-}
-
-.pv-page {
-  padding: 12px;
-}
-
-.pv-hero {
-  border-radius: 8px;
-  padding: 12px;
-  background: var(--pv-brand);
-  color: var(--pv-on);
-  transition: background 0.3s ease;
-}
-
-.pv-hero p {
-  margin: 0 0 2px;
-  opacity: 0.8;
-  font-size: 10px;
-}
-
-.pv-hero strong {
-  display: block;
-  font-size: 13px;
-  line-height: 1.3;
-  margin-bottom: 10px;
-}
-
-.pv-btn {
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 5px;
-  background: var(--pv-on);
-  color: var(--pv-brand);
-  font-weight: 700;
-  font-size: 10px;
-}
-
-.pv-cards {
-  margin-top: 10px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-}
-
-.pv-cards span {
-  height: 44px;
-  border-radius: 6px;
-  background: #f3f5f8;
-  border: 1px solid #eceff4;
-}
-
-.pv-facts {
-  margin: 18px 0 0;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-
-.pv-facts div {
-  padding: 10px;
-  border-radius: 10px;
-  background: var(--paper-2);
-}
-
-.pv-facts dt {
-  font-size: 11px;
-  color: var(--ink-3);
-}
-
-.pv-facts dd {
-  margin: 2px 0 0;
-  font-family: var(--display);
-  font-size: 20px;
-  font-weight: 600;
 }
 
 /* --- console ------------------------------------------------------------------- */
@@ -2178,34 +2026,11 @@
 
 /* --- smaller screens ----------------------------------------------------------- */
 
-@media (max-width: 1240px) {
+@media (max-width: 1360px) {
   .ob {
-    grid-template-columns: 250px minmax(0, 1fr);
+    grid-template-columns: 220px minmax(0, 1fr);
   }
 
-  .ob-preview {
-    display: none;
-  }
-
-  .ob-preview-toggle {
-    display: inline-flex;
-  }
-
-  /* On demand, the preview floats over the page rather than squeezing it. */
-  .ob.show-preview .ob-preview {
-    display: block;
-    position: fixed;
-    right: 16px;
-    top: 16px;
-    bottom: 16px;
-    height: auto;
-    width: 340px;
-    z-index: 30;
-    border: 1px solid var(--rule);
-    border-radius: 16px;
-    box-shadow: var(--ob-shadow-lift);
-    animation: ob-rise 0.25s ease both;
-  }
 }
 
 @media (max-width: 860px) {
@@ -2281,11 +2106,6 @@
     grid-template-columns: 1fr 1fr;
   }
 
-  .ob.show-preview .ob-preview {
-    left: 12px;
-    right: 12px;
-    width: auto;
-  }
 }
 
 /* Image upload */
@@ -2407,13 +2227,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.pv-favicon {
-  width: 12px;
-  height: 12px;
-  object-fit: contain;
-  flex: none;
 }
 
 .affix .affix-input {
@@ -2959,104 +2772,6 @@
 
 /* Preview: screens in the menu, features on the screen */
 
-.pv-menu li {
-  padding: 0;
-}
-
-.pv-menu li button {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 4px;
-  padding: 4px 6px;
-  border: 0;
-  border-radius: 5px;
-  background: transparent;
-  color: #52596a;
-  font: inherit;
-  font-size: 11px;
-  text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.pv-menu li button:hover {
-  background: #eef0f4;
-}
-
-.pv-menu li button.is-on {
-  background: var(--pv-soft);
-  color: var(--pv-brand);
-  font-weight: 700;
-}
-
-.pv-on {
-  margin: 12px 0 6px;
-  font-size: 9px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #858da0;
-}
-
-.pv-features {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.pv-features li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  padding: 6px 8px;
-  border-radius: 6px;
-  background: #f5f7fa;
-  border: 1px solid #eceff4;
-  font-size: 10.5px;
-  animation: ob-rise 0.25s ease both;
-}
-
-.pv-features .pv-empty {
-  justify-content: center;
-  color: #858da0;
-  background: transparent;
-  border-style: dashed;
-}
-
-.pv-live {
-  flex: none;
-  font-size: 7.5px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 1px 3px;
-  border-radius: 3px;
-  background: #e2f1ec;
-  color: #0f6b52;
-}
-
-.pv-added {
-  margin-top: 18px;
-}
-
-.pv-caption-plain::before {
-  display: none;
-}
-
-.pv-added ul {
-  margin: 0;
-  padding: 0 0 0 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 13px;
-  color: var(--ink-2);
-}
 
 /* Console: sections */
 
@@ -3659,4 +3374,89 @@ small.xl-new {
 .map-college-title {
   margin: 0 0 8px;
   font-size: 18px;
+}
+
+
+/* --- a block folded away ----------------------------------------------------
+
+   Two of these steps had a second, rarer way of doing the same job sitting
+   open beside the first: a shared branch catalogue above the course picker,
+   and a build-it-by-hand form under the one that builds from the mapping.
+   Both were why those steps read as a wall. The rare route keeps its place
+   in the order and loses its weight.
+*/
+
+.blk-quiet {
+  background: transparent;
+  box-shadow: none;
+  border-style: dashed;
+  padding: 4px 6px;
+}
+
+.blk-fold {
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr);
+  align-items: start;
+  gap: 2px 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--display);
+  font-size: 14.5px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.blk-fold:hover {
+  color: var(--brand);
+}
+
+/* A caret that turns, so the fold reads as a fold rather than a heading. */
+.blk-fold::before {
+  content: '';
+  grid-row: span 2;
+  align-self: center;
+  width: 6px;
+  height: 6px;
+  margin-left: 2px;
+  border-right: 1.7px solid currentColor;
+  border-bottom: 1.7px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.18s ease;
+  opacity: 0.55;
+}
+
+/* Open: the block is no longer quiet, so the caret points down. */
+.blk:not(.blk-quiet) > .blk-fold::before {
+  transform: rotate(45deg);
+}
+
+.blk-fold small {
+  grid-column: 2;
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+
+.blk:not(.blk-quiet) > .blk-fold {
+  padding: 0 0 12px;
+}
+
+/* The two quieter ways into the course picker. */
+.picker-alts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 2px 0 0;
+  font-size: 12.5px;
+}
+
+.picker-alts:empty {
+  display: none;
 }

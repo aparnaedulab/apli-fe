@@ -1,257 +1,534 @@
 /*
   The student's portal.
 
-  A rail down the side and a page beside it - the same shape as the rest of
-  the platform, so somebody moving between them is not relearning where
-  things are. What differs is the weight: fewer items, more room between
-  them, and a look that belongs to somebody reading rather than to somebody
-  working a queue.
-*/
+  ---------------------------------------------------------------------------
+  Why this is not shaped like the rest of the platform
+
+  Operations, campus and company all run on a sidebar: a permanent column of
+  every section, drawn for somebody at a desk working a queue all day, who
+  needs everything one click away and does not mind spending a fifth of the
+  screen on it.
+
+  A student has none of that. They have five things they ever open, they are
+  on a phone more often than not, and a column of eighteen links down the
+  left is the single thing that made this side read as software their college
+  makes them use rather than something they would open by choice.
+
+  So there is no sidebar here. There is a bar floating over the page with
+  five destinations on it, a dock in the same shape on a phone, and one
+  button that opens the whole portal as a grid of tiles. The page gets the
+  rest of the screen.
+
+  Two lines this side does not cross:
+
+    - It is not a toy. Cartoon corners, bouncing and confetti read as being
+      talked down to by somebody choosing where to spend the next three years
+      of their life. Restraint is what lets a character like Apli land.
+    - It is not a dashboard. Nothing ranks a student against their cohort,
+      and no figure is drawn as a score on the person.
+
+  ---------------------------------------------------------------------------
+  Why it is all in one file
+
+  Everything below is scoped to `.sh`, which only the student shell sets. The
+  sixty-odd student pages already build themselves out of the shared
+  primitives - `.card`, `.btn`, `.pill`, `.empty`, `.data-table`, `.alert` -
+  defined for the operations side in AdminLayout.css. Redrawing those once,
+  here, restyles every one of those pages without touching them, and leaves
+  the operations screens exactly as they were.
+--------------------------------------------------------------------------- */
 
 .sh {
-  display: grid;
-  grid-template-columns: 236px minmax(0, 1fr);
+  /* --- the student palette ------------------------------------------------
+     `--brand` stays the institution's, so a college that set its colour
+     still sees it. The accents beside it are ours: a portal that is only
+     ever one navy is why this side read as a government form. */
+  --s-accent: var(--brand);
+  --s-accent-2: var(--accent-2);
+  --s-accent-3: var(--accent-3);
+  --s-mint: var(--mint);
+  --s-amber: var(--amber);
+  --s-coral: var(--coral);
+  --s-pink: #e64980;
+
+  --s-grad: var(--grad);
+  --s-grad-soft: var(--grad-soft);
+
+  --s-canvas: #f4f5fa;
+  --s-card: #ffffff;
+  --s-card-2: #fafbfe;
+  --s-line: #e6e9f2;
+  --s-line-2: #d3d9e8;
+  --s-glass: rgb(255 255 255 / 0.72);
+
+  --s-r-xl: var(--r-xl);
+  --s-r-lg: var(--r-lg);
+  --s-r-md: var(--r-md);
+  --s-r-sm: var(--r-sm);
+
+  --s-shadow-1: var(--shadow-1);
+  --s-shadow-2: var(--shadow-2);
+  --s-shadow-3: var(--shadow-3);
+  --s-shadow-float:
+    0 2px 6px rgb(16 24 40 / 0.06),
+    0 14px 34px rgb(16 24 40 / 0.14);
+
+  --s-wide: 1220px;
+  --s-dock: 78px;
+  --s-ease: var(--ease);
+  --s-spring: var(--spring);
+
+  /* --- the platform tokens, repointed ------------------------------------
+     This is what makes one stylesheet restyle sixty pages.
+
+     Every student screen was written against the platform's own tokens -
+     `--rule` for a border, `--surface` for a panel, `--radius` for a corner
+     - because those are what the shared primitives use. Repointing them
+     here, inside `.sh` and nowhere else, moves all six hundred of those
+     usages onto the student palette at once, and leaves the operations,
+     campus and company screens on the originals untouched. */
+  --surface: var(--s-card);
+  --paper-2: var(--s-card-2);
+  --rule: var(--s-line);
+  --rule-2: var(--s-line-2);
+  --radius: var(--s-r-sm);
+  --brand-soft: color-mix(in srgb, var(--s-accent) 12%, transparent);
+
+  /* The pipeline states, in this side's colours. Same meanings, warmer. */
+  --pass: var(--s-mint);
+  --pass-soft: color-mix(in srgb, var(--s-mint) 13%, transparent);
+  --hold: var(--s-amber);
+  --hold-soft: color-mix(in srgb, var(--s-amber) 14%, transparent);
+  --stop: var(--s-coral);
+  --stop-soft: color-mix(in srgb, var(--s-coral) 12%, transparent);
+
   min-height: 100vh;
+  /*
+    A canvas rather than a page.
+
+    Four soft washes of colour, fixed so they do not scroll away. It is the
+    difference between reading a document and being inside an application,
+    and it costs nothing - no image, no element, no layout.
+  */
   background:
-    radial-gradient(60rem 30rem at 22% -10%, color-mix(in srgb, var(--brand) 8%, transparent), transparent 70%),
-    var(--paper);
+    radial-gradient(
+      44rem 30rem at 8% -6%,
+      color-mix(in srgb, var(--s-accent) 20%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      38rem 26rem at 92% 0%,
+      color-mix(in srgb, var(--s-accent-2) 17%, transparent),
+      transparent 62%
+    ),
+    radial-gradient(
+      32rem 26rem at 78% 34%,
+      color-mix(in srgb, var(--s-accent-3) 11%, transparent),
+      transparent 60%
+    ),
+    var(--s-canvas);
+  background-attachment: fixed;
 }
 
-/* --- the rail ------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  .sh {
+    /* The accents and the shadow scale flip at :root, which both sides
+       share. Only what is this side's own is restated here. */
+    --s-pink: #faa2c1;
 
-.sh-rail {
+    --s-canvas: #0a0d14;
+    --s-card: #151a24;
+    --s-card-2: #1a202c;
+    --s-line: #242c3a;
+    --s-line-2: #353f52;
+    --s-glass: rgb(21 26 36 / 0.72);
+
+    --s-shadow-float:
+      0 2px 6px rgb(0 0 0 / 0.4),
+      0 14px 34px rgb(0 0 0 / 0.5);
+  }
+}
+
+/* ==========================================================================
+   The bar
+   ========================================================================== */
+
+.sh-top {
   position: sticky;
   top: 0;
-  align-self: start;
-  height: 100vh;
+  z-index: 40;
+  background: color-mix(in srgb, var(--s-canvas) 62%, transparent);
+  backdrop-filter: blur(18px) saturate(160%);
+  border-bottom: 1px solid color-mix(in srgb, var(--s-line) 70%, transparent);
+}
+
+.sh-top-in {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 18px;
-  padding: 18px 14px;
-  overflow-y: auto;
-  border-right: 1px solid var(--rule);
-  background: color-mix(in srgb, var(--surface) 70%, var(--paper));
-  backdrop-filter: blur(6px);
+  width: 100%;
+  max-width: var(--s-wide);
+  margin: 0 auto;
+  padding: 11px 26px;
 }
 
 .sh-brand {
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  padding: 0 8px;
+  flex: none;
   text-decoration: none;
   color: var(--ink);
-  font-weight: 650;
-  font-size: 15.5px;
-  letter-spacing: -0.01em;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 19px;
+  letter-spacing: -0.035em;
 }
 
-.sh-rail nav {
-  display: grid;
-  gap: 16px;
+.sh-brand i {
+  font-style: normal;
+  background: var(--s-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
-.sh-group {
-  display: grid;
+/*
+  The five, as one segmented control.
+
+  A row of links is a website. A single track with a lozenge sliding along it
+  is a control, and that is the difference somebody feels before they read a
+  word of it.
+*/
+.sh-bar {
+  display: flex;
   gap: 2px;
+  margin: 0 auto;
+  padding: 4px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--s-line) 80%, transparent);
+  background: var(--s-glass);
+  box-shadow: var(--s-shadow-1);
 }
 
-.sh-group-label {
-  margin: 0 0 4px;
-  padding: 0 10px;
-  font-family: var(--mono);
-  font-size: 9.5px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
-
-.sh-link {
+.sh-tab {
   position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    color 0.16s ease,
+    background 0.16s ease;
+}
+
+.sh-tab-icon {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.24s var(--s-spring);
+}
+
+.sh-bar .sh-tab:hover {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--s-accent) 8%, transparent);
+}
+
+.sh-bar .sh-tab.is-current {
+  color: #fff;
+  background: var(--s-grad);
+  box-shadow: 0 2px 12px color-mix(in srgb, var(--s-accent) 36%, transparent);
+}
+
+.sh-top-right {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex: none;
+}
+
+/* --- the chip: their own record, from wherever they are ------------------ */
+
+.sh-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 14px 4px 5px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--s-accent) 22%, transparent);
+  background: var(--s-glass);
+  text-decoration: none;
+  transition:
+    border-color 0.16s ease,
+    transform 0.16s var(--s-ease);
+}
+
+.sh-chip:hover {
+  border-color: color-mix(in srgb, var(--s-accent) 50%, transparent);
+  transform: translateY(-1px);
+}
+
+.sh-chip b {
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--ink-2);
+}
+
+.sh-chip.is-ok {
+  padding: 6px 14px;
+  border-color: color-mix(in srgb, var(--s-mint) 32%, transparent);
+  background: color-mix(in srgb, var(--s-mint) 12%, transparent);
+  color: var(--s-mint);
+}
+
+.sh-chip.is-ok b {
+  color: var(--s-mint);
+}
+
+/* How far the record has got, as a ring around the figure. A conic gradient
+   means no SVG and no second element for something this small. */
+.sh-chip-ring {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--s-accent) var(--p, 0%),
+    color-mix(in srgb, var(--ink-3) 20%, transparent) 0
+  );
+}
+
+.sh-chip-ring i {
+  display: grid;
+  place-items: center;
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  background: var(--s-card);
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  color: var(--s-accent);
+}
+
+/* --- everything there is -------------------------------------------------- */
+
+.sh-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 15px 8px 12px;
+  border: 1px solid var(--s-line);
+  border-radius: 999px;
+  background: var(--s-glass);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    color 0.16s ease,
+    transform 0.16s var(--s-ease);
+}
+
+.sh-all svg {
+  width: 17px;
+  height: 17px;
+}
+
+.sh-all:hover {
+  border-color: color-mix(in srgb, var(--s-accent) 45%, transparent);
+  color: var(--s-accent);
+  transform: translateY(-1px);
+}
+
+/* The bell was drawn for the operations topbar; here it matches the row it
+   is in rather than importing that one's square edges. */
+.sh .bell {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--s-line);
+  background: var(--s-glass);
+}
+
+.sh .bell:hover {
+  border-color: color-mix(in srgb, var(--s-accent) 45%, transparent);
+}
+
+.sh .bell-panel {
+  border-radius: var(--s-r-lg);
+  border: 1px solid var(--s-line);
+  box-shadow: var(--s-shadow-3);
+  overflow: hidden;
+}
+
+/* --- the account menu ----------------------------------------------------- */
+
+.sh-account {
+  position: relative;
+}
+
+.sh-avatar {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--s-grad);
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 750;
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--s-accent) 34%, transparent);
+  cursor: pointer;
+  transition: transform 0.16s var(--s-spring);
+}
+
+.sh-avatar:hover {
+  transform: scale(1.06);
+}
+
+.sh-avatar.is-big {
+  width: 46px;
+  height: 46px;
+  font-size: 15px;
+}
+
+.sh-account-pop {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 12px);
+  width: 258px;
+  padding: 15px 16px 10px;
+  border-radius: var(--s-r-lg);
+  border: 1px solid var(--s-line);
+  background: var(--s-card);
+  box-shadow: var(--s-shadow-3);
+  animation: sh-pop 0.2s var(--s-spring) both;
+  transform-origin: top right;
+}
+
+@keyframes sh-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(-6px);
+  }
+}
+
+.sh-account-name {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.sh-account-mail,
+.sh-account-batch {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ink-3);
+  overflow-wrap: anywhere;
+}
+
+.sh-account-batch {
+  padding-bottom: 11px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--s-line);
+}
+
+.sh-account-link {
+  display: block;
   padding: 8px 10px;
-  border-radius: 9px;
+  margin: 0 -10px;
+  border-radius: var(--s-r-sm);
   font-size: 13.5px;
   color: var(--ink-2);
   text-decoration: none;
-  transition:
-    background 0.14s ease,
-    color 0.14s ease;
 }
 
-.sh-link:hover {
-  background: color-mix(in srgb, var(--brand) 8%, transparent);
-  color: var(--ink);
+.sh-account-link:hover {
+  background: color-mix(in srgb, var(--s-accent) 8%, transparent);
+  color: var(--s-accent);
 }
 
-/* The current section, said with a bar and weight rather than a slab of
-   colour: a rail is glanced at, and should stay quiet. */
-.sh-link.is-current {
-  background: var(--brand-soft);
-  color: var(--brand);
+.sh-account-pop .lang-switch {
+  margin: 10px 0 4px;
+}
+
+.sh-account-out {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: calc(100% + 20px);
+  margin: 6px -10px 0;
+  padding: 10px;
+  border: 0;
+  border-top: 1px solid var(--s-line);
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
   font-weight: 600;
-}
-
-.sh-link.is-current::before {
-  content: '';
-  position: absolute;
-  left: -14px;
-  top: 7px;
-  bottom: 7px;
-  width: 3px;
-  border-radius: 0 999px 999px 0;
-  background: var(--brand);
-}
-
-/*
-  Not built yet.
-
-  Kept on the rail so the shape of the portal is visible, set apart by a rule
-  and one heading rather than by a badge on every row - thirteen badges all
-  saying the same word stop being read as information and start being read as
-  texture.
-*/
-.sh-soon {
-  margin-top: 6px;
-  padding-top: 12px;
-  border-top: 1px solid var(--rule);
-}
-
-.sh-link.is-soon {
-  color: var(--ink-3);
-  font-size: 13px;
-}
-
-.sh-link.is-soon:hover {
-  color: var(--ink-2);
-}
-
-/* A hollow dot: present, but nothing behind it yet. */
-.sh-link.is-soon::after {
-  content: '';
-  margin-left: auto;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  border: 1px solid var(--rule-2);
-}
-
-.sh-link.is-soon.is-current::after {
-  border-color: var(--brand);
-}
-
-.sh-more {
-  width: 100%;
-  margin-top: 2px;
-  padding: 6px 10px;
-  border: 0;
-  border-radius: 9px;
-  background: transparent;
-  font: inherit;
-  font-size: 12px;
   text-align: left;
-  color: var(--ink-3);
+  color: var(--s-coral);
   cursor: pointer;
 }
 
-.sh-more:hover {
-  background: color-mix(in srgb, var(--brand) 8%, transparent);
-  color: var(--brand);
+.sh-out-icon {
+  width: 15px;
+  height: 15px;
 }
 
-/* --- who is signed in ----------------------------------------------------- */
+/* ==========================================================================
+   The page
+   ========================================================================== */
 
-.sh-me {
-  margin-top: auto;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 3px 9px;
-  padding: 11px 10px;
-  border-radius: 12px;
-  border: 1px solid var(--rule);
-  background: var(--surface);
+.sh-page {
+  width: 100%;
+  max-width: var(--s-wide);
+  margin: 0 auto;
+  padding: 26px 26px 80px;
 }
 
-.sh-initials {
-  grid-row: span 2;
-  align-self: center;
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--brand-soft);
-  color: var(--brand);
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.sh-me-who {
-  display: grid;
-  min-width: 0;
-}
-
-.sh-me-who b {
-  font-size: 13px;
-  color: var(--ink);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.sh-me-who small {
-  font-size: 11px;
-  color: var(--ink-3);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.sh-out {
-  grid-column: 2;
-  justify-self: start;
-  margin-top: 2px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  font: inherit;
-  font-size: 12px;
-  color: var(--ink-3);
-  cursor: pointer;
-}
-
-.sh-out:hover {
-  color: var(--stop);
-}
-
-/* --- the page ------------------------------------------------------------- */
-
-.sh-main {
-  min-width: 0;
-}
-
-/* Nothing sits above the page any more, so it starts at the top of the
-   column: the rail already says where the student is, and an empty strip
-   would only push the first thing they came for further down. */
 /*
   The way back, for a page reached from somewhere in particular.
 
   Rendered by the layout rather than by each destination, so a section can
   link anywhere in the student side without that page having to know it
-  exists - and nobody who followed a badge into their applications is left
-  working out how to get back.
+  exists.
 */
 .sh-back {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  padding: 6px 15px 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--s-line);
+  background: var(--s-glass);
   font-size: 12.5px;
   font-weight: 600;
   color: var(--ink-3);
   text-decoration: none;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s var(--s-ease);
 }
 
 .sh-back::before {
@@ -264,134 +541,35 @@
 }
 
 .sh-back:hover {
-  color: var(--brand);
-}
-
-.sh-page {
-  max-width: 1100px;
-  padding: 26px 28px 64px;
+  color: var(--s-accent);
+  border-color: color-mix(in srgb, var(--s-accent) 40%, transparent);
+  transform: translateX(-2px);
 }
 
 .sh .page-head {
-  margin-bottom: 18px;
+  margin-bottom: 22px;
 }
 
 .sh .page-head h1 {
-  font-size: 26px;
-  letter-spacing: -0.02em;
+  font-family: var(--display);
+  font-size: 34px;
+  font-weight: 750;
+  letter-spacing: -0.035em;
+  line-height: 1.12;
 }
 
 .sh .page-lede {
-  max-width: 72ch;
+  max-width: 68ch;
+  font-size: 15px;
+  line-height: 1.65;
 }
 
-/* Below this the rail would take a third of the screen, so it becomes a row
-   across the top instead and the page gets the rest. */
-@media (max-width: 900px) {
-  .sh {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .sh-rail {
-    position: static;
-    height: auto;
-    flex-direction: row;
-    align-items: center;
-    gap: 12px;
-    overflow-x: auto;
-    border-right: 0;
-    border-bottom: 1px solid var(--rule);
-    padding: 12px 16px;
-  }
-
-  .sh-rail nav {
-    display: flex;
-    gap: 12px;
-  }
-
-  .sh-group {
-    display: flex;
-    gap: 4px;
-  }
-
-  .sh-group-label,
-  .sh-me-who,
-  .sh-out {
-    display: none;
-  }
-
-  .sh-link {
-    white-space: nowrap;
-    border-radius: 999px;
-    border: 1px solid var(--rule);
-  }
-
-  .sh-link.is-current::before {
-    display: none;
-  }
-
-  .sh-me {
-    margin-top: 0;
-    grid-template-columns: auto;
-    padding: 4px;
-    border: 0;
-    background: transparent;
-  }
-
-  .sh-page {
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-
-  .sh .page-head h1 {
-    font-size: 22px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .sh-link {
-    transition: none;
-  }
-}
-
-/* ==========================================================================
-   The student's interface
-
-   Everything below is scoped to `.sh`, which only the student shell sets, so
-   the operations and campus screens keep the look they were built for. They
-   share a stylesheet because they share primitives - a card, a button, a
-   pill - and those primitives were drawn for somebody working a queue all
-   day: tight, square, high-contrast, everything within a click.
-
-   A student is not working a queue. They open this between lectures, on a
-   phone, to find out whether the thing they have been waiting for has
-   happened. So the same primitives are redrawn softer and roomier here, with
-   the type doing more of the work than the borders.
-   ========================================================================== */
-
-/* --- cards ---------------------------------------------------------------- */
-
-.sh .card {
-  padding: 20px 22px;
-  margin-bottom: 16px;
-  border-radius: 16px;
-  border: 1px solid var(--rule);
-  background: var(--surface);
-  box-shadow: 0 1px 2px rgb(15 23 42 / 0.03);
-}
-
-.sh .card h2 {
-  font-size: 16px;
-  letter-spacing: -0.01em;
-}
-
-.sh .card > .muted:first-of-type {
-  font-size: 13.5px;
-  line-height: 1.55;
-}
-
-.sh .card-head {
-  margin-bottom: 12px;
+.sh .eyebrow {
+  font-family: var(--sans);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  color: var(--s-accent);
 }
 
 /*
@@ -404,7 +582,7 @@
 @keyframes sh-rise {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(12px);
   }
 }
 
@@ -412,64 +590,404 @@
 .sh-page > section,
 .sh-page > .apli,
 .sh-page > .job-tabs,
-.sh-page > .empty {
-  animation: sh-rise 0.4s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+.sh-page > .empty,
+.sh-page > header {
+  animation: sh-rise 0.44s var(--s-ease) both;
 }
 
 .sh-page > *:nth-child(2) {
-  animation-delay: 40ms;
+  animation-delay: 50ms;
 }
 .sh-page > *:nth-child(3) {
-  animation-delay: 80ms;
+  animation-delay: 100ms;
 }
 .sh-page > *:nth-child(4) {
-  animation-delay: 120ms;
+  animation-delay: 150ms;
 }
 .sh-page > *:nth-child(n + 5) {
-  animation-delay: 160ms;
+  animation-delay: 190ms;
+}
+
+/* ==========================================================================
+   The dock, on a phone
+   ========================================================================== */
+
+/*
+  Detached from the edge, floating over the page.
+
+  A thumb reaches the middle of the bottom of a screen far more easily than
+  its corners, and a bar welded across the full width is the one thing that
+  always reads as a website pretending to be an application.
+*/
+.sh-dock {
+  display: none;
+  position: fixed;
+  left: 50%;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 50;
+  gap: 2px;
+  padding: 6px;
+  max-width: calc(100vw - 20px);
+  border-radius: 24px;
+  border: 1px solid color-mix(in srgb, var(--s-line) 80%, transparent);
+  background: var(--s-glass);
+  backdrop-filter: blur(22px) saturate(170%);
+  box-shadow: var(--s-shadow-float);
+}
+
+.sh-dock .sh-tab {
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 12px 7px;
+  border-radius: 18px;
+  font-size: 10px;
+  font-weight: 650;
+  color: var(--ink-3);
+}
+
+.sh-dock .sh-tab-icon {
+  width: 21px;
+  height: 21px;
+}
+
+.sh-dock .sh-tab.is-current {
+  color: var(--s-accent);
+  background: color-mix(in srgb, var(--s-accent) 12%, transparent);
+}
+
+.sh-dock .sh-tab.is-current .sh-tab-icon {
+  transform: translateY(-1px) scale(1.08);
+}
+
+/* ==========================================================================
+   The launcher: the whole portal, as a grid
+   ========================================================================== */
+
+.sh-launch {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.sh-launch-scrim {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  background: rgb(8 11 18 / 0.5);
+  backdrop-filter: blur(6px);
+  animation: sh-fade 0.2s ease both;
+  cursor: pointer;
+}
+
+@keyframes sh-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.sh-launch-panel {
+  position: relative;
+  width: min(880px, 100%);
+  max-height: min(84vh, 780px);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 22px 18px;
+  border-radius: var(--s-r-xl);
+  border: 1px solid var(--s-line);
+  background: var(--s-card);
+  box-shadow: var(--s-shadow-3);
+  animation: sh-launch-in 0.28s var(--s-spring) both;
+}
+
+@keyframes sh-launch-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(14px);
+  }
+}
+
+.sh-launch-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--s-line);
+}
+
+.sh-launch-me {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.sh-launch-me > span:last-child {
+  display: grid;
+  min-width: 0;
+}
+
+.sh-launch-me b {
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sh-launch-me small {
+  font-size: 12.5px;
+  color: var(--ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sh-launch-x {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid var(--s-line);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.2s var(--s-spring);
+}
+
+.sh-launch-x svg {
+  width: 18px;
+  height: 18px;
+}
+
+.sh-launch-x:hover {
+  color: var(--s-coral);
+  border-color: color-mix(in srgb, var(--s-coral) 45%, transparent);
+  transform: rotate(90deg);
+}
+
+.sh-launch-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 18px 2px 4px;
+  display: grid;
+  gap: 22px;
+}
+
+.sh-launch-tag {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--s-accent);
+}
+
+.sh-launch-lede {
+  margin: 3px 0 12px;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.sh-launch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(146px, 1fr));
+  gap: 9px;
+}
+
+.sh-launch-tile {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 12px 13px;
+  border-radius: var(--s-r-md);
+  border: 1px solid var(--s-line);
+  background: var(--s-card-2);
+  text-decoration: none;
+  transition:
+    border-color 0.16s ease,
+    background 0.16s ease,
+    transform 0.16s var(--s-ease);
+}
+
+.sh-launch-tile:hover {
+  border-color: color-mix(in srgb, var(--s-accent) 42%, transparent);
+  background: var(--s-card);
+  transform: translateY(-2px);
+}
+
+.sh-launch-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--s-accent) 11%, transparent);
+  color: var(--s-accent);
+}
+
+.sh-launch-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.sh-launch-tile b {
+  font-size: 13.5px;
+  font-weight: 650;
+  color: var(--ink);
+  line-height: 1.3;
+}
+
+.sh-launch-tile.is-current {
+  border-color: transparent;
+  background: var(--s-grad);
+}
+
+.sh-launch-tile.is-current b {
+  color: #fff;
+}
+
+.sh-launch-tile.is-current .sh-launch-icon {
+  background: rgb(255 255 255 / 0.2);
+  color: #fff;
+}
+
+.sh-launch-out {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  margin-top: 14px;
+  padding: 9px 17px;
+  border: 1px solid var(--s-line);
+  border-radius: 999px;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--s-coral);
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.sh-launch-out:hover {
+  border-color: color-mix(in srgb, var(--s-coral) 45%, transparent);
+}
+
+/* ==========================================================================
+   The primitives, redrawn
+
+   Everything from here down restyles classes the student pages already use,
+   so sixty screens change with this file and none of them change with an
+   edit of their own.
+   ========================================================================== */
+
+.sh .card {
+  padding: 22px 24px;
+  margin-bottom: 18px;
+  border-radius: var(--s-r-lg);
+  border: 1px solid var(--s-line);
+  background: var(--s-card);
+  box-shadow: var(--s-shadow-1);
+  transition:
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.sh .card:hover {
+  box-shadow: var(--s-shadow-2);
+}
+
+.sh .card h2 {
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.sh .card > .muted:first-of-type {
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+.sh .card-head {
+  margin-bottom: 14px;
 }
 
 /* --- buttons -------------------------------------------------------------- */
 
 .sh .btn {
   border-radius: 999px;
-  padding: 9px 18px;
-  font-size: 13.5px;
-  font-weight: 600;
+  padding: 10px 21px;
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: -0.005em;
   transition:
-    transform 0.14s cubic-bezier(0.2, 0.7, 0.3, 1),
-    box-shadow 0.14s ease,
-    background 0.14s ease;
+    transform 0.16s var(--s-spring),
+    box-shadow 0.16s ease,
+    background 0.14s ease,
+    border-color 0.14s ease,
+    color 0.14s ease;
 }
 
 .sh .btn-primary {
-  box-shadow: 0 2px 8px color-mix(in srgb, var(--brand) 26%, transparent);
+  background: var(--s-grad);
+  border-color: transparent;
+  box-shadow: 0 2px 12px color-mix(in srgb, var(--s-accent) 32%, transparent);
 }
 
 .sh .btn-primary:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--brand) 32%, transparent);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--s-accent) 40%, transparent);
+}
+
+.sh .btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.sh .btn-secondary {
+  background: var(--s-card);
+  border-color: var(--s-line-2);
 }
 
 .sh .btn-secondary:hover:not(:disabled) {
-  border-color: var(--brand);
-  color: var(--brand);
+  border-color: var(--s-accent);
+  color: var(--s-accent);
+  transform: translateY(-1px);
 }
 
 .sh .btn:disabled {
   box-shadow: none;
   transform: none;
+  opacity: 0.55;
 }
 
 .sh .btn-sm {
-  padding: 6px 13px;
-  font-size: 12.5px;
+  padding: 7px 15px;
+  font-size: 13px;
 }
 
 .sh .link-btn {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--brand);
+  font-size: 13.5px;
+  font-weight: 650;
+  color: var(--s-accent);
 }
 
 /* --- fields --------------------------------------------------------------- */
@@ -477,9 +995,10 @@
 .sh input:not([type='checkbox']):not([type='radio']),
 .sh select,
 .sh textarea {
-  border-radius: 10px;
-  border-color: var(--rule-2);
-  background: var(--surface);
+  border-radius: var(--s-r-sm);
+  border-color: var(--s-line-2);
+  background: var(--s-card);
+  font-size: 14.5px;
   transition:
     border-color 0.14s ease,
     box-shadow 0.14s ease;
@@ -489,13 +1008,13 @@
 .sh select:focus,
 .sh textarea:focus {
   outline: none;
-  border-color: var(--brand);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent);
+  border-color: var(--s-accent);
+  box-shadow: 0 0 0 3.5px color-mix(in srgb, var(--s-accent) 16%, transparent);
 }
 
 .sh .field-label {
   font-size: 12.5px;
-  font-weight: 600;
+  font-weight: 650;
   color: var(--ink-2);
 }
 
@@ -508,10 +1027,10 @@
 
 .sh .pill {
   border-radius: 999px;
-  padding: 3px 10px;
+  padding: 4px 11px;
   font-family: var(--sans);
   font-size: 11.5px;
-  font-weight: 600;
+  font-weight: 650;
   letter-spacing: 0;
   text-transform: none;
 }
@@ -521,57 +1040,305 @@
   it reads as a note beside the page rather than a warning stripe across it.
 */
 .sh .alert {
-  border-radius: 12px;
+  border-radius: var(--s-r-md);
   border-left-width: 3px;
-  padding: 12px 15px;
+  padding: 13px 16px;
   font-size: 13.5px;
-  line-height: 1.55;
+  line-height: 1.6;
 }
 
 /* --- empty states --------------------------------------------------------- */
 
+/*
+  An empty screen here is nearly always "nothing has happened yet", not "you
+  did something wrong", and it is read by somebody already worried that
+  nothing is happening.
+*/
 .sh .empty {
-  border-radius: 16px;
-  border-style: dashed;
-  padding: 44px 28px;
-  background: color-mix(in srgb, var(--brand) 3%, transparent);
+  border-radius: var(--s-r-xl);
+  border: 1.5px dashed color-mix(in srgb, var(--s-accent) 26%, transparent);
+  padding: 54px 28px;
+  background: var(--s-grad-soft);
 }
 
 .sh .empty h2 {
-  font-size: 17px;
+  font-family: var(--display);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .sh .empty p {
   max-width: 46ch;
   margin-left: auto;
   margin-right: auto;
-  font-size: 13.5px;
-  line-height: 1.6;
-  color: var(--ink-3);
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--ink-2);
 }
 
 /* --- tables --------------------------------------------------------------- */
 
+.sh .table-wrap {
+  border-radius: var(--s-r-lg);
+  border: 1px solid var(--s-line);
+  background: var(--s-card);
+  overflow: hidden;
+}
+
 .sh .data-table {
-  font-size: 13.5px;
+  font-size: 14px;
 }
 
 .sh .data-table th {
-  font-family: var(--mono);
-  font-size: 10.5px;
-  letter-spacing: 0.07em;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--ink-3);
+  background: var(--s-card-2);
 }
 
 .sh .data-table td,
 .sh .data-table th {
-  padding-top: 11px;
-  padding-bottom: 11px;
+  padding-top: 13px;
+  padding-bottom: 13px;
+}
+
+.sh .data-table tbody tr {
+  transition: background 0.12s ease;
 }
 
 .sh .data-table tbody tr:hover {
-  background: color-mix(in srgb, var(--brand) 4%, transparent);
+  background: color-mix(in srgb, var(--s-accent) 5%, transparent);
+}
+
+/* --- figures -------------------------------------------------------------- */
+
+.sh .stat {
+  padding: 16px 18px;
+  border-radius: var(--s-r-lg);
+  border: 1px solid var(--s-line);
+  background: var(--s-card);
+}
+
+.sh .stat-value {
+  font-family: var(--display);
+  font-size: 27px;
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.sh .stat-label {
+  font-size: 12px;
+  font-weight: 550;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: var(--ink-3);
+}
+
+/* --- waiting -------------------------------------------------------------- */
+
+/*
+  A shimmer, not a spinner.
+
+  A spinner says "something is happening somewhere"; a block the shape of the
+  thing that is coming says "this is what will be here", and the page does
+  not jump when it arrives.
+*/
+.sh .sk {
+  border-radius: var(--s-r-lg);
+  background: linear-gradient(
+    100deg,
+    color-mix(in srgb, var(--ink-3) 9%, transparent) 30%,
+    color-mix(in srgb, var(--ink-3) 16%, transparent) 50%,
+    color-mix(in srgb, var(--ink-3) 9%, transparent) 70%
+  );
+  background-size: 220% 100%;
+  animation: sh-shimmer 1.35s linear infinite;
+}
+
+@keyframes sh-shimmer {
+  from {
+    background-position: 140% 0;
+  }
+  to {
+    background-position: -40% 0;
+  }
+}
+
+/* --- a rail of cards that scrolls sideways -------------------------------- */
+
+/*
+  Used wherever a set is worth showing in full but not worth a whole screen.
+  Snapping is what makes it feel like a deck rather than an overflowing div,
+  and the scrollbar goes because nobody drags it.
+*/
+.sh .rail {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+  /* The cards keep their shadow instead of being clipped by the scroller. */
+  margin: 0 -26px;
+  padding-left: 26px;
+  padding-right: 26px;
+}
+
+.sh .rail::-webkit-scrollbar {
+  display: none;
+}
+
+.sh .rail > * {
+  scroll-snap-align: start;
+  flex: none;
+}
+
+/* ==========================================================================
+   Narrower
+   ========================================================================== */
+
+@media (max-width: 1080px) {
+  .sh-top-in {
+    padding: 10px 18px;
+  }
+
+  .sh-page {
+    padding: 22px 18px 80px;
+  }
+
+  .sh .rail {
+    margin: 0 -18px;
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  /* The bar keeps the icons and drops the words before it starts to crowd
+     the brand and the controls. */
+  .sh-bar .sh-tab span {
+    display: none;
+  }
+
+  .sh-bar .sh-tab {
+    padding: 9px 13px;
+  }
+
+  .sh-all span {
+    display: none;
+  }
+
+  .sh-all {
+    padding: 9px 11px;
+  }
+}
+
+/*
+  Below this the bar cannot hold five destinations and the controls at once,
+  so it keeps the controls and the five move to the dock at the bottom of the
+  screen, where a thumb is.
+*/
+@media (max-width: 860px) {
+  .sh-bar {
+    display: none;
+  }
+
+  .sh-dock {
+    display: flex;
+  }
+
+  .sh-chip b {
+    display: none;
+  }
+
+  .sh-chip {
+    padding: 4px;
+    border: 0;
+    background: transparent;
+  }
+
+  .sh-top-in {
+    padding: 9px 14px;
+    gap: 10px;
+  }
+
+  .sh-brand span {
+    display: none;
+  }
+
+  .sh-top-right {
+    margin-left: auto;
+  }
+
+  .sh-page {
+    padding: 18px 14px calc(var(--s-dock) + 28px);
+  }
+
+  .sh .rail {
+    margin: 0 -14px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .sh .page-head h1 {
+    font-size: 27px;
+  }
+
+  .sh .card {
+    padding: 18px 17px;
+    border-radius: var(--s-r-md);
+  }
+
+  .sh .empty {
+    padding: 40px 20px;
+    border-radius: var(--s-r-lg);
+  }
+
+  /* A table that cannot fit scrolls on its own rather than stretching the
+     page sideways under everything else. */
+  .sh .table-wrap {
+    overflow-x: auto;
+  }
+
+  .sh-launch {
+    padding: 0;
+    place-items: end stretch;
+  }
+
+  .sh-launch-panel {
+    width: 100%;
+    max-height: 90vh;
+    border-radius: var(--s-r-xl) var(--s-r-xl) 0 0;
+    padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+    animation: sh-launch-up 0.3s var(--s-ease) both;
+  }
+
+  @keyframes sh-launch-up {
+    from {
+      transform: translateY(100%);
+    }
+  }
+}
+
+@media (max-width: 560px) {
+  .sh-dock .sh-tab {
+    padding: 8px 9px 7px;
+  }
+
+  .sh-dock .sh-tab span {
+    font-size: 9.5px;
+  }
+
+  .sh .stat-value {
+    font-size: 23px;
+  }
+
+  .sh-launch-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -579,11 +1346,21 @@
   .sh-page > section,
   .sh-page > .apli,
   .sh-page > .job-tabs,
-  .sh-page > .empty {
+  .sh-page > .empty,
+  .sh-page > header {
     animation: none;
   }
 
+  .sh-tab,
+  .sh-tab-icon,
+  .sh-chip,
+  .sh-all,
+  .sh-back,
+  .sh-avatar,
+  .sh-launch-tile,
+  .sh-launch-x,
   .sh .btn,
+  .sh .card,
   .sh .job-card,
   .sh input,
   .sh select,
@@ -591,8 +1368,25 @@
     transition: none;
   }
 
+  .sh-chip:hover,
+  .sh-all:hover,
+  .sh-back:hover,
+  .sh-avatar:hover,
+  .sh-launch-tile:hover,
+  .sh-launch-x:hover,
   .sh .btn-primary:hover:not(:disabled),
+  .sh .btn-secondary:hover:not(:disabled),
   .sh .job-card:hover {
     transform: none;
+  }
+
+  .sh .sk {
+    animation: none;
+  }
+
+  .sh-launch-panel,
+  .sh-launch-scrim,
+  .sh-account-pop {
+    animation: none;
   }
 }

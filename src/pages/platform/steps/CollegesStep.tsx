@@ -20,7 +20,7 @@ function suggestCode(name: string): string {
  * - and checked - on its own, so a clashing code or a bad PIN shows up on the
  * college it belongs to.
  */
-export default function CollegesStep({ state, catalogue, onSaved, goto, setPreview, updateCatalogue }: StepProps) {
+export default function CollegesStep({ state, catalogue, onSaved, goto, updateCatalogue }: StepProps) {
   const t = state!.tenant;
   const single = t.kind === 'COLLEGE';
   const colleges = state!.colleges;
@@ -36,7 +36,6 @@ export default function CollegesStep({ state, catalogue, onSaved, goto, setPrevi
     try {
       const next = await platformApi.deleteCollege(t.id, c.id);
       onSaved(next);
-      setPreview({ colleges: next.colleges.length });
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Could not remove that college.');
     }
@@ -110,7 +109,6 @@ export default function CollegesStep({ state, catalogue, onSaved, goto, setPrevi
             onClose={() => setBulk(false)}
             onDone={(saved) => {
               onSaved(saved);
-              setPreview({ colleges: saved.colleges.length });
             }}
           />
         )}
@@ -130,7 +128,6 @@ export default function CollegesStep({ state, catalogue, onSaved, goto, setPrevi
             onCancel={colleges.length > 0 || editing !== 'new' ? () => setEditing(null) : undefined}
             onSaved={(saved, officer, name) => {
               onSaved(saved);
-              setPreview({ colleges: saved.colleges.length });
               setNotice({ college: name, officer });
               setEditing(null);
             }}

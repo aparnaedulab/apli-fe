@@ -1,7 +1,25 @@
+/*
+  Sign in.
+
+  The one screen everybody crosses, and the seam where the marketing site
+  used to hand over to a different-looking product: a flat navy page with
+  square corners on one side, a rounded, gradient, glass-surfaced portal on
+  the other. It uses the shared `:root` accents and corner scale so the
+  crossing is not felt.
+*/
+
 .login {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
   min-height: 100vh;
+  /* The same wash the landing hero and the student canvas carry. */
+  background:
+    radial-gradient(
+      40rem 28rem at 6% -8%,
+      color-mix(in srgb, var(--brand) 13%, transparent),
+      transparent 62%
+    ),
+    var(--paper);
 }
 
 .login-panel {
@@ -21,16 +39,25 @@
   font-family: var(--display);
   font-weight: 700;
   font-size: 17px;
-  letter-spacing: -0.015em;
-  margin-bottom: 44px;
+  letter-spacing: -0.025em;
+  margin-bottom: 40px;
   align-self: flex-start;
+}
+
+/* ".ai", in the gradient - the lockup the portal's own header uses. */
+.login-brand i {
+  font-style: normal;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .login h1 {
   font-family: var(--display);
-  font-weight: 600;
-  font-size: 32px;
-  letter-spacing: -0.026em;
+  font-weight: 700;
+  font-size: 30px;
+  letter-spacing: -0.032em;
   margin: 0 0 8px;
 }
 
@@ -204,5 +231,47 @@
 
   .login-panel {
     margin: 0 auto;
+  }
+}
+
+
+/* --- the shared language ---------------------------------------------------
+
+   Pills and the gradient, as on the landing page and inside the portal.
+*/
+
+.login .btn {
+  border-radius: 999px;
+  font-weight: 650;
+  transition:
+    transform 0.16s var(--spring),
+    box-shadow 0.16s ease,
+    background 0.14s ease;
+}
+
+.login .btn-primary {
+  background: var(--grad);
+  border-color: transparent;
+  box-shadow: 0 2px 12px color-mix(in srgb, var(--brand) 32%, transparent);
+}
+
+.login .btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--brand) 40%, transparent);
+}
+
+.login .field input,
+.login .field select {
+  border-radius: var(--r-sm);
+  font-size: 14.5px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login .btn {
+    transition: none;
+  }
+
+  .login .btn-primary:hover:not(:disabled) {
+    transform: none;
   }
 }

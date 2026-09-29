@@ -9,6 +9,7 @@ import AddColleges from './AddColleges';
 import BatchForm from '../../components/BatchForm';
 import SetupLists from './SetupLists';
 import AddStudents from '../../components/AddStudents';
+import StudentIntake from './StudentIntake';
 import MapData from '../../components/MapData';
 import UniversityPrograms from './UniversityPrograms';
 import { adminMapping, type Offered } from '../../api/mapping';
@@ -205,7 +206,7 @@ export default function Setup() {
   /** Moving step closes whatever form was open on the one you left. */
   function goTo(n: number) {
     setAdding(null);
-    if ((n === 4 || n === 7) && !mapCollegeId && collegeId) setMapCollegeId(collegeId);
+    if ((n === 4 || n === 8) && !mapCollegeId && collegeId) setMapCollegeId(collegeId);
     setStep(n);
   }
 
@@ -260,12 +261,18 @@ export default function Setup() {
     },
     {
       n: 6,
+      title: 'Student details',
+      state: 'What to collect, and who adds',
+      ready: true,
+    },
+    {
+      n: 7,
       title: 'Students',
       state: batch ? `Into ${batch.name}` : targetCollegeId ? 'Batch from each row' : 'Choose where',
       // Never blocked: where the students go is chosen inside this step.
       ready: true,
     },
-    { n: 7, title: 'Map students', state: 'Into each course and branch', ready: true },
+    { n: 8, title: 'Map students', state: 'Into each course and branch', ready: true },
   ];
 
   return (
@@ -306,6 +313,12 @@ export default function Setup() {
           {step === 0 && (
             <Pane
               title="Lists"
+              todo={[
+                'Open each list and check it holds what this university uses.',
+                'Add anything missing — a course, a city, a NAAC grade.',
+                'Retire anything nobody uses. It leaves the forms and stays on the records that already carry it.',
+              ]}
+              note='Everything else in set-up picks from these, so a batch, a student and a job all mean the same thing by the same word.'
               lede="The courses, cities, grades and types every other form offers. Kept here so a batch, a student and a role all mean the same thing by the same word."
               next={{ label: 'University', onClick: () => goTo(1) }}
             >
@@ -316,6 +329,10 @@ export default function Setup() {
           {step === 1 && (
             <Pane
               title={university || 'University'}
+              todo={[
+                'Check the name and contact details students and recruiters will see.',
+                'Set the grading scale and when the academic year turns over.',
+              ]}
               lede="Everything sits under this one university. Colleges are affiliated to it, and a batch can belong to it directly rather than to any single college."
               next={{ label: 'Courses & branches', onClick: () => goTo(2) }}
             >
@@ -336,6 +353,12 @@ export default function Setup() {
           {step === 2 && (
             <Pane
               title="Courses & branches"
+              todo={[
+                'Tick the courses this university runs.',
+                'Inside each course, tick its branches.',
+                'Anything missing can be added from the Lists step.',
+              ]}
+              note='Colleges choose only from this list in the next-but-one step, so every college spells B.E. – Computer Engineering the same way.'
               lede="Tick the courses the university runs and, inside each, its branches. Colleges choose only from this list in step 4, so every college spells B.E. – Computer Engineering the same way."
               next={{ label: 'Colleges', onClick: () => goTo(3) }}
             >
@@ -346,6 +369,11 @@ export default function Setup() {
           {step === 3 && (
             <Pane
               title="Colleges"
+              todo={[
+                'Add each college with its short code — PICT, COEP. The code is unique across the whole platform.',
+                "Give each one a placement officer's email. They are sent an invitation as soon as you save.",
+                'A college with no officer has nobody who can add its students.',
+              ]}
               lede="Add the colleges this university affiliates, then choose the one you are setting up. Leave it blank to work on the university's own batches instead — a year group spanning every college, say."
               next={{ label: 'Map courses to colleges', onClick: () => goTo(4) }}
               more={{ to: '/admin/colleges', label: 'Open the full colleges screen' }}
@@ -403,6 +431,11 @@ export default function Setup() {
           {step === 4 && (
             <Pane
               title="Map courses to colleges"
+              todo={[
+                'Pick a college.',
+                'Tick the course-and-branch pairs it actually runs.',
+              ]}
+              note='Worth doing before any roster is uploaded: a student whose programme is not on this list lands unmapped, and an unmapped student is invisible to every role that filters on a course.'
               context={mapCollege?.name}
               lede="Choose a college, then tick which of the university's courses and branches it runs. Do this for each college; the college's own login can add to it later."
               next={{ label: 'Batches', onClick: () => goTo(5) }}
@@ -425,9 +458,14 @@ export default function Setup() {
           {step === 5 && (
             <Pane
               title="Batches"
+              todo={[
+                'Choose whether the batch belongs to the whole university or to one college.',
+                'Name it the way this university does — “2026 Batch”, or “B.Tech CSE 2026”.',
+              ]}
+              note='A batch can also be created on the way in: a class list that names a batch nobody has made yet makes it.'
               context={`${batchTotal} on the platform`}
               lede="Every batch on the platform, grouped by what it belongs to. A batch is whichever students should be treated together — a degree cohort, a year of study, a department, or a group made for one drive. You choose which one students go into in step 4."
-              next={{ label: 'Students', onClick: () => goTo(6) }}
+              next={{ label: 'Student details', onClick: () => goTo(6) }}
               more={{ to: '/admin/batches', label: 'Open the full batches screen' }}
             >
               <div className="pane-actions">
@@ -577,7 +615,29 @@ export default function Setup() {
 
           {step === 6 && (
             <Pane
+              title="Student details"
+              todo={[
+                'Mark each detail Not collected, Optional or Required.',
+                'Say who adds students: the university, its colleges, or the students themselves.',
+                'If students may register, tick what the registration form asks them.',
+              ]}
+              note="Everything after this follows: the spreadsheet prints these columns, the upload holds rows to them, and a student's own profile asks for the same things."
+              lede="What this university records about a student, which of those it insists on, and who is allowed to put one on the roster. Settle it here and every screen after this follows: the spreadsheet prints these columns, the upload holds rows to them, and a student's own profile asks for the same things."
+              next={{ label: 'Students', onClick: () => goTo(7) }}
+            >
+              <StudentIntake bare />
+            </Pane>
+          )}
+
+          {step === 7 && (
+            <Pane
               title="Students"
+              todo={[
+                'Choose which batch they go into, or let each row name its own.',
+                "Download the template — it carries this college's batches and programmes as dropdowns.",
+                'Upload it. You get a check of what would happen before anything is written.',
+              ]}
+              note='Each student is sent a one-time activation link, shown once after the upload. Nobody can sign in until they use it.'
               context={
                 batch ? `${batch.collegeName} · ${batch.name}` : college?.name ?? 'No batch chosen'
               }
@@ -591,7 +651,7 @@ export default function Setup() {
                   ? { to: `/admin/colleges/${targetCollegeId}`, label: 'Open this college' }
                   : undefined
               }
-              next={{ label: 'Map students', onClick: () => goTo(7) }}
+              next={{ label: 'Map students', onClick: () => goTo(8) }}
             >
               {/*
                 The one question this step turns on, asked here and nowhere
@@ -688,9 +748,14 @@ export default function Setup() {
               )}
             </Pane>
           )}
-          {step === 7 && (
+          {step === 8 && (
             <Pane
               title="Map students"
+              todo={[
+                'Pick a college and look at its unmapped students.',
+                'Put each into the programme they are actually on.',
+              ]}
+              note='A student here is on the roster but invisible to any role that filters on a course, so this list is worth emptying.'
               context={mapCollege?.name}
               lede="Choose a college and one of its courses and branches, then tick the students who belong in it. Students the university added without a college can be pulled in here too."
               more={{ to: '/admin/map-data', label: 'Open Map data' }}
@@ -725,6 +790,8 @@ function Pane({
   title,
   context,
   lede,
+  todo,
+  note,
   next,
   nextHint,
   more,
@@ -733,6 +800,16 @@ function Pane({
   title: string;
   context?: string;
   lede: string;
+  /**
+   * What to actually do on this step, in order.
+   *
+   * Set-up is worked through once, by somebody who has not done it before,
+   * and the question they have is never "what is this screen for" - it is
+   * "so what do I type". A sentence of explanation does not answer that.
+   */
+  todo?: string[];
+  /** The one thing worth knowing that is not an instruction. */
+  note?: string;
   next?: { label: string; onClick: () => void };
   nextHint?: string;
   more?: { to: string; label: string };
@@ -744,6 +821,18 @@ function Pane({
         {context && <p className="pane-context">{context}</p>}
         <h2>{title}</h2>
         <p className="pane-lede">{lede}</p>
+
+        {todo && todo.length > 0 && (
+          <div className="pane-guide">
+            <p className="pane-guide-tag">What to do here</p>
+            <ol>
+              {todo.map((t) => (
+                <li key={t}>{t}</li>
+              ))}
+            </ol>
+            {note && <p className="pane-guide-note">{note}</p>}
+          </div>
+        )}
       </header>
 
       <div className="pane-body">{children}</div>

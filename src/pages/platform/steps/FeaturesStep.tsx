@@ -22,7 +22,7 @@ const AUDIENCE_TAG: Record<Audience, string> = { student: 'Students', college: '
  * sentence saying so, because a toggle that silently moves other toggles is
  * the fastest way to lose somebody's trust in a screen.
  */
-export default function FeaturesStep({ state, catalogue, onSaved, goto, setPreview }: StepProps) {
+export default function FeaturesStep({ state, catalogue, onSaved, goto }: StepProps) {
   const t = state!.tenant;
   const { modules, plans, categories } = catalogue;
   const byKey = useMemo(() => new Map(modules.map((m) => [m.key, m])), [modules]);
@@ -36,10 +36,6 @@ export default function FeaturesStep({ state, catalogue, onSaved, goto, setPrevi
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    setPreview({ modules: [...selected] });
-  }, [selected, setPreview]);
 
   const currentPlan = useMemo(() => {
     for (const p of plans) {

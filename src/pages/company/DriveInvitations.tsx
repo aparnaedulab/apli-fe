@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import CompanyLayout from './CompanyLayout';
 import { ApiError } from '../../api/client';
-import { companyDrivesApi, type Drive, type EligibilityReport } from '../../api/drives';
+import { barsOf, companyDrivesApi, type Drive, type EligibilityReport } from '../../api/drives';
 import '../campus/CampusDrives.css';
 
 /**
@@ -136,26 +137,7 @@ export default function DriveInvitations() {
                 </div>
               </dl>
 
-              {d.status === 'INVITED' ? (
-                <Bar
-                  drive={d}
-                  onChanged={(drive, report) => {
-                    setDrives((ds) => ds?.map((x) => (x.id === drive.id ? drive : x)) ?? ds);
-                    setReports((m) => ({ ...m, [drive.id]: report }));
-                  }}
-                />
-              ) : (
-                <p className="drive-bar muted">
-                  Your bar:{' '}
-                  {[
-                    d.minCgpa && `CGPA ${d.minCgpa}+`,
-                    d.maxBacklogs !== null && `backlogs ≤ ${d.maxBacklogs}`,
-                    d.gradYears.length > 0 && d.gradYears.map((g) => g.year).join(', '),
-                  ]
-                    .filter(Boolean)
-                    .join(' · ') || 'everyone verified in the season'}
-                </p>
-              )}
+              <Bar drive={d} />
 
               {r && (
                 <div className="drive-report">
@@ -313,81 +295,43 @@ function Roster({ driveId }: { driveId: string }) {
 }
 
 /**
- * The bar, as the company's own.
+ * The bar, as the roles state it.
  *
- * The college wrote down what it was told on the phone; this is where that
- * gets corrected by the people whose requirement it actually is. The counts
- * move with it, so the trade - drop to 6.5 and reach nineteen more - is one
- * number to look at rather than a second conversation.
+ * This was a form: three boxes that wrote a bar onto the drive, so a
+ * recruiter could pull CGPA down to 6.5 and watch the count move. The
+ * numbers were real and the trade was worth showing - but they gated
+ * nothing. A student was admitted or refused by the role's criteria, in
+ * jobs/visibility.ts, and nothing made the two agree.
+ *
+ * So the bar is read here and set where it binds: the role editor. The
+ * counts underneath now move with the rule that will actually be applied,
+ * which is the only version of this screen that was ever telling the truth.
  */
-function Bar({
-  drive: d,
-  onChanged,
-}: {
-  drive: Drive;
-  onChanged: (drive: Drive, report: EligibilityReport) => void;
-}) {
-  const [cgpa, setCgpa] = useState(d.minCgpa ?? '');
-  const [backlogs, setBacklogs] = useState(d.maxBacklogs === null ? '' : String(d.maxBacklogs));
-  const [years, setYears] = useState(d.gradYears.map((g) => g.year).join(', '));
-  const [busy, setBusy] = useState(false);
-  const [note, setNote] = useState<string | null>(null);
+function Bar({ drive: d }: { drive: Drive }) {
+  const bars = barsOf(d);
 
-  async function apply() {
-    setBusy(true);
-    setNote(null);
-    try {
-      const r = await companyDrivesApi.setCriteria(d.id, {
-        minCgpa: cgpa === '' ? null : Number(cgpa),
-        maxBacklogs: backlogs === '' ? null : Number(backlogs),
-        gradYears: years
-          .split(',')
-          .map((y) => Number(y.trim()))
-          .filter((y) => Number.isFinite(y) && y > 2000),
-      });
-      onChanged(r.drive, r.report);
-      setNote('Updated. The counts below are for this bar.');
-    } catch (e) {
-      setNote(e instanceof ApiError ? e.message : 'Could not change that.');
-    } finally {
-      setBusy(false);
-    }
+  if (bars.length === 0) {
+    return (
+      <p className="drive-bar muted">
+        No roles on this drive yet, so there is no bar and nothing to count against. Add one under{' '}
+        <Link to="/company/jobs">your roles</Link>, and the numbers below narrow to it.
+      </p>
+    );
   }
 
   return (
-    <div className="drive-barform">
-      <p className="drive-barform-head">
-        <b>Your requirement</b> — {d.college.name} wrote down what you asked for. Correct it and the
-        numbers move.
+    <div className="drive-bar">
+      <p className="drive-bar-head">
+        <b>Your bar</b> — stated by each role, and the same rule that decides who may
+        apply. Change it in <Link to="/company/jobs">the role</Link>.
       </p>
-      <div className="drive-barform-row">
-        <label className="field">
-          <span className="field-label">Minimum CGPA</span>
-          <input className="input" value={cgpa} onChange={(e) => setCgpa(e.target.value)} placeholder="any" />
-        </label>
-        <label className="field">
-          <span className="field-label">Backlogs allowed</span>
-          <input
-            className="input"
-            value={backlogs}
-            onChange={(e) => setBacklogs(e.target.value)}
-            placeholder="any"
-          />
-        </label>
-        <label className="field">
-          <span className="field-label">Graduating years</span>
-          <input
-            className="input"
-            value={years}
-            onChange={(e) => setYears(e.target.value)}
-            placeholder="2026"
-          />
-        </label>
-        <button type="button" className="btn btn-secondary btn-sm" onClick={apply} disabled={busy}>
-          {busy ? 'Counting…' : 'Recount'}
-        </button>
-      </div>
-      {note && <p className="muted">{note}</p>}
+      <ul className="drive-bars">
+        {bars.map((b) => (
+          <li key={b.title}>
+            <b>{b.title}</b> — {b.bar}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

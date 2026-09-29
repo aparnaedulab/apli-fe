@@ -28,6 +28,48 @@
   --stop: #9d2f2f;
   --stop-soft: #f8e6e5;
 
+  /* --- the accents, shared -------------------------------------------------
+     `--brand` is the institution's, and on the marketing site it is ours.
+     These sit beside it and are the same on both sides of the sign-in page,
+     because a student who meets a gradient and a rounded card on the way in
+     and a flat navy form on the way out has been handed to a different
+     product. They were invented for the student portal and lived inside
+     `.sh`; they are here so the landing page can mean the same thing by
+     them. */
+  --accent-2: #7c5cff;
+  --accent-3: #00b0d8;
+  --mint: #0ca678;
+  --amber: #e8850c;
+  --coral: #f03e3e;
+
+  --grad: linear-gradient(118deg, var(--brand), var(--accent-2) 62%, var(--accent-3));
+  --grad-soft: linear-gradient(
+    118deg,
+    color-mix(in srgb, var(--brand) 12%, transparent),
+    color-mix(in srgb, var(--accent-2) 10%, transparent) 60%,
+    color-mix(in srgb, var(--accent-3) 9%, transparent)
+  );
+
+  /* Corners and depth, one scale. `--radius` above stays what it was, so the
+     operations screens are untouched. */
+  --r-xl: 26px;
+  --r-lg: 20px;
+  --r-md: 14px;
+  --r-sm: 10px;
+
+  --shadow-1:
+    0 1px 2px rgb(16 24 40 / 0.04),
+    0 1px 3px rgb(16 24 40 / 0.05);
+  --shadow-2:
+    0 2px 6px rgb(16 24 40 / 0.05),
+    0 12px 26px rgb(16 24 40 / 0.06);
+  --shadow-3:
+    0 8px 20px rgb(16 24 40 / 0.1),
+    0 24px 56px rgb(16 24 40 / 0.14);
+
+  --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --spring: cubic-bezier(0.22, 1.2, 0.36, 1);
+
   --sans: 'Public Sans', ui-sans-serif, system-ui, 'Segoe UI', Roboto, Arial, sans-serif;
   --display: 'Bricolage Grotesque', 'Public Sans', ui-sans-serif, system-ui, sans-serif;
   --mono: ui-monospace, 'SFMono-Regular', 'Consolas', monospace;
@@ -53,6 +95,20 @@
     --brand-hover: #9ab6f3;
     --brand-soft: #18233c;
     --on-brand: #0e1116;
+
+    --accent-2: #a18cff;
+    --accent-3: #4fd3f0;
+    --mint: #38d9a9;
+    --amber: #ffc078;
+    --coral: #ff8787;
+
+    --shadow-1: 0 1px 2px rgb(0 0 0 / 0.4);
+    --shadow-2:
+      0 2px 6px rgb(0 0 0 / 0.35),
+      0 12px 26px rgb(0 0 0 / 0.35);
+    --shadow-3:
+      0 8px 20px rgb(0 0 0 / 0.45),
+      0 24px 56px rgb(0 0 0 / 0.5);
 
     --pass: #4fc19b;
     --pass-soft: #0f2b22;

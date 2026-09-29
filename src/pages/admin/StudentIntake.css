@@ -1,0 +1,284 @@
+/*
+  What an institution collects about a student.
+
+  A long list of fields with three choices each is the kind of screen people
+  set once and never open again - so the work here goes into making one pass
+  down it readable: what the field is, what it costs to drop, and three
+  buttons that read as a single choice rather than as three checkboxes.
+*/
+
+.si-block {
+  padding-top: 20px;
+  margin-top: 20px;
+  border-top: 1px solid var(--rule);
+}
+
+.si-block:first-of-type {
+  padding-top: 0;
+  margin-top: 0;
+  border-top: 0;
+}
+
+.si-block h3 {
+  margin: 0 0 4px;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+}
+
+.si-lede {
+  margin: 0 0 16px;
+  max-width: 74ch;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+
+/* --- who may add ---------------------------------------------------------- */
+
+.si-who {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.si-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.si-check input {
+  margin-top: 2px;
+  flex: none;
+}
+
+.si-check span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.si-check b {
+  font-size: 13.5px;
+  color: var(--ink);
+}
+
+.si-check small {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+
+/* --- the field list ------------------------------------------------------- */
+
+.si-fields {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.si-fields li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+.si-fields li:last-child {
+  border-bottom: 0;
+}
+
+/* A field nobody collects is still listed - it has to be, to be switched
+   back on - but it stops competing for attention with the ones in use. */
+.si-fields li.is-off {
+  background: var(--paper-2);
+}
+
+.si-fields li.is-off .si-field-what {
+  opacity: 0.55;
+}
+
+.si-field-what {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.si-field-what b {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--ink);
+}
+
+.si-field-what small {
+  max-width: 68ch;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+
+/* Said on the field itself, because it is the whole reason switching one off
+   is a decision rather than a preference. */
+.si-tag {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.si-locked {
+  flex: none;
+  font-size: 12px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+/* --- the three-way choice ------------------------------------------------- */
+
+.si-rules {
+  flex: none;
+  display: flex;
+  padding: 2px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: var(--paper-2);
+}
+
+.si-rule {
+  padding: 5px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-3);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.14s ease,
+    color 0.14s ease;
+}
+
+.si-rule:hover {
+  color: var(--ink);
+}
+
+.si-rule.is-on {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.08);
+}
+
+.si-rule.is-on.is-required {
+  background: var(--brand);
+  color: var(--on-brand);
+}
+
+.si-rule.is-on.is-off {
+  color: var(--ink-3);
+}
+
+/* --- what registration asks ----------------------------------------------- */
+
+.si-pickers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.si-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border: 1px solid var(--rule-2);
+  border-radius: 999px;
+  background: var(--surface);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition:
+    border-color 0.14s ease,
+    background 0.14s ease,
+    color 0.14s ease;
+}
+
+.si-pick:hover {
+  border-color: var(--brand);
+}
+
+.si-pick.is-on {
+  border-color: transparent;
+  background: var(--brand);
+  color: var(--on-brand);
+}
+
+.si-pick i {
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+/* --- saving --------------------------------------------------------------- */
+
+.si-save {
+  margin-top: 22px;
+  align-items: center;
+  gap: 12px;
+}
+
+.si-saved {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pass);
+}
+
+@media (max-width: 720px) {
+  .si-fields li {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .si-rules {
+    align-self: stretch;
+    justify-content: space-between;
+  }
+
+  .si-rule {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .si-rule,
+  .si-pick {
+    transition: none;
+  }
+}

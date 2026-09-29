@@ -1,0 +1,163 @@
+/*
+  A student joining their college's portal.
+
+  One column, centred, nothing else on the page. Somebody arrives here from a
+  link a senior sent them, on a phone, and the only job is to get them
+  through it - so the first screen asks one thing, and the second asks only
+  what their university actually wanted.
+*/
+
+.rg {
+  min-height: 100vh;
+  display: grid;
+  place-items: start center;
+  padding: 48px 20px 80px;
+  /* The same wash as the landing hero, the sign-in page and the portal. */
+  background:
+    radial-gradient(
+      44rem 30rem at 10% -10%,
+      color-mix(in srgb, var(--brand) 16%, transparent),
+      transparent 62%
+    ),
+    radial-gradient(
+      34rem 24rem at 92% 4%,
+      color-mix(in srgb, var(--accent-2) 12%, transparent),
+      transparent 64%
+    ),
+    var(--paper);
+}
+
+.rg-panel {
+  width: 100%;
+  max-width: 420px;
+  padding: 32px 30px 26px;
+  border: 1px solid var(--rule);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-2);
+}
+
+.rg-panel.is-wide {
+  max-width: 660px;
+}
+
+.rg-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 22px;
+  font-family: var(--display);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.rg-brand i {
+  font-style: normal;
+  color: var(--brand);
+}
+
+.rg-panel h1 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.rg-sub {
+  margin: 10px 0 22px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+/* Which college, once it is known - with the way back, because a mistyped
+   code is the commonest thing to happen on the screen before this. */
+.rg-where {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0 0 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--brand);
+}
+
+.rg-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px 16px;
+  margin-bottom: 22px;
+}
+
+.rg-req {
+  font-style: normal;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+
+.rg-go {
+  width: 100%;
+  justify-content: center;
+  padding: 12px 20px;
+}
+
+.rg-error {
+  margin: 0 0 16px;
+  padding: 11px 14px;
+  border-left: 3px solid var(--stop);
+  border-radius: 8px;
+  background: var(--stop-soft);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.rg-foot {
+  margin: 18px 0 0;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.rg-foot a {
+  font-weight: 600;
+  color: var(--brand);
+}
+
+.rg-foot a:hover {
+  text-decoration: underline;
+}
+
+/* The other way in, said plainly - most colleges enter their own students,
+   and somebody who was sent an activation link should stop here. */
+.rg-note {
+  margin: 14px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+
+@media (max-width: 560px) {
+  .rg {
+    padding: 28px 14px 60px;
+  }
+
+  .rg-panel {
+    padding: 24px 20px 20px;
+    border-radius: var(--r-md);
+  }
+
+  .rg-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

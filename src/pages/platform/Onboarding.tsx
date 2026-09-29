@@ -8,12 +8,12 @@ import {
   type StepKey,
   type TenantKind,
 } from '../../api/platform';
-import Preview, { type PreviewModel } from './Preview';
 import { SavedAgo } from './ui';
 import IdentityStep from './steps/IdentityStep';
 import AcademicsStep from './steps/AcademicsStep';
 import CollegesStep from './steps/CollegesStep';
 import BatchesStep from './steps/BatchesStep';
+import StudentsStep from './steps/StudentsStep';
 import MappingStep from './steps/MappingStep';
 import FeaturesStep from './steps/FeaturesStep';
 import PeopleStep from './steps/PeopleStep';
@@ -27,7 +27,6 @@ export interface StepProps {
   catalogue: Catalogue;
   onSaved: (next: OnboardingState, goTo?: StepKey) => void;
   goto: (step: StepKey) => void;
-  setPreview: (p: Partial<PreviewModel>) => void;
   /** For a step that adds to the shared lists, e.g. a new course. */
   updateCatalogue: (fn: (c: Catalogue) => Catalogue) => void;
 }
@@ -37,6 +36,17 @@ interface StepMeta {
   title: string;
   /** Said once, at the top of the step: what this is for, in a sentence. */
   lede: string;
+  /**
+   * What to actually do, in order.
+   *
+   * Onboarding is done a handful of times a year by somebody who has not
+   * done it recently, against an institution whose answers they are reading
+   * off an email. A sentence explaining the step is not enough on its own -
+   * the question is always "so what do I type". These are that.
+   */
+  todo: string[];
+  /** The one thing worth knowing that is not an instruction. */
+  note?: string;
 }
 
 export const STEPS: StepMeta[] = [
@@ -44,61 +54,108 @@ export const STEPS: StepMeta[] = [
     key: 'identity',
     title: 'Who they are',
     lede: 'The university’s name, its address on the platform, and how its portal looks.',
+    todo: [
+      'Name it as students and recruiters should see it.',
+      'Pick its web address. It ends up in bookmarks and on printed posters, so it is not meant to change later.',
+      'Add the person we deal with at the institution.',
+    ],
+    note: 'That contact is not a login. The people who sign in are invited at “Who runs it”.',
   },
   {
     key: 'academics',
     title: 'What they teach',
-    lede: 'The courses and branches they run, and their placement rules. Every roster and job reads from this.',
+    lede: 'The courses and branches they run, and their placement rules.',
+    todo: [
+      'Tick the courses this university runs. Anything missing can be added here.',
+      'Inside each course, tick the branches of it.',
+      'Set the grading scale and when its academic year turns over.',
+    ],
+    note: 'Colleges pick only from this list, so every college spells B.E. — Computer Engineering the same way.',
   },
   {
     key: 'colleges',
     title: 'Where they teach',
     lede: 'Every college in the university, with its details and who runs its placement cell.',
+    todo: [
+      'Add each college with a short code — PICT, COEP. The code is unique across the whole platform.',
+      'Give each one a placement officer’s email address.',
+      'Set the passing years. One batch per year is created in each college.',
+    ],
+    note: 'Each officer is sent an invitation the moment you save. Saving the same list again sends nothing twice.',
   },
   {
     key: 'mapping',
     title: 'Map courses to colleges',
-    lede: 'Which college runs which of the courses and branches above - and, once students are on the roster, which student is in which.',
+    lede: 'Which college runs which of the courses and branches above.',
+    todo: [
+      'Pick a college on the left.',
+      'Tick the course-and-branch pairs it actually runs.',
+    ],
+    note: 'Optional — a college can do its own once it signs in. But a roster uploaded before this is done lands unmapped, and an unmapped student is invisible to every role that filters on a course.',
   },
   {
     key: 'batches',
     title: 'Their batches',
-    lede: 'Group students the way this university does - “2026 Batch” for everyone, or “B.Tech 2026” in each college.',
+    lede: 'Group students the way this university does.',
+    todo: [
+      'Choose who the batch is for: the whole university, every college, or the ones you pick.',
+      'Add any of course, branch and year. The name writes itself, and you can change it.',
+    ],
+    note: 'Optional — placement cells can create their own later.',
+  },
+  {
+    key: 'students',
+    title: 'Student details',
+    lede: 'What this university records about a student, and who may put one on the roster.',
+    todo: [
+      'Mark each detail Not collected, Optional or Required.',
+      'Say who adds students: the university, its colleges, or the students themselves.',
+      'If students may register, tick what the registration form asks them.',
+    ],
+    note: 'Optional. Left alone, this university gets what every institution got before there was a choice: name, email and mobile required, and both the university and its colleges able to add.',
   },
   {
     key: 'features',
     title: 'What they get',
     lede: 'Start from a plan, then switch individual modules on or off.',
+    todo: [
+      'Pick the plan closest to what they bought.',
+      'Switch individual modules on or off from there.',
+    ],
+    note: 'Some modules need others to work. Anything pulled in is listed when you save.',
   },
   {
     key: 'people',
     title: 'Who runs it',
     lede: 'Invite the people who will run this university’s portal day to day.',
+    todo: [
+      'Invite at least one institution admin — usually the placement head or a registrar.',
+      'Choose whether we email the invitation or you copy the link and send it yourself.',
+    ],
+    note: 'Placement officers for each college were already invited at “Where they teach”. These are the people who run the university’s own console.',
   },
   {
     key: 'review',
     title: 'Go live',
     lede: 'Check everything is in place, then open the portal to its people.',
+    todo: [
+      'Work down the list. Anything marked required has to be done before you can launch.',
+      'Launch. The portal becomes reachable straight away, and the invitations you sent start working.',
+    ],
   },
 ];
 
-const EMPTY_PREVIEW: PreviewModel = {
-  name: '',
-  shortName: '',
-  brandColor: '#1d3b8b',
-  logoUrl: '',
-  faviconUrl: '',
-  kind: 'UNIVERSITY' as TenantKind,
-  modules: [],
-  colleges: 0,
-  tagline: '',
-};
+/** Where the "what to do here" preference is kept. */
+const GUIDE_KEY = 'apli.onboarding.guide';
 
 /**
  * The onboarding wizard.
  *
- * Three columns: the journey on the left, the step in the middle, and on the
- * right the portal as the institution will see it, repainting as you type.
+ * Two columns: the journey on the left and the step beside it. There was a
+ * third - a live repaint of the institution's portal - and it cost a third
+ * of the screen for something nobody was doing this job to look at. Its
+ * absence is what lets everything else have room.
+ *
  * Steps can be visited in any order - the rail shows which are done and what
  * each holds - but "Save & continue" always walks forward, so somebody who
  * simply follows the button never has to think about where to go next.
@@ -111,8 +168,6 @@ export default function Onboarding() {
   const [state, setState] = useState<OnboardingState | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<number | null>(null);
-  const [preview, setPreviewState] = useState<PreviewModel>(EMPTY_PREVIEW);
-  const [showPreview, setShowPreview] = useState(false);
 
   const step: StepKey = !id
     ? 'identity'
@@ -148,27 +203,6 @@ export default function Onboarding() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  // The preview follows what is saved, and steps overlay what is being typed.
-  useEffect(() => {
-    if (!state) return;
-    const t = state.tenant;
-    setPreviewState({
-      name: t.name,
-      shortName: t.shortName ?? '',
-      brandColor: t.brandColor,
-      logoUrl: t.logoUrl ?? '',
-      faviconUrl: t.faviconUrl ?? '',
-      kind: t.kind,
-      tagline: t.tagline ?? '',
-      modules: state.modules,
-      colleges: state.colleges.length,
-    });
-  }, [state]);
-
-  const setPreview = useCallback((p: Partial<PreviewModel>) => {
-    setPreviewState((prev) => ({ ...prev, ...p }));
-  }, []);
-
   const updateCatalogue = useCallback((fn: (c: Catalogue) => Catalogue) => {
     setCatalogue((c) => (c ? fn(c) : c));
   }, []);
@@ -194,6 +228,27 @@ export default function Onboarding() {
     [id, navigate],
   );
 
+  /*
+   * Whether the instructions are open, remembered across steps and visits.
+   * Open the first time somebody ever sees this, because that is who needs
+   * them; closed thereafter if they closed it.
+   */
+  const [guide, setGuide] = useState(() => {
+    try {
+      return window.localStorage.getItem(GUIDE_KEY) !== 'shut';
+    } catch {
+      return true;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(GUIDE_KEY, guide ? 'open' : 'shut');
+    } catch {
+      /* a browser that refuses storage still gets the default */
+    }
+  }, [guide]);
+
   const meta = STEPS.find((s) => s.key === step)!;
   const index = STEPS.indexOf(meta);
   const done = new Set(state?.tenant.completedSteps ?? []);
@@ -218,11 +273,11 @@ export default function Onboarding() {
 
   const ready = catalogue && (!id || state);
   const stepProps: StepProps | null = ready
-    ? { state, catalogue: catalogue!, onSaved, goto, setPreview, updateCatalogue }
+    ? { state, catalogue: catalogue!, onSaved, goto, updateCatalogue }
     : null;
 
   return (
-    <div className={`ob ${showPreview ? 'show-preview' : ''}`}>
+    <div className="ob">
       <aside className="ob-rail">
         <Link to="/platform" className="ob-home">
           <span className="brand-mark" aria-hidden="true" />
@@ -286,9 +341,6 @@ export default function Onboarding() {
             </p>
             <div className="ob-head-tools">
               <SavedAgo at={savedAt} />
-              <button type="button" className="btn btn-ghost ob-preview-toggle" onClick={() => setShowPreview((v) => !v)}>
-                {showPreview ? 'Hide preview' : 'Preview'}
-              </button>
               <Link to="/platform" className="btn btn-ghost">
                 Exit
               </Link>
@@ -296,6 +348,37 @@ export default function Onboarding() {
           </div>
           <h1>{meta.title}</h1>
           <p className="ob-lede">{meta.lede}</p>
+
+          {/*
+            What to actually do, in order.
+
+            Onboarding happens a handful of times a year, by somebody who
+            has not done it recently, reading an institution's answers off
+            an email. "What is this step for" is not the question they have
+            - "so what do I type" is. Shown by default for that reason, and
+            foldable because the third time through it is in the way.
+          */}
+          <div className={`ob-guide ${guide ? '' : 'is-shut'}`}>
+            <button
+              type="button"
+              className="ob-guide-tag"
+              onClick={() => setGuide((v) => !v)}
+              aria-expanded={guide}
+            >
+              What to do here
+            </button>
+
+            {guide && (
+              <>
+                <ol>
+                  {meta.todo.map((t) => (
+                    <li key={t}>{t}</li>
+                  ))}
+                </ol>
+                {meta.note && <p className="ob-guide-note">{meta.note}</p>}
+              </>
+            )}
+          </div>
         </header>
 
         {!stepProps ? (
@@ -309,16 +392,13 @@ export default function Onboarding() {
             {step === 'colleges' && <CollegesStep {...stepProps} />}
             {step === 'mapping' && <MappingStep {...stepProps} />}
             {step === 'batches' && <BatchesStep {...stepProps} />}
+            {step === 'students' && <StudentsStep {...stepProps} />}
             {step === 'features' && <FeaturesStep {...stepProps} />}
             {step === 'people' && <PeopleStep {...stepProps} />}
             {step === 'review' && <ReviewStep {...stepProps} />}
           </div>
         )}
       </main>
-
-      <aside className="ob-preview" aria-label="Preview of the university’s portal">
-        <Preview model={preview} catalogue={catalogue} />
-      </aside>
     </div>
   );
 }

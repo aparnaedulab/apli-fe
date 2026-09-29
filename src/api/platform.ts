@@ -11,6 +11,7 @@ export type StepKey =
   | 'colleges'
   | 'mapping'
   | 'batches'
+  | 'students'
   | 'features'
   | 'people'
   | 'review';

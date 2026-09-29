@@ -297,3 +297,49 @@
 .drive-addrole .muted {
   font-size: 12.5px;
 }
+
+/* The bar, one line per role, on both the cell's card and the company's
+   invitation. One line per drive would have to flatten two roles' criteria
+   into a third that is neither. */
+.drive-bars {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 3px;
+  font-size: 13px;
+}
+
+.drive-bars b {
+  font-weight: 600;
+}
+
+.drive-bar-head {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+/* How many clear each role, when a drive carries more than one. */
+.drive-roles {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.drive-roles li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 10px;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.drive-roles span {
+  color: var(--ink-2);
+  white-space: nowrap;
+}

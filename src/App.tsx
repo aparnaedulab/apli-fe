@@ -41,6 +41,7 @@ import CompanyAssessments from './pages/company/Assessments';
 import ApplicantDetail from './pages/company/ApplicantDetail';
 import AcceptInvite from './pages/AcceptInvite';
 import JoinBatch from './pages/JoinBatch';
+import RegisterStudent from './pages/RegisterStudent';
 import CampusDashboard from './pages/campus/CampusDashboard';
 import Batches from './pages/campus/Batches';
 import BatchDetail from './pages/campus/BatchDetail';
@@ -185,6 +186,8 @@ export default function App() {
         <Route key={path} path={path} element={<RequireAuth roles={[role]}>{page}</RequireAuth>} />
       ))}
       <Route path="/join/:code" element={<JoinBatch />} />
+      {/* A student joining from the public site, where their institution allows it. */}
+      <Route path="/register/student" element={<RegisterStudent />} />
 
       {/* The platform console: onboarding institutions. Operations accounts
           that belong to an institution are refused, not redirected. */}

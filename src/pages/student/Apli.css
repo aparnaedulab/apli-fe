@@ -5,20 +5,46 @@
   spend the next three years, so it has to feel like a colleague rather than
   a mascot in a game - which mostly means restraint: one line at a time, no
   bouncing, and an expression that changes with what is actually being said.
+
+  The craft is what buys the licence to have a character at all. A flat
+  smiley reads as clip art; a drawing with depth, a glass visor and a
+  catchlight in the eye reads as designed, and a twenty-year-old can tell the
+  difference in about a second.
 */
 
 .apli-face {
   display: block;
-  color: var(--brand);
+  color: var(--s-accent, var(--brand));
+  overflow: visible;
 }
 
-.apli-body {
+.apli-ear {
   fill: currentColor;
+  opacity: 0.55;
+}
+
+.apli-visor {
+  /* The fill comes from the gradient in the markup; this is the rim light
+     that separates the glass from the shell. */
+  stroke: rgb(255 255 255 / 0.16);
+  stroke-width: 0.9;
+}
+
+.apli-gleam {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.3);
+  stroke-width: 1.6;
+  stroke-linecap: round;
 }
 
 .apli-eyes circle {
   fill: #fff;
   transform-origin: center;
+}
+
+.apli-spark {
+  fill: #fff;
+  opacity: 0.95;
 }
 
 /* A blink every few seconds. Slow and rare: anything faster is a distraction
@@ -30,20 +56,21 @@
     transform: scaleY(1);
   }
   95% {
-    transform: scaleY(0.12);
+    transform: scaleY(0.1);
   }
 }
 
 .apli-eyes {
   animation: apli-blink 6.5s ease-in-out infinite;
-  transform-origin: center 23px;
+  transform-origin: center 23.6px;
 }
 
 .apli-mouth {
   fill: none;
   stroke: #fff;
-  stroke-width: 2.2;
+  stroke-width: 2.3;
   stroke-linecap: round;
+  transition: d 0.25s ease;
 }
 
 .apli-stalk {
@@ -56,19 +83,21 @@
   fill: currentColor;
 }
 
-/* The expression, which is the only thing that changes between moods. */
-.apli-face.is-cheer .apli-mouth {
-  d: path('M18 29c1.8 2.6 3.8 3.9 6 3.9s4.2-1.3 6-3.9');
+/* Cheeks, off by default: colour in the face is for when there is something
+   to be pleased about, not for all day. */
+.apli-blush ellipse {
+  fill: #ff7a9c;
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
 
-.apli-face.is-nudge .apli-mouth {
-  d: path('M19 31h10');
+.apli-face.is-cheer .apli-blush ellipse,
+.apli-face.is-proud .apli-blush ellipse {
+  opacity: 0.55;
 }
 
-.apli-face.is-think .apli-mouth {
-  d: path('M20 31c1.2-1.2 2.5-1.8 4-1.8s2.8.6 4 1.8');
-}
-
+/* The antenna lights when Apli is working something out or asking for
+   something. */
 .apli-face.is-think .apli-dot,
 .apli-face.is-nudge .apli-dot {
   animation: apli-pulse 2.4s ease-in-out infinite;
@@ -80,124 +109,189 @@
     opacity: 1;
   }
   50% {
-    opacity: 0.35;
+    opacity: 0.32;
   }
 }
 
-/* --- Apli with something to say ------------------------------------------- */
+/* Breathing, for the companion. A few pixels over four seconds: present, not
+   performing. */
+@keyframes apli-breathe {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2.5px);
+  }
+}
 
-.apli {
+.apli-face.is-idle {
+  animation: apli-breathe 4.2s ease-in-out infinite;
+}
+
+/* --- Apli in the corner --------------------------------------------------- */
+
+.apli-bubble {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 60;
   display: flex;
-  align-items: start;
-  gap: 14px;
-  padding: 16px 18px;
-  margin-bottom: 18px;
-  border-radius: 16px;
-  border: 1px solid color-mix(in srgb, var(--brand) 22%, transparent);
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--brand) 8%, var(--surface)),
-    var(--surface) 65%
-  );
-  opacity: 0;
-  transform: translateY(6px);
-  transition:
-    opacity 0.4s ease,
-    transform 0.4s cubic-bezier(0.2, 0.7, 0.3, 1);
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
 }
 
-.apli.is-in {
-  opacity: 1;
-  transform: none;
-}
-
-.apli-avatar {
-  flex: none;
+.apli-tab {
+  position: relative;
   display: grid;
   place-items: center;
   width: 56px;
   height: 56px;
-  border-radius: 16px;
-  background: color-mix(in srgb, var(--brand) 12%, transparent);
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--s-accent, var(--brand)) 26%, transparent);
+  border-radius: 20px;
+  background: var(--s-card, var(--surface));
+  box-shadow: var(--s-shadow-3, 0 10px 30px rgb(15 23 42 / 0.16));
+  cursor: pointer;
+  transition:
+    transform 0.16s cubic-bezier(0.2, 0.7, 0.3, 1),
+    box-shadow 0.16s ease;
 }
 
-.apli-says {
-  min-width: 0;
-  display: grid;
-  gap: 3px;
+.apli-tab:hover {
+  transform: translateY(-2px) scale(1.03);
 }
 
-.apli-who {
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--brand);
+.apli-bubble.is-open .apli-tab {
+  transform: none;
 }
 
-.apli-who span {
-  padding: 1px 8px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--brand) 12%, transparent);
-  font-family: var(--mono);
-  font-size: 9.5px;
-  font-weight: 400;
-  letter-spacing: 0.06em;
+/* A quiet ring that says it is there without waving. */
+.apli-tab::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 20px;
+  border: 1.5px solid color-mix(in srgb, var(--s-accent, var(--brand)) 40%, transparent);
+  animation: apli-ring 3.6s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes apli-ring {
+  0% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  60%,
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+.apli-bubble.is-open .apli-tab::after {
+  display: none;
+}
+
+.apli-pop {
+  width: min(310px, calc(100vw - 44px));
+  padding: 16px 18px 18px;
+  border-radius: var(--s-r-lg, 22px);
+  border: 1px solid var(--s-line, var(--rule));
+  background: var(--s-card, var(--surface));
+  box-shadow: var(--s-shadow-3, 0 18px 44px rgb(15 23 42 / 0.2));
+  animation: apli-pop-in 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.1) both;
+  transform-origin: bottom right;
+}
+
+@keyframes apli-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(8px);
+  }
+}
+
+.apli-pop-tag {
+  margin: 0 0 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+  color: var(--s-accent, var(--brand));
 }
 
-.apli-line {
-  margin: 0;
+.apli-pop-title {
+  margin: 0 0 6px;
   font-size: 15px;
-  line-height: 1.5;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   color: var(--ink);
 }
 
-.apli-do {
-  justify-self: start;
-  margin-top: 5px;
+.apli-pop-body {
+  margin: 0;
   font-size: 13.5px;
-  font-weight: 600;
-  color: var(--brand);
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+.apli-pop-do {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 13px;
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--s-accent, var(--brand));
   text-decoration: none;
 }
 
-.apli-do::after {
-  content: ' →';
+.apli-pop-do::after {
+  content: '→';
 }
 
-.apli-do:hover {
+.apli-pop-do:hover {
   text-decoration: underline;
 }
 
-@media (max-width: 560px) {
-  .apli {
-    gap: 11px;
-    padding: 13px 14px;
+/* Matches the breakpoint at which the shell moves its five destinations
+   into the floating dock. */
+@media (max-width: 860px) {
+  /* Clear of the dock, not behind it. */
+  .apli-bubble {
+    right: 14px;
+    bottom: calc(var(--s-dock, 78px) + env(safe-area-inset-bottom, 0px) + 10px);
   }
 
-  .apli-avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 13px;
+  .apli-tab {
+    width: 50px;
+    height: 50px;
+    border-radius: 17px;
   }
 
-  .apli-line {
-    font-size: 14px;
+  .apli-tab::after {
+    border-radius: 17px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .apli {
-    transition: none;
-    opacity: 1;
-    transform: none;
+  .apli-eyes,
+  .apli-dot,
+  .apli-face.is-idle,
+  .apli-tab::after {
+    animation: none;
   }
 
-  .apli-eyes,
-  .apli-dot {
+  .apli-tab::after {
+    display: none;
+  }
+
+  .apli-pop {
     animation: none;
+  }
+
+  .apli-tab:hover {
+    transform: none;
   }
 }

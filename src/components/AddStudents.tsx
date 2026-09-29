@@ -3,9 +3,19 @@ import { api, ApiError } from '../api/client';
 import './AddStudents.css';
 
 export interface AddStudentsResult {
-  created: { name: string; email: string; rollNo: string | null; batch: string; link: string }[];
+  created: {
+    name: string;
+    email: string;
+    rollNo: string | null;
+    batch: string;
+    link: string;
+    /** Went in anyway, but something about it is worth knowing. */
+    warning?: string;
+  }[];
   skipped: { email: string; reason: string }[];
   batchesCreated: { id: string; name: string; graduationYear: number | null }[];
+  /** Nothing was written; this is a report of what would be. */
+  dryRun?: boolean;
 }
 
 interface Row {
@@ -25,7 +35,13 @@ interface Row {
   degreePct: string;
   tenthPct: string;
   twelfthPct: string;
+  diplomaPct: string;
+  activeBacklogs: string;
   backlogs: string;
+  pgCgpa: string;
+  pgPct: string;
+  gapYears: string;
+  isLateralEntry: string;
 }
 
 const BLANK: Row = {
@@ -45,7 +61,13 @@ const BLANK: Row = {
   degreePct: '',
   tenthPct: '',
   twelfthPct: '',
+  diplomaPct: '',
+  activeBacklogs: '',
   backlogs: '',
+  pgCgpa: '',
+  pgPct: '',
+  gapYears: '',
+  isLateralEntry: '',
 };
 
 interface Field {
@@ -70,6 +92,15 @@ const BATCH_FIELDS: Field[] = [
   { key: 'graduationYear', label: 'Graduating year', placeholder: '2026' },
 ];
 
+/*
+ * The same columns the spreadsheet carries, in the same order.
+ *
+ * Six of these were on the template and not on this form - the diploma and
+ * postgraduate marks, live backlogs, gap years and lateral entry - so the
+ * same student entered by hand and entered by upload ended up with different
+ * records. Five of the six are bars a role can set, which meant a
+ * hand-entered student was quietly invisible to any role that set one.
+ */
 const OPTIONAL: Field[] = [
   { key: 'rollNo', label: 'Roll no.', placeholder: 'CS22-101' },
   { key: 'prn', label: 'PRN', placeholder: '72012345K' },
@@ -80,7 +111,17 @@ const OPTIONAL: Field[] = [
   { key: 'degreePct', label: 'Degree %', placeholder: '81.5' },
   { key: 'tenthPct', label: '10th %', placeholder: '91' },
   { key: 'twelfthPct', label: '12th %', placeholder: '88' },
-  { key: 'backlogs', label: 'Backlogs', placeholder: '0' },
+  // For a lateral entrant, who has no 12th. Without it, every role that
+  // sets a 12th bar is invisible to them.
+  { key: 'diplomaPct', label: 'Diploma %', placeholder: '78' },
+  { key: 'isLateralEntry', label: 'Lateral entry', placeholder: 'Yes / No' },
+  // "No live backlogs, at most two ever" is one sentence asking for both.
+  { key: 'activeBacklogs', label: 'Live backlogs', placeholder: '0' },
+  { key: 'backlogs', label: 'Backlogs (total)', placeholder: '0' },
+  // The master's on top of the bachelor's, blank for most of a roster.
+  { key: 'pgCgpa', label: 'PG CGPA', placeholder: '8.1' },
+  { key: 'pgPct', label: 'PG %', placeholder: '76' },
+  { key: 'gapYears', label: 'Gap years', placeholder: '0' },
 ];
 
 /**
@@ -117,6 +158,8 @@ export default function AddStudents({
   const [downloading, setDownloading] = useState(false);
   const [rows, setRows] = useState<Row[]>([{ ...BLANK }]);
   const [result, setResult] = useState<AddStudentsResult | null>(null);
+  /** What the file would do, before it does it. */
+  const [preview, setPreview] = useState<AddStudentsResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -146,27 +189,53 @@ export default function AddStudents({
     }
   }
 
+  /**
+   * One call, run twice: once to see, once to do.
+   *
+   * The first pass writes nothing. It is here because the checks are strict
+   * now - a programme the college does not run, a CGPA out of range, a batch
+   * name one character off - and finding that out after two hundred and
+   * ninety-two students have been created and invited is not finding out in
+   * time. The same request with `dryRun` off is what commits it.
+   */
+  async function send(opts: { dryRun?: boolean; allowUnmapped?: boolean } = {}) {
+    const query = new URLSearchParams();
+    if (opts.dryRun) query.set('dryRun', '1');
+    if (opts.allowUnmapped) query.set('allowUnmapped', '1');
+    const url = query.size > 0 ? `${endpoint}?${query}` : endpoint;
+
+    if (mode === 'file' && file) {
+      const form = new FormData();
+      form.append('file', file);
+      for (const [k, v] of Object.entries(extra ?? {})) if (v) form.append(k, v);
+      return api.upload<AddStudentsResult>(url, form);
+    }
+    return api.post<AddStudentsResult>(url, { students: filledRows, ...extra });
+  }
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     if (saving) return;
     setError(null);
     setSaving(true);
     try {
-      let added: AddStudentsResult;
+      setPreview(await send({ dryRun: true }));
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Could not check the list.');
+    } finally {
+      setSaving(false);
+    }
+  }
 
-      if (mode === 'file' && file) {
-        const form = new FormData();
-        form.append('file', file);
-        for (const [k, v] of Object.entries(extra ?? {})) if (v) form.append(k, v);
-        added = await api.upload<AddStudentsResult>(endpoint, form);
-      } else {
-        added = await api.post<AddStudentsResult>(endpoint, {
-          students: filledRows,
-          ...extra,
-        });
-      }
-
+  /** The commit, from the preview screen. */
+  async function commit(allowUnmapped: boolean) {
+    if (saving) return;
+    setError(null);
+    setSaving(true);
+    try {
+      const added = await send({ allowUnmapped });
       setResult(added);
+      setPreview(null);
       setFile(null);
       setRows([{ ...BLANK }]);
       onDone();
@@ -178,6 +247,18 @@ export default function AddStudents({
   }
 
   if (result) return <ResultCard result={result} onDismiss={() => setResult(null)} />;
+
+  if (preview) {
+    return (
+      <PreviewCard
+        preview={preview}
+        busy={saving}
+        error={error}
+        onBack={() => setPreview(null)}
+        onCommit={commit}
+      />
+    );
+  }
 
   return (
     <form className={bare ? 'bare-form' : 'card form-card'} onSubmit={onSubmit} noValidate>
@@ -355,14 +436,126 @@ export default function AddStudents({
 
       <button type="submit" className="btn btn-primary" disabled={saving || !ready}>
         {saving
-          ? 'Adding…'
+          ? 'Checking…'
           : mode === 'file'
             ? file
-              ? `Upload ${file.name}`
-              : 'Upload students'
-            : `Add ${count || ''} student${count === 1 ? '' : 's'}`}
+              ? `Check ${file.name}`
+              : 'Check the file'
+            : `Check ${count || ''} student${count === 1 ? '' : 's'}`}
       </button>
     </form>
+  );
+}
+
+/**
+ * What the file would do, before it does it.
+ *
+ * Nothing on this screen has been written. It exists because the checks are
+ * strict: a programme the college does not run is refused rather than filed
+ * as unmapped, and a batch name one character off makes a second class. Both
+ * are right, and both are infuriating to discover afterwards - so they are
+ * discovered here, with the row and the reason, while the spreadsheet is
+ * still open in the other window.
+ */
+function PreviewCard({
+  preview,
+  busy,
+  error,
+  onBack,
+  onCommit,
+}: {
+  preview: AddStudentsResult;
+  busy: boolean;
+  error: string | null;
+  onBack: () => void;
+  onCommit: (allowUnmapped: boolean) => void;
+}) {
+  const ok = preview.created.length;
+  const bad = preview.skipped.length;
+
+  /*
+   * A programme that matched nothing is the one refusal worth offering a way
+   * past. Everything else - a malformed mark, a duplicate email - is a
+   * mistake in the sheet, and letting it through would only write the
+   * mistake down.
+   */
+  const unmapped = preview.skipped.filter((s) => /does not run|needs a branch|Did you mean/.test(s.reason));
+
+  return (
+    <section className="card">
+      <h2>
+        {ok} student{ok === 1 ? '' : 's'} ready
+        {bad > 0 && `, ${bad} need${bad === 1 ? 's' : ''} attention`}
+      </h2>
+
+      <p className="muted">
+        Nothing has been added yet. This is what the file would do.
+      </p>
+
+      {error && <p className="alert alert-error">{error}</p>}
+
+      {preview.batchesCreated.length > 0 && (
+        <p className="alert alert-warn">
+          This will create {preview.batchesCreated.length} new batch
+          {preview.batchesCreated.length === 1 ? '' : 'es'}:{' '}
+          <b>{preview.batchesCreated.map((b) => b.name).join(', ')}</b>. If one of those is a
+          spelling of a batch you already have, fix the sheet rather than adding it twice.
+        </p>
+      )}
+
+      {bad > 0 && (
+        <div className="skipped">
+          <p className="skipped-title">
+            {bad} row{bad === 1 ? '' : 's'} will not be added
+          </p>
+          <ul>
+            {preview.skipped.map((row, i) => (
+              <li key={`${row.email}-${i}`}>
+                <b>{row.email || '(blank row)'}</b> — {row.reason}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {preview.created.length > 0 && (
+        <p className="muted">
+          Ready: {preview.created.slice(0, 6).map((c) => c.name).join(', ')}
+          {preview.created.length > 6 && ` and ${preview.created.length - 6} more`}
+        </p>
+      )}
+
+      <div className="btn-row">
+        <button
+          type="button"
+          className="btn btn-primary"
+          disabled={busy || ok === 0}
+          onClick={() => onCommit(false)}
+        >
+          {busy ? 'Adding…' : `Add ${ok} student${ok === 1 ? '' : 's'}`}
+        </button>
+
+        <button type="button" className="btn btn-secondary" disabled={busy} onClick={onBack}>
+          Back
+        </button>
+      </div>
+
+      {unmapped.length > 0 && (
+        <p className="path-note">
+          {unmapped.length} of those are about a programme this college does not run. You can add
+          them anyway and map them later — but until they are mapped they will not appear for any
+          role that filters on a course.{' '}
+          <button
+            type="button"
+            className="link-btn"
+            disabled={busy}
+            onClick={() => onCommit(true)}
+          >
+            Add all {ok + unmapped.length} anyway
+          </button>
+        </p>
+      )}
+    </section>
   );
 }
 
@@ -390,6 +583,13 @@ function ResultCard({ result, onDismiss }: { result: AddStudentsResult; onDismis
       <h2>
         {result.created.length} student{result.created.length === 1 ? '' : 's'} added
       </h2>
+
+      {result.created.some((c) => c.warning) && (
+        <p className="alert alert-warn">
+          {result.created.filter((c) => c.warning).length} of them went in without a programme.
+          They will not appear for any role that filters on a course until they are mapped.
+        </p>
+      )}
 
       {result.batchesCreated.length > 0 && (
         <p className="alert alert-ok">

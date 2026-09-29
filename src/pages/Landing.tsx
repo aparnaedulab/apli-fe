@@ -146,6 +146,9 @@ function SiteHeader({ persona, onPersona }: { persona: Persona; onPersona: (p: P
           <Link to="/login" className="btn btn-ghost">
             Sign in
           </Link>
+          <Link to="/register/student" className="btn btn-secondary">
+            Student sign-up
+          </Link>
           <Link to="/register/company" className="btn btn-primary">
             Register a company
           </Link>
@@ -595,6 +598,7 @@ function SiteFooter() {
         <nav className="foot-col" aria-label="For you">
           <h2>For you</h2>
           <Link to="/login">Students, sign in</Link>
+          <Link to="/register/student">Students, join your college</Link>
           <Link to="/login">Placement cells</Link>
           <Link to="/register/company">Register a company</Link>
           <a href="#behind">Who backed this</a>

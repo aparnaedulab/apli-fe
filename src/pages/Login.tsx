@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { ApiError } from '../api/client';
 import { homeFor, useAuth } from '../auth/AuthContext';
+import { ApliFace } from './student/Apli';
 import './Login.css';
 
 export default function Login() {
@@ -52,8 +53,12 @@ export default function Login() {
     <div className="login">
       <div className="login-panel">
         <Link to="/" className="login-brand">
-          <span className="brand-mark" aria-hidden="true" />
-          <span>Apli.ai</span>
+          {/* The same lockup the portal's own header carries, so the name
+              does not change shape at the moment somebody signs in. */}
+          <ApliFace size={26} />
+          <span>
+            Apli<i>.ai</i>
+          </span>
         </Link>
 
         <h1>Sign in</h1>
