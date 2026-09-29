@@ -37,12 +37,12 @@
 .console .input {
   width: 100%;
   font: inherit;
-  font-size: 14px;
+  font-size: 13.5px;
   color: var(--ink);
   background: var(--surface);
   border: 1px solid var(--rule-2);
   border-radius: 8px;
-  padding: 8px 11px;
+  padding: 7px 10px;
   transition:
     border-color 0.15s ease,
     box-shadow 0.15s ease;
@@ -167,10 +167,15 @@
 
 /* Fields */
 
+/*
+  As many columns as fit, not always two. At 720px that is still two; at
+  the width this now has it is three or four, which is what stops a form
+  of short fields running down the left of an empty page.
+*/
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px 16px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 10px 14px;
 }
 
 .f {
@@ -184,8 +189,24 @@
   grid-column: 1 / -1;
 }
 
+/*
+  A row is much wider than it was, and a field that spans one should not
+  stretch a name box to 1080px just because it can. The cap does nothing
+  in a single column and everything in a spanned one.
+*/
+.ob .input,
+.console .input {
+  max-width: 620px;
+}
+
+/* Except the ones where the width is the point. */
+.ob textarea.input,
+.console textarea.input {
+  max-width: none;
+}
+
 .f-label {
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--ink);
   display: flex;
@@ -476,7 +497,7 @@
 */
 .ob {
   display: grid;
-  grid-template-columns: 236px minmax(0, 1fr);
+  grid-template-columns: 220px minmax(0, 1fr);
 }
 
 .ob-rail {
@@ -485,8 +506,8 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 18px 14px;
+  gap: 16px;
+  padding: 16px 12px;
   border-right: 1px solid var(--rule);
   background:
     radial-gradient(120% 60% at 0% 0%, var(--brand-soft), transparent 60%),
@@ -612,8 +633,8 @@
 
 .ob-step-title {
   font-weight: 600;
-  font-size: 13px;
-  line-height: 1.35;
+  font-size: 12.5px;
+  line-height: 1.3;
 }
 
 .ob-step-sum {
@@ -655,12 +676,18 @@
 
 .ob-main {
   min-width: 0;
-  padding: 22px clamp(18px, 2.2vw, 34px) 0;
+  padding: 18px clamp(16px, 2vw, 30px) 0;
 }
 
+/*
+  The content was capped at 720px while the preview held the right-hand
+  third. With the preview gone that cap left half the screen empty, so it
+  widens - and centres in the space beside the rail, rather than hugging
+  the left edge with a void next to it.
+*/
 .ob-head {
-  max-width: 720px;
-  margin-bottom: 18px;
+  max-width: 1080px;
+  margin: 0 auto 16px;
 }
 
 .ob-head-top {
@@ -689,7 +716,7 @@
 .ob-head h1 {
   font-family: var(--display);
   font-weight: 650;
-  font-size: clamp(22px, 1.9vw, 27px);
+  font-size: clamp(19px, 1.5vw, 23px);
   letter-spacing: -0.028em;
   line-height: 1.15;
   margin: 6px 0 5px;
@@ -698,7 +725,7 @@
 .ob-lede {
   margin: 0;
   color: var(--ink-2);
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.6;
   max-width: 66ch;
 }
@@ -713,7 +740,7 @@
 */
 
 .ob-guide {
-  margin-top: 14px;
+  margin-top: 12px;
   padding-left: 13px;
   border-left: 2px solid var(--brand-soft);
 }
@@ -758,10 +785,10 @@
 }
 
 .ob-guide li {
-  font-size: 13px;
-  line-height: 1.55;
+  font-size: 12.5px;
+  line-height: 1.5;
   color: var(--ink-2);
-  max-width: 68ch;
+  max-width: 80ch;
 }
 
 .ob-guide li::marker {
@@ -771,11 +798,11 @@
 
 /* The thing worth knowing that is not an instruction. */
 .ob-guide-note {
-  margin: 8px 0 0;
-  font-size: 12.5px;
-  line-height: 1.55;
+  margin: 7px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
   color: var(--ink-3);
-  max-width: 68ch;
+  max-width: 80ch;
 }
 
 .saved {
@@ -803,7 +830,8 @@
 }
 
 .ob-body {
-  max-width: 720px;
+  max-width: 1080px;
+  margin: 0 auto;
   animation: ob-rise 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -812,8 +840,8 @@
   background: var(--surface);
   border: 1px solid var(--rule);
   border-radius: var(--ob-radius);
-  padding: 16px 18px;
-  margin-bottom: 12px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
   box-shadow: var(--ob-shadow);
 }
 
@@ -828,15 +856,15 @@
 .blk-title {
   font-family: var(--display);
   font-weight: 650;
-  font-size: 15.5px;
+  font-size: 14px;
   letter-spacing: -0.012em;
-  margin: 0 0 10px;
+  margin: 0 0 8px;
 }
 
 .blk-sub {
-  margin: -6px 0 12px;
+  margin: -4px 0 10px;
   color: var(--ink-2);
-  font-size: 13px;
+  font-size: 12.5px;
   line-height: 1.55;
   max-width: 66ch;
 }
@@ -1685,7 +1713,8 @@
 .step-foot {
   position: sticky;
   bottom: 0;
-  margin: 8px -4px 0;
+  max-width: 1080px;
+  margin: 8px auto 0;
   padding: 14px 4px 18px;
   background: linear-gradient(180deg, transparent, var(--paper-2) 30%);
   z-index: 5;
