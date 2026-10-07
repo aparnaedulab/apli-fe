@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 import { companyAdminApi } from '../../api/admin';
+import ApliLogo from '../../components/ApliLogo';
 
 /**
  * The console's top bar: the two things the platform team looks after -
@@ -25,9 +26,8 @@ export default function ConsoleHeader() {
   return (
     <header className="console-top">
       <div className="console-brand">
-        <span className="brand-mark" aria-hidden="true" />
+        <ApliLogo className="brand-logo" title="Apli.ai" />
         <span>
-          <strong>Apli.ai</strong>
           <small>Platform console</small>
         </span>
       </div>

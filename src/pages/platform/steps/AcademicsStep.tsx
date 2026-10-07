@@ -1,8 +1,8 @@
-import { useMemo, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { ApiError } from '../../../api/client';
 import { platformApi, type Catalogue } from '../../../api/platform';
 import type { StepProps } from '../Onboarding';
-import { Chip, StepFooter, Toggle } from '../ui';
+import { Chip, StepFooter } from '../ui';
 import { BulkBranches, BulkCourses } from './BulkAdd';
 
 /** Selected courses: course id → chosen branch (specialisation) ids; empty = the whole course. */
@@ -13,29 +13,36 @@ type Branch = Catalogue['branches'][number];
 const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name);
 
 /**
- * What the institution teaches - branches first, then courses.
+ * What the institution teaches.
  *
- * Branches are one master list for the whole platform. They are defined once
- * ("Computer Engineering"), and a course only ever picks from that list, so the
- * same branch is spelt the same way under B.Tech, M.Tech and at every
- * institution. Adding a branch is where spelling is checked: a look-alike of an
- * existing one ("Comp Engg") is flagged before it can be added.
+ * One idea per screen: a grid of every course on the platform, and a tick on
+ * the ones this institution runs. A ticked course runs all of its branches
+ * unless somebody narrows it, and narrowing happens in a dialog with one
+ * checkbox per branch - so the page itself never turns into a wall of chips.
+ *
+ * Branches are one master list for the whole platform, so the same branch is
+ * spelt the same way everywhere. That list is managed at the foot of the step,
+ * folded, because it is rarely needed.
  */
 export default function AcademicsStep({ state, catalogue, onSaved, goto, updateCatalogue }: StepProps) {
   const t = state!.tenant;
-  const [oneOffer, setOneOffer] = useState(t.oneOfferDefault);
-  const [selfJoin, setSelfJoin] = useState(t.allowSelfJoin);
-  const [responseDays, setResponseDays] = useState(t.responseDays ?? 7);
-  const [companyApproval, setCompanyApproval] = useState(t.companyApprovalRequired ?? false);
-  const [unverifiedAccess, setUnverifiedAccess] = useState(t.unverifiedCompanyAccess ?? false);
+  // Placement rules are hidden on this step for now (see the comment further
+  // down). Their saved values are still sent back unchanged on save.
+  const oneOffer = t.oneOfferDefault;
+  const selfJoin = t.allowSelfJoin;
+  const responseDays = t.responseDays ?? 7;
+  const companyApproval = t.companyApprovalRequired ?? false;
+  const unverifiedAccess = t.unverifiedCompanyAccess ?? false;
+
   const [picked, setPicked] = useState<Selection>(
     () => new Map(state!.programs.map((p) => [p.courseId, new Set(p.specialisationIds)])),
   );
   const [query, setQuery] = useState('');
+  const [show, setShow] = useState<'all' | 'picked'>('all');
+  /** The course whose branches are being chosen, in the dialog. */
+  const [editing, setEditing] = useState<string | null>(null);
   const [addingCourse, setAddingCourse] = useState(false);
   const [bulkCourses, setBulkCourses] = useState(false);
-  /** Show the whole catalogue rather than only what a search turned up. */
-  const [browse, setBrowse] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const branchesRef = useRef<HTMLElement>(null);
@@ -45,21 +52,32 @@ export default function AcademicsStep({ state, catalogue, onSaved, goto, updateC
   const courses = catalogue.courses;
   const byId = useMemo(() => new Map(courses.map((c) => [c.id, c])), [courses]);
 
-  const available = useMemo(() => {
+  const shown = useMemo(() => {
     const q = query.trim().toLowerCase();
     return courses
-      .filter((c) => !picked.has(c.id))
+      .filter((c) => show === 'all' || picked.has(c.id))
       .filter(
         (c) =>
           !q ||
           c.name.toLowerCase().includes(q) ||
           c.specialisations.some((s) => s.name.toLowerCase().includes(q)),
       );
-  }, [courses, picked, query]);
+  }, [courses, picked, query, show]);
 
-  // Twelve is enough to answer a search. Browsing is a different question -
-  // "what is there?" - and a truncated answer to that is a wrong one.
-  const matches = browse ? available : available.slice(0, 12);
+  const allShownOn = shown.length > 0 && shown.every((c) => picked.has(c.id));
+  const someShownOn = shown.some((c) => picked.has(c.id));
+
+  /** Tick or untick every course the current search and filter show. */
+  function setShownCourses(on: boolean) {
+    setPicked((m) => {
+      const next = new Map(m);
+      for (const c of shown) {
+        if (on && !next.has(c.id)) next.set(c.id, new Set());
+        if (!on) next.delete(c.id);
+      }
+      return next;
+    });
+  }
 
   const exact = courses.some((c) => c.name.toLowerCase() === query.trim().toLowerCase());
 
@@ -73,25 +91,13 @@ export default function AcademicsStep({ state, catalogue, onSaved, goto, updateC
 
   function add(id: string) {
     setPicked((m) => new Map(m).set(id, new Set()));
-    setQuery('');
   }
 
-  function remove(id: string) {
+  function toggleCourse(id: string) {
     setPicked((m) => {
       const next = new Map(m);
-      next.delete(id);
-      return next;
-    });
-  }
-
-  function toggleBranch(courseId: string, specId: string | null) {
-    setPicked((m) => {
-      const next = new Map(m);
-      const set = new Set(next.get(courseId) ?? []);
-      if (specId === null) set.clear();
-      else if (set.has(specId)) set.delete(specId);
-      else set.add(specId);
-      next.set(courseId, set);
+      if (next.has(id)) next.delete(id);
+      else next.set(id, new Set());
       return next;
     });
   }
@@ -99,7 +105,7 @@ export default function AcademicsStep({ state, catalogue, onSaved, goto, updateC
   async function submit(e: FormEvent) {
     e.preventDefault();
     if (picked.size === 0) {
-      setError('Add at least one course they run.');
+      setError('Tick at least one course they run.');
       return;
     }
     setBusy(true);
@@ -122,34 +128,61 @@ export default function AcademicsStep({ state, catalogue, onSaved, goto, updateC
   }
 
   const branchCount = [...picked.values()].reduce((n, s) => n + s.size, 0);
+  const editingCourse = editing ? byId.get(editing) : undefined;
 
   return (
     <form onSubmit={submit} noValidate>
-      {/*
-        One block, one job: pick the courses.
-
-        This used to open with a section for managing the shared branch
-        list - a global catalogue, before you had chosen a single course to
-        put a branch in. It was the first thing on the step and almost never
-        the first thing anybody needed, so it is now at the foot, folded,
-        where somebody goes when a branch is actually missing.
-      */}
-      <section className="blk">
-        <div className="blk-head">
-          <div>
-            <h2 className="blk-title">Courses they run</h2>
-            <p className="blk-sub">
-              Search for a course and add it. Then tick which of its branches this institution
-              offers — leave them all unticked and it runs all of them.
-            </p>
+      <section className="blk cg-blk">
+        {/* One line of tools: what to do, a filter, and the two ways to add
+            a course that is not in the list. */}
+        <div className="cg-bar">
+          <div className="cg-tabs" role="tablist" aria-label="Which courses to show">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={show === 'all'}
+              className={show === 'all' ? 'is-on' : ''}
+              onClick={() => setShow('all')}
+            >
+              All courses <span>{courses.length}</span>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={show === 'picked'}
+              className={show === 'picked' ? 'is-on' : ''}
+              onClick={() => setShow('picked')}
+            >
+              Ticked <span>{picked.size}</span>
+            </button>
           </div>
-          {!addingCourse && (
-            <span className="blk-actions">
-              <button type="button" className="btn btn-secondary btn-sm" onClick={() => setAddingCourse(true)}>
-                + Add a course
+
+          <div className="search cg-search">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="11" cy="11" r="6.5" />
+              <path d="m20 20-4.2-4.2" />
+            </svg>
+            <input
+              className="input"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Find a course or branch"
+              aria-label="Find a course or branch"
+            />
+          </div>
+
+          <span className="cg-tools">
+            {!bulkCourses && (
+              <button type="button" className="btn btn-ghost btn-sm" onClick={() => setBulkCourses(true)}>
+                Upload from Excel
               </button>
-            </span>
-          )}
+            )}
+            {!addingCourse && (
+              <button type="button" className="btn btn-secondary btn-sm" onClick={() => setAddingCourse(true)}>
+                + New course
+              </button>
+            )}
+          </span>
         </div>
 
         {bulkCourses && (
@@ -184,139 +217,141 @@ export default function AcademicsStep({ state, catalogue, onSaved, goto, updateC
             onAdded={(course) => {
               putCourse(course);
               add(course.id);
+              setQuery('');
               setAddingCourse(false);
             }}
           />
         )}
 
-        <div className="picker">
-          <div className="search">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="11" cy="11" r="6.5" />
-              <path d="m20 20-4.2-4.2" />
-            </svg>
-            <input
-              className="input"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search courses or branches - try “B.Tech” or “Computer”"
-              aria-label="Search courses"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && matches[0]) {
-                  e.preventDefault();
-                  add(matches[0].id);
+        {/*
+          The courses, as a table: a row each, a tick to say they run it.
+          A table because the catalogue grows - at fifty or a hundred
+          courses, rows scan and cards do not. The header stays put while
+          the body scrolls.
+        */}
+        {shown.length > 0 ? (
+          <div className="ct-wrap">
+            <table className="ct">
+              <thead>
+                <tr>
+                  <th className="ct-tick">
+                    <input
+                      type="checkbox"
+                      aria-label={allShownOn ? 'Untick every course shown' : 'Tick every course shown'}
+                      checked={allShownOn}
+                      ref={(el) => {
+                        if (el) el.indeterminate = someShownOn && !allShownOn;
+                      }}
+                      onChange={() => setShownCourses(!allShownOn)}
+                    />
+                  </th>
+                  <th>Course</th>
+                  <th>Branches it runs</th>
+                  <th className="ct-num">Available</th>
+                  <th className="ct-act">
+                    <span className="sr-only">Actions</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {shown.map((c) => {
+                  const chosen = picked.get(c.id);
+                  const on = Boolean(chosen);
+                  const total = c.specialisations.length;
+                  const names = c.specialisations.filter((s) => chosen?.has(s.id)).map((s) => s.name);
+                  const runs = !on
+                    ? '—'
+                    : total === 0
+                      ? 'Whole course'
+                      : chosen!.size === 0
+                        ? 'All branches'
+                        : names.length > 3
+                          ? `${names.slice(0, 3).join(', ')} +${names.length - 3} more`
+                          : names.join(', ');
+                  return (
+                    <tr key={c.id} className={on ? 'is-on' : ''} onClick={() => toggleCourse(c.id)}>
+                      <td className="ct-tick">
+                        <input
+                          type="checkbox"
+                          checked={on}
+                          aria-label={`${c.name} runs here`}
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={() => toggleCourse(c.id)}
+                        />
+                      </td>
+                      <td className="ct-name">{c.name}</td>
+                      <td className={`ct-runs ${on && chosen!.size === 0 && total > 0 ? 'is-all' : ''}`}>{runs}</td>
+                      <td className="ct-num">{total || '—'}</td>
+                      <td className="ct-act">
+                        {on && total > 0 && (
+                          <button
+                            type="button"
+                            className="linkish"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditing(c.id);
+                            }}
+                          >
+                            Choose branches
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="cg-empty">
+            {show === 'picked' && !query ? (
+              <p>Nothing ticked yet. Tick the courses this institution runs under “All courses”.</p>
+            ) : query.trim().length >= 2 && !exact ? (
+              <p>
+                No course called “{query.trim()}”.{' '}
+                <button type="button" className="linkish" onClick={() => setAddingCourse(true)}>
+                  Add it as a new course
+                </button>
+              </p>
+            ) : (
+              <p>No courses yet. Use “New course” to add the first.</p>
+            )}
+          </div>
+        )}
+      </section>
+
+      {editingCourse && (
+        <BranchDialog
+          course={editingCourse}
+          chosen={picked.get(editingCourse.id) ?? new Set()}
+          onChange={(next) => setPicked((m) => new Map(m).set(editingCourse.id, next))}
+          onClose={() => setEditing(null)}
+          attach={
+            <AttachBranches
+              course={editingCourse}
+              branches={catalogue.branches}
+              onAttached={(updated) => {
+                putCourse(updated);
+                // A branch attached here is one this institution offers.
+                const chosen = picked.get(editingCourse.id) ?? new Set<string>();
+                const before = new Set(editingCourse.specialisations.map((s) => s.id));
+                const fresh = updated.specialisations.filter((s) => !before.has(s.id)).map((s) => s.id);
+                if (chosen.size > 0) {
+                  setPicked((m) => new Map(m).set(editingCourse.id, new Set([...chosen, ...fresh])));
                 }
               }}
             />
-          </div>
-          {(query || browse || picked.size === 0) && (
-            <div className={`picker-results ${browse ? 'is-browsing' : ''}`}>
-              {matches.map((c) => (
-                <button key={c.id} type="button" className="picker-row" onClick={() => add(c.id)}>
-                  <span>{c.name}</span>
-                  <small>{c.specialisations.length ? `${c.specialisations.length} branches` : 'No branches'}</small>
-                  <span className="picker-add">Add</span>
-                </button>
-              ))}
-              {query.trim().length >= 2 && !exact && (
-                <button type="button" className="picker-row picker-new" onClick={() => setAddingCourse(true)}>
-                  <span>
-                    + Add “<strong>{query.trim()}</strong>” as a new course
-                  </span>
-                </button>
-              )}
-              {matches.length === 0 && query.trim().length < 2 && (
-                <p className="muted">No courses yet. Use “Add a course”.</p>
-              )}
-            </div>
-          )}
-
-          {/* The other two ways in, kept quiet: most institutions need
-              neither, and as buttons beside the heading they competed with
-              the search that nearly everybody wants. */}
-          <p className="picker-alts">
-            {available.length > 0 && (
-              <button type="button" className="linkish" onClick={() => setBrowse((v) => !v)} aria-expanded={browse}>
-                {browse ? 'Hide the full catalogue' : `Browse all ${available.length} courses`}
-              </button>
-            )}
-            {!bulkCourses && (
-              <button type="button" className="linkish" onClick={() => setBulkCourses(true)}>
-                Upload a list from Excel
-              </button>
-            )}
-          </p>
-        </div>
-
-        {picked.size > 0 && (
-          <div className="list-panel-head list-panel-head-inline">
-            <h3>
-              Courses this institution runs
-              <span className="count">{picked.size}</span>
-            </h3>
-            {branchCount > 0 && (
-              <p className="muted">
-                {branchCount} branch{branchCount === 1 ? '' : 'es'} chosen across them
-              </p>
-            )}
-          </div>
-        )}
-
-        {picked.size > 0 && (
-          <ul className="courses">
-            {[...picked].map(([courseId, chosen]) => {
-              const course = byId.get(courseId);
-              if (!course) return null;
-              return (
-                <li key={courseId} className="course">
-                  <div className="course-head">
-                    <strong>{course.name}</strong>
-                    <span className="muted">
-                      {chosen.size === 0 ? 'All branches' : `${chosen.size} of ${course.specialisations.length} branches`}
-                    </span>
-                    <button type="button" className="icon-btn" onClick={() => remove(courseId)} aria-label={`Remove ${course.name}`}>
-                      ×
-                    </button>
-                  </div>
-                  <div className="chips">
-                    {course.specialisations.length > 0 && (
-                      <Chip on={chosen.size === 0} onClick={() => toggleBranch(courseId, null)}>
-                        All branches
-                      </Chip>
-                    )}
-                    {course.specialisations.map((s) => (
-                      <Chip key={s.id} on={chosen.has(s.id)} onClick={() => toggleBranch(courseId, s.id)}>
-                        {s.name}
-                      </Chip>
-                    ))}
-                    <AttachBranches
-                      course={course}
-                      branches={catalogue.branches}
-                      onAttached={(updated) => {
-                        putCourse(updated);
-                        // A branch attached here is one this institution offers.
-                        const before = new Set(course.specialisations.map((s) => s.id));
-                        const fresh = updated.specialisations.filter((s) => !before.has(s.id)).map((s) => s.id);
-                        if (chosen.size > 0) {
-                          setPicked((m) => new Map(m).set(courseId, new Set([...chosen, ...fresh])));
-                        }
-                      }}
-                    />
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
+          }
+        />
+      )}
 
       {/*
         The shared branch list.
 
         Every institution picks branches from one catalogue, so each branch
-        has exactly one spelling. Managing it is a rare job and a confusing
-        way to open the step, so it lives here - and opens itself when
-        somebody adding a course goes looking for a branch that is missing.
+        has exactly one spelling. Managing it is a rare job, so it lives here,
+        folded - and opens itself when somebody adding a course goes looking
+        for a branch that is missing.
       */}
       <section className="blk blk-quiet" ref={branchesRef}>
         <button
@@ -334,55 +369,14 @@ export default function AcademicsStep({ state, catalogue, onSaved, goto, updateC
         )}
       </section>
 
-      <section className="blk">
-        <h2 className="blk-title">Placement rules</h2>
-        <div className="toggles">
-          <Toggle
-            checked={oneOffer}
-            onChange={setOneOffer}
-            label="One offer, then you’re out"
-            description="New drives start with this on: a student who accepts an offer is withdrawn from the rest. Each drive can still change it."
-          />
-          <Toggle
-            checked={selfJoin}
-            onChange={setSelfJoin}
-            label="Students can join with a batch code"
-            description="Placement cells may share a code so students register themselves. Off means every student is entered by the college."
-          />
-          <Toggle
-            checked={unverifiedAccess}
-            onChange={setUnverifiedAccess}
-            label="Companies can sign in while we check them"
-            description="Off (usual): a company that registers waits for Apli.ai to verify it before it can sign in at all. On: it gets in at once and can draft, but still reaches no college of yours until it is verified."
-          />
-          <Toggle
-            checked={companyApproval}
-            onChange={setCompanyApproval}
-            label="Companies need our approval first"
-            description="On top of the platform's verification, the institution approves each company before it can send roles to any of its colleges. Off means each college's approval of each role is the gate."
-          />
-          <div className="response-days">
-            <span className="toggle-text">
-              <span className="toggle-label">Company response time</span>
-              <span className="toggle-desc">
-                Days a company has to answer an application before students and the placement cell see it as overdue.
-              </span>
-            </span>
-            <select
-              className="input"
-              value={responseDays}
-              onChange={(e) => setResponseDays(Number(e.target.value))}
-              aria-label="Company response time in days"
-            >
-              {[3, 5, 7, 10, 14, 21, 30].map((d) => (
-                <option key={d} value={d}>
-                  {d} days
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </section>
+      {/*
+        Placement rules - hidden for now to keep this step to courses alone.
+        The saved values are read from the tenant above and sent back
+        unchanged, so hiding the section changes nothing that is stored. The
+        previous version of this step with the rules section is in git history
+        / the scratchpad backup; to bring it back, restore the state hooks and
+        the <Toggle> block.
+      */}
 
       <StepFooter
         busy={busy}
@@ -392,6 +386,99 @@ export default function AcademicsStep({ state, catalogue, onSaved, goto, updateC
         note={picked.size > 0 ? `${picked.size} course${picked.size === 1 ? '' : 's'}${branchCount ? ` · ${branchCount} branches` : ''}` : null}
       />
     </form>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Choosing a course's branches                                                */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * A dialog for one course's branches: "all of them" or a checkbox each. In
+ * its own focused box, so the grid behind it stays a grid of course names.
+ */
+function BranchDialog({
+  course,
+  chosen,
+  onChange,
+  onClose,
+  attach,
+}: {
+  course: Course;
+  chosen: Set<string>;
+  /** The new selection; empty means every branch. */
+  onChange: (next: Set<string>) => void;
+  onClose: () => void;
+  attach: ReactNode;
+}) {
+  const box = useRef<HTMLDivElement>(null);
+  const all = chosen.size === 0;
+  const ids = course.specialisations.map((s) => s.id);
+
+  /** Untick one of "all" and the rest stay; tick the last one back and it is "all" again. */
+  function flip(id: string) {
+    const next = new Set(all ? ids : chosen);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    // None ticked is not a choice anybody means; keep at least one.
+    if (next.size === 0) return;
+    onChange(next.size === ids.length ? new Set() : next);
+  }
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    box.current?.focus();
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  return (
+    <div className="bd-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <div
+        className="bd"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="bd-title"
+        tabIndex={-1}
+        ref={box}
+      >
+        <div className="bd-head">
+          <div>
+            <h2 id="bd-title">{course.name} branches</h2>
+            <p>Which branches of {course.name} does this institution run?</p>
+          </div>
+          <button type="button" className="icon-btn" onClick={onClose} aria-label="Close">
+            ×
+          </button>
+        </div>
+
+        <label className={`bd-all ${all ? 'is-on' : ''}`}>
+          <input type="checkbox" checked={all} onChange={() => !all && onChange(new Set())} />
+          <span>
+            <strong>All branches</strong>
+            <small>{all ? 'Untick any branch below to run only some' : `${chosen.size} of ${ids.length} chosen`}</small>
+          </span>
+        </label>
+
+        <div className="bd-list">
+          {course.specialisations.map((s) => (
+            <label key={s.id} className={`bd-opt ${all || chosen.has(s.id) ? 'is-on' : ''}`}>
+              <input type="checkbox" checked={all || chosen.has(s.id)} onChange={() => flip(s.id)} />
+              <span>{s.name}</span>
+            </label>
+          ))}
+        </div>
+
+        <div className="bd-foot">
+          <div className="bd-attach">{attach}</div>
+          <button type="button" className="btn btn-primary btn-sm" onClick={onClose}>
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 

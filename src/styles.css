@@ -442,3 +442,41 @@ code {
   justify-content: flex-start;
   margin-bottom: 14px;
 }
+
+/* ---------------------------------------------------------------------------
+   The lockup, everywhere.
+
+   This used to live only in Landing.css, which meant it only existed on pages
+   that had loaded the landing stylesheet. Every other screen fell back to
+   `.brand-mark` - an 18px rounded square painted with `--grad` - and the
+   comment in Landing.css called that what it was: a placeholder.
+
+   The result was four different answers to "what does this product look like".
+   The landing page had the real mark; sign-in and the student portal had the
+   Apli mascot's face beside the name; admin, campus and company had the
+   placeholder square. Worse, the square is painted with the app's gradient,
+   which ends in cyan - so the brand was a blue square on exactly the screens a
+   paying institution spends its day in.
+
+   One mark now, in currentColor, so it takes the ink of whatever it sits on and
+   there is no light file and dark file to keep in step.
+
+   `ApliFace` keeps its own job. It is the mascot, and it belongs to the
+   assistant bubble and the empty states it already appears in - not to the
+   brand lockup, which is a different thing wearing the same name.
+--------------------------------------------------------------------------- */
+
+.brand-logo {
+  display: block;
+  height: 26px;
+  width: auto;
+  /* The mark is the ink of its surroundings, never a fixed colour. */
+  color: var(--ink);
+  flex: none;
+}
+
+/* In a narrow rail the lockup earns a little less room. */
+.admin-nav-head .brand-logo,
+.admin-brand .brand-logo {
+  height: 24px;
+}

@@ -4,6 +4,7 @@ import { joinApi, type JoinPreview } from '../api/campus';
 import { ApiError } from '../api/client';
 import { useAuth } from '../auth/AuthContext';
 import './Login.css';
+import ApliLogo from '../components/ApliLogo';
 
 /**
  * Public self-registration through a batch join link. The second of the two
@@ -86,9 +87,8 @@ export default function JoinBatch() {
   return (
     <div className="login">
       <div className="login-panel">
-        <Link to="/" className="login-brand">
-          <span className="brand-mark" aria-hidden="true" />
-          <span>Apli.ai</span>
+        <Link to="/" className="login-brand" aria-label="Apli.ai, home">
+          <ApliLogo className="brand-logo" />
         </Link>
 
         <h1>Join {batch.batchName}</h1>

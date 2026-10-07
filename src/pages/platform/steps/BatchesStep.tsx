@@ -1,8 +1,8 @@
-import { useMemo, useState, type FormEvent } from 'react';
+import { useCallback, useMemo, useState, type FormEvent } from 'react';
 import { ApiError } from '../../../api/client';
-import { platformApi, type BatchForm, type BatchRow } from '../../../api/platform';
+import { platformApi, type BatchForm, type CollegeRow, type OnboardingState } from '../../../api/platform';
 import type { StepProps } from '../Onboarding';
-import { Chip, Field, Segmented, StepFooter } from '../ui';
+import { Chip, Field, Segmented, SidePanel, StepFooter } from '../ui';
 
 /** A passing year as universities write it: the academic year it ends. 2027 -> "2026-2027". */
 export const academicYear = (passingYear: number) => `${passingYear - 1}-${passingYear}`;
@@ -13,14 +13,16 @@ const SCOPES: { value: BatchForm['scope']; label: string; hint: string }[] = [
   { value: 'SOME_COLLEGES', label: 'Chosen colleges', hint: 'Only in the colleges you pick' },
 ];
 
+/** The college filter's value for batches that belong to the whole university. */
+const UNIVERSITY = '__university';
+
 /**
  * The batches: how this institution groups its students.
  *
- * Its own step, after colleges and courses, because a batch names both. There
- * is no one right shape - one university has a single "2026 Batch", another a
- * "B.Tech Computer Engineering 2026" in each college - so the admin builds
- * them: who the batch is for, then any of course, branch and year. The name
- * writes itself from those and can be changed.
+ * Batches multiply - colleges × their course/branch pairs × passing years -
+ * so the step is the list of them, as a table you can filter by college and
+ * year. Making them happens in a side panel: "from the mapping" for nearly
+ * everybody, "by hand" for any other kind of group.
  */
 export default function BatchesStep({ state, catalogue, onSaved, goto }: StepProps) {
   const t = state!.tenant;
@@ -32,15 +34,492 @@ export default function BatchesStep({ state, catalogue, onSaved, goto }: StepPro
   // first-year cohort of a five-year course.
   const years = [thisYear, thisYear + 1, thisYear + 2, thisYear + 3, thisYear + 4, thisYear + 5];
 
-  // Colleges with courses mapped: what "create from the mapping" works from.
-  const mappedColleges = colleges.filter((c) => c.programs > 0);
-  const [fromYears, setFromYears] = useState<number[]>([thisYear + 1]);
-  const [fromColleges, setFromColleges] = useState<string[]>([]);
-  const fromTargets = fromColleges.length
-    ? mappedColleges.filter((c) => fromColleges.includes(c.id))
-    : mappedColleges;
-  const fromCount = fromTargets.reduce((n, c) => n + c.programs, 0) * fromYears.length;
+  const [panel, setPanel] = useState<'mapping' | 'hand' | null>(null);
+  const closePanel = useCallback(() => setPanel(null), []);
+  const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
+  // The table's filters and selection.
+  const [query, setQuery] = useState('');
+  const [collegeFilter, setCollegeFilter] = useState('');
+  const [yearFilter, setYearFilter] = useState('');
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [confirming, setConfirming] = useState(false);
+  const [removing, setRemoving] = useState(false);
+
+  const shown = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return batches
+      .filter((b) =>
+        !collegeFilter ? true : collegeFilter === UNIVERSITY ? !b.collegeId : b.collegeId === collegeFilter,
+      )
+      .filter((b) => !yearFilter || String(b.graduationYear ?? '') === yearFilter)
+      .filter(
+        (b) =>
+          !q ||
+          b.name.toLowerCase().includes(q) ||
+          (b.course ?? '').toLowerCase().includes(q) ||
+          (b.specialisation ?? '').toLowerCase().includes(q) ||
+          (b.college?.code ?? '').toLowerCase().includes(q),
+      )
+      .sort(
+        (a, b) =>
+          (a.college?.code ?? '').localeCompare(b.college?.code ?? '') ||
+          (a.graduationYear ?? 0) - (b.graduationYear ?? 0) ||
+          a.name.localeCompare(b.name),
+      );
+  }, [batches, query, collegeFilter, yearFilter]);
+
+  const usedYears = useMemo(
+    () => [...new Set(batches.map((b) => b.graduationYear).filter((y): y is number => !!y))].sort(),
+    [batches],
+  );
+
+  // Only empty batches can be removed; one with students in it is kept.
+  const removable = shown.filter((b) => b.students === 0);
+  const picked = [...selected].filter((id) => batches.some((b) => b.id === id && b.students === 0));
+  const allPicked = removable.length > 0 && removable.every((b) => selected.has(b.id));
+
+  function flip(id: string) {
+    setSelected((s) => {
+      const n = new Set(s);
+      if (n.has(id)) n.delete(id);
+      else n.add(id);
+      return n;
+    });
+    setConfirming(false);
+  }
+
+  async function removeSelected() {
+    setRemoving(true);
+    setError(null);
+    // One at a time: each delete returns the fresh state. If one fails, the
+    // ones already removed still show as removed.
+    let last: OnboardingState | null = null;
+    let done = 0;
+    try {
+      for (const id of picked) {
+        last = await platformApi.deleteBatch(t.id, id);
+        done++;
+      }
+      setNotice(`Removed ${done} batch${done === 1 ? '' : 'es'}.`);
+      setSelected(new Set());
+    } catch (err) {
+      setError(
+        (err instanceof ApiError ? err.message : 'Could not remove those batches.') +
+          (done ? ` ${done} were removed before that.` : ''),
+      );
+    } finally {
+      if (last) onSaved(last);
+      setRemoving(false);
+      setConfirming(false);
+    }
+  }
+
+  async function next(e: FormEvent) {
+    e.preventDefault();
+    if (batches.length === 0 && !t.completedSteps.includes('batches')) {
+      onSaved(await platformApi.completeStep(t.id, 'batches'));
+    }
+    goto('features');
+  }
+
+  const mappedColleges = colleges.filter((c) => c.programs > 0);
+
+  return (
+    <form onSubmit={next} noValidate>
+      <section className="blk cg-blk">
+        {batches.length > 0 && (
+          <div className="cg-bar">
+            <div className="search cg-search">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="11" cy="11" r="6.5" />
+                <path d="m20 20-4.2-4.2" />
+              </svg>
+              <input
+                className="input"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Find a batch, course or branch"
+                aria-label="Find a batch"
+              />
+            </div>
+            <select
+              className="input cg-select"
+              value={collegeFilter}
+              onChange={(e) => setCollegeFilter(e.target.value)}
+              aria-label="Filter by college"
+            >
+              <option value="">All colleges</option>
+              <option value={UNIVERSITY}>Whole university</option>
+              {colleges.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.code} · {c.name}
+                </option>
+              ))}
+            </select>
+            <select
+              className="input cg-select"
+              value={yearFilter}
+              onChange={(e) => setYearFilter(e.target.value)}
+              aria-label="Filter by passing year"
+            >
+              <option value="">All years</option>
+              {usedYears.map((y) => (
+                <option key={y} value={y}>
+                  {academicYear(y)}
+                </option>
+              ))}
+            </select>
+            <span className="cg-tools">
+              <button type="button" className="btn btn-ghost btn-sm" onClick={() => setPanel('hand')}>
+                Make one by hand
+              </button>
+              <button type="button" className="btn btn-secondary btn-sm" onClick={() => setPanel('mapping')}>
+                + Create from mapping
+              </button>
+            </span>
+          </div>
+        )}
+
+        {notice && (
+          <p className="notice ob-in cg-notice" role="status">
+            {notice}
+          </p>
+        )}
+
+        {batches.length === 0 ? (
+          <div className="cg-start">
+            <h3>No batches yet</h3>
+            <p>
+              A batch is one college’s course, branch and passing year - e.g. “PICT · B.E. Computer Engineering{' '}
+              {academicYear(thisYear + 1)}”. Drives, eligibility and reports work at that level, and students join
+              their batch automatically. This step is optional.
+            </p>
+            {mappedColleges.length === 0 ? (
+              <button type="button" className="btn btn-secondary" onClick={() => goto('mapping')}>
+                ← Map courses to colleges first
+              </button>
+            ) : (
+              <span className="cg-start-actions">
+                <button type="button" className="btn btn-secondary" onClick={() => setPanel('mapping')}>
+                  + Create from mapping
+                </button>
+                <button type="button" className="linkish" onClick={() => setPanel('hand')}>
+                  or make one by hand
+                </button>
+              </span>
+            )}
+          </div>
+        ) : (
+          <>
+            {picked.length > 0 && (
+              <div className="ct-bulk ob-in">
+                <span>
+                  {picked.length} batch{picked.length === 1 ? '' : 'es'} selected
+                </span>
+                {confirming ? (
+                  <>
+                    <span className="ct-bulk-q">Remove them? This cannot be undone.</span>
+                    <button type="button" className="btn btn-ghost btn-sm" onClick={() => setConfirming(false)}>
+                      Cancel
+                    </button>
+                    <button type="button" className="btn btn-danger btn-sm" onClick={removeSelected} disabled={removing}>
+                      {removing ? 'Removing…' : `Remove ${picked.length}`}
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button type="button" className="btn btn-ghost btn-sm" onClick={() => setSelected(new Set())}>
+                      Clear
+                    </button>
+                    <button type="button" className="btn btn-secondary btn-sm" onClick={() => setConfirming(true)}>
+                      Remove
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+
+            {shown.length === 0 ? (
+              <div className="cg-empty">
+                <p>No batch matches those filters.</p>
+              </div>
+            ) : (
+              <div className="ct-wrap">
+                <table className="ct">
+                  <thead>
+                    <tr>
+                      <th className="ct-tick">
+                        <input
+                          type="checkbox"
+                          aria-label="Select every empty batch shown"
+                          title="Only batches with no students can be removed"
+                          checked={allPicked}
+                          disabled={removable.length === 0}
+                          onChange={() => {
+                            setSelected(allPicked ? new Set() : new Set(removable.map((b) => b.id)));
+                            setConfirming(false);
+                          }}
+                        />
+                      </th>
+                      <th>Batch</th>
+                      <th>College</th>
+                      <th>Course</th>
+                      <th>Branch</th>
+                      <th>Passing year</th>
+                      <th className="ct-num">Students</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {shown.map((b) => {
+                      const locked = b.students > 0;
+                      return (
+                        <tr
+                          key={b.id}
+                          className={selected.has(b.id) ? 'is-on' : ''}
+                          onClick={() => !locked && flip(b.id)}
+                          title={locked ? 'Has students, so it cannot be removed here' : undefined}
+                        >
+                          <td className="ct-tick">
+                            <input
+                              type="checkbox"
+                              checked={selected.has(b.id)}
+                              disabled={locked}
+                              aria-label={`Select ${b.name}`}
+                              onClick={(e) => e.stopPropagation()}
+                              onChange={() => flip(b.id)}
+                            />
+                          </td>
+                          <td className="ct-name ct-wrap-text">{b.name}</td>
+                          <td className={b.college ? 'ct-code' : 'ct-muted'}>{b.college?.code ?? 'University'}</td>
+                          <td>{b.course ?? <span className="ct-muted">Any</span>}</td>
+                          <td>{b.specialisation ?? <span className="ct-muted">All</span>}</td>
+                          <td className="ct-muted">
+                            {b.graduationYear ? academicYear(b.graduationYear) : b.studyYear ? `Year ${b.studyYear}` : '—'}
+                          </td>
+                          <td className="ct-num">{b.students || '—'}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </>
+        )}
+      </section>
+
+      {panel === 'mapping' && (
+        <FromMappingPanel
+          tenantId={t.id}
+          colleges={mappedColleges}
+          years={years}
+          thisYear={thisYear}
+          onClose={closePanel}
+          onCreated={(res, message) => {
+            onSaved(res);
+            setNotice(message);
+            setPanel(null);
+          }}
+        />
+      )}
+
+      {panel === 'hand' && (
+        <ByHandPanel
+          state={state!}
+          catalogue={catalogue}
+          years={years}
+          thisYear={thisYear}
+          onClose={closePanel}
+          onCreated={(res, message) => {
+            onSaved(res);
+            setNotice(message);
+            setPanel(null);
+          }}
+        />
+      )}
+
+      <StepFooter
+        busy={false}
+        error={error}
+        onBack={() => goto('mapping')}
+        submitLabel={batches.length ? 'Continue' : 'Skip for now'}
+        note={`${batches.length} batch${batches.length === 1 ? '' : 'es'}`}
+      />
+    </form>
+  );
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* Create from the mapping                                                     */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The usual way: one batch for every course/branch pair each mapped college
+ * runs, for each passing year picked. Colleges are a table with ticks, since
+ * a university can have dozens.
+ */
+function FromMappingPanel({
+  tenantId,
+  colleges,
+  years,
+  thisYear,
+  onClose,
+  onCreated,
+}: {
+  tenantId: string;
+  colleges: CollegeRow[];
+  years: number[];
+  thisYear: number;
+  onClose: () => void;
+  onCreated: (res: OnboardingState, message: string) => void;
+}) {
+  const [pickYears, setPickYears] = useState<number[]>([thisYear + 1]);
+  // Every mapped college starts ticked: untick the ones to leave out.
+  const [pickColleges, setPickColleges] = useState<Set<string>>(() => new Set(colleges.map((c) => c.id)));
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const targets = colleges.filter((c) => pickColleges.has(c.id));
+  const count = targets.reduce((n, c) => n + c.programs, 0) * pickYears.length;
+  const allOn = targets.length === colleges.length;
+
+  async function create() {
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await platformApi.createBatchesFromMapping(tenantId, {
+        graduationYears: pickYears,
+        collegeIds: allOn ? undefined : [...pickColleges],
+      });
+      const { created, skipped } = res.result;
+      onCreated(
+        res,
+        `Created ${created.length} batch${created.length === 1 ? '' : 'es'}.` +
+          (skipped.length ? ` ${skipped.length} already existed and were left as they are.` : ''),
+      );
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Could not create the batches.');
+      setBusy(false);
+    }
+  }
+
+  return (
+    <SidePanel
+      title="Create batches from the mapping"
+      subtitle="One batch for each college, course, branch and passing year"
+      onClose={onClose}
+      footer={
+        <>
+          <span className="sp-foot-note">
+            Up to <strong>{count}</strong> batch{count === 1 ? '' : 'es'} · ones that already exist are skipped
+          </span>
+          {error && <span className="f-error">{error}</span>}
+          <button type="button" className="btn btn-primary" onClick={create} disabled={busy || count === 0}>
+            {busy ? 'Creating…' : `Create ${count} batch${count === 1 ? '' : 'es'}`}
+          </button>
+        </>
+      }
+    >
+      <div className="sp-section">
+        <h3>Passing years</h3>
+        <p className="sp-hint">The academic year each batch passes out in. Pick one or more.</p>
+        <div className="chips">
+          {years.map((y) => (
+            <Chip
+              key={y}
+              on={pickYears.includes(y)}
+              onClick={() => setPickYears((v) => (v.includes(y) ? v.filter((x) => x !== y) : [...v, y].sort()))}
+            >
+              {academicYear(y)}
+            </Chip>
+          ))}
+        </div>
+      </div>
+
+      <div className="sp-section">
+        <h3>
+          Colleges <span className="count">{targets.length}</span>
+        </h3>
+        <p className="sp-hint">Every college with courses mapped. Untick any to leave out.</p>
+        <div className="ct-wrap is-short">
+          <table className="ct">
+            <thead>
+              <tr>
+                <th className="ct-tick">
+                  <input
+                    type="checkbox"
+                    aria-label={allOn ? 'Untick every college' : 'Tick every college'}
+                    checked={allOn}
+                    ref={(el) => {
+                      if (el) el.indeterminate = targets.length > 0 && !allOn;
+                    }}
+                    onChange={() => setPickColleges(allOn ? new Set() : new Set(colleges.map((c) => c.id)))}
+                  />
+                </th>
+                <th>Code</th>
+                <th>College</th>
+                <th className="ct-num">Course/branch pairs</th>
+              </tr>
+            </thead>
+            <tbody>
+              {colleges.map((c) => {
+                const on = pickColleges.has(c.id);
+                const flip = () =>
+                  setPickColleges((s) => {
+                    const n = new Set(s);
+                    if (n.has(c.id)) n.delete(c.id);
+                    else n.add(c.id);
+                    return n;
+                  });
+                return (
+                  <tr key={c.id} className={on ? 'is-on' : ''} onClick={flip}>
+                    <td className="ct-tick">
+                      <input
+                        type="checkbox"
+                        checked={on}
+                        aria-label={c.name}
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={flip}
+                      />
+                    </td>
+                    <td className="ct-code">{c.code}</td>
+                    <td className="ct-wrap-text">{c.name}</td>
+                    <td className="ct-num">{c.programs}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </SidePanel>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Make one by hand                                                            */
+/* -------------------------------------------------------------------------- */
+
+/** Any other kind of group: a whole-university year, the same batch in every college, a year of study. */
+function ByHandPanel({
+  state,
+  catalogue,
+  years,
+  thisYear,
+  onClose,
+  onCreated,
+}: {
+  state: NonNullable<StepProps['state']>;
+  catalogue: StepProps['catalogue'];
+  years: number[];
+  thisYear: number;
+  onClose: () => void;
+  onCreated: (res: OnboardingState, message: string) => void;
+}) {
+  const colleges = state.colleges;
   const [form, setForm] = useState<BatchForm>({
     scope: 'UNIVERSITY',
     collegeIds: [],
@@ -53,15 +532,12 @@ export default function BatchesStep({ state, catalogue, onSaved, goto }: StepPro
   });
   const [nameTouched, setNameTouched] = useState(false);
   const [busy, setBusy] = useState(false);
-  /** The by-hand route, folded until somebody wants it. */
-  const [byHand, setByHand] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
 
   // The courses this institution runs, each with the branches it offers.
   const courses = useMemo(
     () =>
-      state!.programs.map((p) => {
+      state.programs.map((p) => {
         const course = catalogue.courses.find((c) => c.id === p.courseId);
         const all = course?.specialisations ?? [];
         const offered = p.specialisationIds.length ? all.filter((s) => p.specialisationIds.includes(s.id)) : all;
@@ -92,20 +568,14 @@ export default function BatchesStep({ state, catalogue, onSaved, goto }: StepPro
     setError(null);
   }
 
-  function preset(p: Partial<BatchForm>) {
-    setForm((f) => ({ ...f, course: '', specialisation: '', studyYear: undefined, collegeIds: [], ...p }));
-    setNameTouched(false);
-  }
-
   async function create() {
     setBusy(true);
     setError(null);
-    setNotice(null);
     try {
-      const res = await platformApi.createBatches(t.id, { ...form, name });
-      onSaved(res);
+      const res = await platformApi.createBatches(state.tenant.id, { ...form, name });
       const { created, skipped } = res.result;
-      setNotice(
+      onCreated(
+        res,
         [
           created.length ? `Created ${created.length} batch${created.length === 1 ? '' : 'es'}.` : '',
           skipped.length
@@ -115,206 +585,63 @@ export default function BatchesStep({ state, catalogue, onSaved, goto }: StepPro
           .filter(Boolean)
           .join(' '),
       );
-      setNameTouched(false);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Could not create that batch.');
-    } finally {
       setBusy(false);
     }
   }
-
-  async function createFromMapping() {
-    setBusy(true);
-    setError(null);
-    setNotice(null);
-    try {
-      const res = await platformApi.createBatchesFromMapping(t.id, {
-        graduationYears: fromYears,
-        collegeIds: fromColleges.length ? fromColleges : undefined,
-      });
-      onSaved(res);
-      const { created, skipped } = res.result;
-      setNotice(
-        `Created ${created.length} batch${created.length === 1 ? '' : 'es'}.` +
-          (skipped.length ? ` ${skipped.length} already existed and were left as they are.` : ''),
-      );
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not create the batches.');
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function remove(b: BatchRow) {
-    try {
-      onSaved(await platformApi.deleteBatch(t.id, b.id));
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not remove that batch.');
-    }
-  }
-
-  async function next(e: FormEvent) {
-    e.preventDefault();
-    if (batches.length === 0 && !t.completedSteps.includes('batches')) {
-      onSaved(await platformApi.completeStep(t.id, 'batches'));
-    }
-    goto('features');
-  }
-
-  // Grouped for the list: the university's own first, then college by college.
-  const groups = useMemo(() => {
-    const map = new Map<string, { title: string; items: BatchRow[] }>();
-    for (const b of batches) {
-      const key = b.collegeId ?? '';
-      const title = b.college ? `${b.college.code} · ${b.college.name}` : 'Whole university';
-      if (!map.has(key)) map.set(key, { title, items: [] });
-      map.get(key)!.items.push(b);
-    }
-    return [...map.entries()].sort(([a], [b]) => (a === '' ? -1 : b === '' ? 1 : 0)).map(([, g]) => g);
-  }, [batches]);
 
   return (
-    <form onSubmit={next} noValidate>
-      {/*
-        One way in at a time.
-
-        Two creation blocks used to sit open on top of each other - "from
-        your mapping" and "by hand" - each with its own fields, and the
-        reader had to work out which one they were in before they could do
-        anything. The mapped route is right for nearly everybody, so it is
-        the one that is open; the other is a line underneath.
-      */}
-      <section className="blk">
-        <h2 className="blk-title">Create the batches</h2>
-        <p className="blk-sub">
-          One batch for each college, course, branch and passing year - e.g. “PICT · B.E. Computer Engineering{' '}
-          {academicYear(thisYear + 1)}”. That is the level drives, eligibility and reports work at, and students
-          mapped to that course and branch later join their batch automatically, by their passing year.
-        </p>
-
-        {mappedColleges.length === 0 ? (
-          <p className="notice">
-            No college has courses mapped yet.{' '}
-            <button type="button" className="btn btn-secondary btn-sm" onClick={() => goto('mapping')}>
-              ← Map courses to colleges
-            </button>
-          </p>
-        ) : (
-          <>
-            <Field label="Passing years" hint="The academic year the batch passes out in. Pick one or more." wide>
-              {() => (
-                <div className="chips">
-                  {years.map((y) => (
-                    <Chip
-                      key={y}
-                      on={fromYears.includes(y)}
-                      onClick={() =>
-                        setFromYears((v) => (v.includes(y) ? v.filter((x) => x !== y) : [...v, y].sort()))
-                      }
-                    >
-                      {academicYear(y)}
-                    </Chip>
-                  ))}
-                </div>
-              )}
-            </Field>
-            <Field label="Colleges" hint="All mapped colleges, unless you pick some." optional wide>
-              {() => (
-                <div className="chips">
-                  {mappedColleges.map((c) => (
-                    <Chip
-                      key={c.id}
-                      on={fromColleges.includes(c.id)}
-                      title={`${c.name} · ${c.programs} course/branch${c.programs === 1 ? '' : 'es'}`}
-                      onClick={() =>
-                        setFromColleges((v) => (v.includes(c.id) ? v.filter((x) => x !== c.id) : [...v, c.id]))
-                      }
-                    >
-                      {c.code}
-                    </Chip>
-                  ))}
-                </div>
-              )}
-            </Field>
-            <div className="batch-preview">
-              <span>
-                Creates up to <strong>{fromCount}</strong> batch{fromCount === 1 ? '' : 'es'}:{' '}
-                {fromTargets.length} college{fromTargets.length === 1 ? '' : 's'} × their course/branch pairs ×{' '}
-                {fromYears.length} passing year{fromYears.length === 1 ? '' : 's'}. Ones that already exist are skipped.
-              </span>
-              <button
-                type="button"
-                className="btn btn-primary btn-sm"
-                onClick={createFromMapping}
-                disabled={busy || fromCount === 0}
-              >
-                {busy ? 'Creating…' : `Create ${fromCount} batches`}
-              </button>
-            </div>
-          </>
-        )}
-      </section>
-
-      <section className={`blk ${byHand ? '' : 'blk-quiet'}`}>
-        <button
-          type="button"
-          className="blk-fold"
-          onClick={() => setByHand((v) => !v)}
-          aria-expanded={byHand}
-        >
-          Or make one by hand
-          <small>
-            For any other group — a whole-university year, or the same batch in every college
-          </small>
-        </button>
-
-        {byHand && (
-          <>
-
-        <div className="presets">
-          <span className="muted">Quick start:</span>
-          <button type="button" className="chip" onClick={() => preset({ scope: 'UNIVERSITY', graduationYear: thisYear + 1 })}>
-            {academicYear(thisYear + 1)} Batch · whole university
+    <SidePanel
+      title="Make a batch by hand"
+      subtitle="For any other group - a whole-university year, or the same batch in every college"
+      onClose={onClose}
+      footer={
+        <>
+          <span className="sp-foot-note">
+            {name ? (
+              <>
+                Creates <strong>{targets.length}</strong> batch{targets.length === 1 ? '' : 'es'}
+                {targets.length === 1 && targets[0] === null ? ' for the whole university' : ''}
+              </>
+            ) : (
+              'Choose a year, a course, or type a name.'
+            )}
+          </span>
+          {error && <span className="f-error">{error}</span>}
+          <button type="button" className="btn btn-primary" onClick={create} disabled={busy || !name || targets.length === 0}>
+            {busy ? 'Creating…' : `Create ${targets.length > 1 ? `${targets.length} batches` : 'batch'}`}
           </button>
-          {courses[0] && (
-            <button
-              type="button"
-              className="chip"
-              onClick={() => preset({ scope: 'ALL_COLLEGES', course: courses[0]!.name, graduationYear: thisYear + 1 })}
-            >
-              {courses[0].name} {academicYear(thisYear + 1)} · in every college
-            </button>
-          )}
-        </div>
+        </>
+      }
+    >
+      <div className="sp-section">
+        <h3>Who is it for</h3>
+        <Segmented label="Who is the batch for" value={form.scope} onChange={(v) => set('scope', v)} options={SCOPES} />
+        <p className="sp-hint">{SCOPES.find((s) => s.value === form.scope)?.hint}</p>
+        {form.scope === 'SOME_COLLEGES' && (
+          <div className="chips">
+            {colleges.map((c) => (
+              <Chip
+                key={c.id}
+                on={form.collegeIds.includes(c.id)}
+                onClick={() =>
+                  set(
+                    'collegeIds',
+                    form.collegeIds.includes(c.id) ? form.collegeIds.filter((x) => x !== c.id) : [...form.collegeIds, c.id],
+                  )
+                }
+                title={c.name}
+              >
+                {c.code}
+              </Chip>
+            ))}
+          </div>
+        )}
+      </div>
 
-        <Field label="Who is it for">
-          {() => (
-            <div className="affiliation">
-              <Segmented label="Who is the batch for" value={form.scope} onChange={(v) => set('scope', v)} options={SCOPES} />
-              <p className="f-hint">{SCOPES.find((s) => s.value === form.scope)?.hint}</p>
-              {form.scope === 'SOME_COLLEGES' && (
-                <div className="chips">
-                  {colleges.map((c) => (
-                    <Chip
-                      key={c.id}
-                      on={form.collegeIds.includes(c.id)}
-                      onClick={() =>
-                        set(
-                          'collegeIds',
-                          form.collegeIds.includes(c.id) ? form.collegeIds.filter((x) => x !== c.id) : [...form.collegeIds, c.id],
-                        )
-                      }
-                      title={c.name}
-                    >
-                      {c.code}
-                    </Chip>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </Field>
-
+      <div className="sp-section">
+        <h3>What it is</h3>
         <div className="grid batch-grid">
           <Field label="Course" optional>
             {(id) => (
@@ -346,7 +673,7 @@ export default function BatchesStep({ state, catalogue, onSaved, goto }: StepPro
               </select>
             )}
           </Field>
-          <Field label="Passing year" hint="The academic year the batch passes out in." optional>
+          <Field label="Passing year" optional>
             {(id) => (
               <select
                 id={id}
@@ -363,7 +690,7 @@ export default function BatchesStep({ state, catalogue, onSaved, goto }: StepPro
               </select>
             )}
           </Field>
-          <Field label="Year of study" hint="For a group like “Second year”, which keeps its name as students move up." optional>
+          <Field label="Year of study" hint="For a group like “Second year”." optional>
             {(id) => (
               <select
                 id={id}
@@ -393,7 +720,7 @@ export default function BatchesStep({ state, catalogue, onSaved, goto }: StepPro
           </Field>
           <Field
             label="Batch name"
-            hint={nameTouched && suggested ? undefined : 'Written from the course, branch and year. Change it if you call it something else.'}
+            hint={nameTouched && suggested ? undefined : 'Written from the course, branch and year. Change it if you like.'}
             wide
           >
             {(id) => (
@@ -418,84 +745,7 @@ export default function BatchesStep({ state, catalogue, onSaved, goto }: StepPro
             )}
           </Field>
         </div>
-
-        <div className="batch-preview">
-          <span>
-            {name ? (
-              <>
-                Creates <strong>{targets.length}</strong> batch{targets.length === 1 ? '' : 'es'}:{' '}
-                {targets
-                  .slice(0, 4)
-                  .map((c) => (c ? `${c.code} · ${name}` : `${name} (whole university)`))
-                  .join(', ')}
-                {targets.length > 4 && ` and ${targets.length - 4} more`}
-              </>
-            ) : (
-              <span className="muted">Choose a year, a course, or type a name.</span>
-            )}
-          </span>
-          <button type="button" className="btn btn-primary btn-sm" onClick={create} disabled={busy || !name || targets.length === 0}>
-            {busy ? 'Creating…' : `Create ${targets.length > 1 ? `${targets.length} batches` : 'batch'}`}
-          </button>
-        </div>
-
-            {notice && (
-              <p className="notice ob-in" role="status">
-                {notice}
-              </p>
-            )}
-          </>
-        )}
-      </section>
-
-      <section className="blk">
-        <h2 className="blk-title">Batches so far</h2>
-        {batches.length === 0 ? (
-          <p className="muted">None yet. You can continue without any.</p>
-        ) : (
-          <div className="batch-groups">
-            {groups.map((g) => (
-              <div key={g.title} className="batch-group">
-                <p className="batch-group-title">{g.title}</p>
-                <div className="chips">
-                  {g.items.map((b) => (
-                    <span key={b.id} className="chip is-static batch-chip" title={batchTitle(b)}>
-                      {b.name}
-                      {b.students > 0 ? (
-                        <small> · {b.students}</small>
-                      ) : (
-                        <button type="button" className="batch-x" onClick={() => remove(b)} aria-label={`Remove ${b.name}`}>
-                          ×
-                        </button>
-                      )}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      <StepFooter
-        busy={false}
-        error={error}
-        onBack={() => goto('mapping')}
-        submitLabel={batches.length ? 'Continue' : 'Skip for now'}
-        note={`${batches.length} batch${batches.length === 1 ? '' : 'es'}`}
-      />
-    </form>
+      </div>
+    </SidePanel>
   );
-}
-
-function batchTitle(b: BatchRow): string {
-  return [
-    b.course,
-    b.specialisation,
-    b.graduationYear ? `passing ${academicYear(b.graduationYear)}` : null,
-    b.studyYear ? `Year ${b.studyYear}` : null,
-    `${b.students} students`,
-  ]
-    .filter(Boolean)
-    .join(' · ');
 }

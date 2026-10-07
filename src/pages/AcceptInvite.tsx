@@ -4,6 +4,7 @@ import { inviteApi, type InvitePreview } from '../api/admin';
 import { ApiError } from '../api/client';
 import { HOME_FOR, homeFor, useAuth, type Role } from '../auth/AuthContext';
 import './Login.css';
+import ApliLogo from '../components/ApliLogo';
 
 const ROLE_LABEL: Record<InvitePreview['role'], string> = {
   CAMPUS: 'placement team',
@@ -101,9 +102,8 @@ export default function AcceptInvite() {
   return (
     <div className="login">
       <div className="login-panel">
-        <Link to="/" className="login-brand">
-          <span className="brand-mark" aria-hidden="true" />
-          <span>Apli.ai</span>
+        <Link to="/" className="login-brand" aria-label="Apli.ai, home">
+          <ApliLogo className="brand-logo" />
         </Link>
 
         <h1>Set up your account</h1>

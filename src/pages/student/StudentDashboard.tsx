@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import StudentLayout from './StudentLayout';
-import { ApliFace, type Mood } from './Apli';
 import { refreshMe } from './me';
 import {
   candidateApi,
@@ -14,84 +13,55 @@ import { ApiError } from '../../api/client';
 import { useT } from '../../i18n';
 import NoticeBoard from '../../components/NoticeBoard';
 import StudentDrives from '../../components/StudentDrives';
-import './Dashboard.css';
+import './Home.css';
 
 /**
- * The first screen a student sees.
+ * The first screen a student sees: their placement season as a path.
  *
- * Not a dashboard. A dashboard is a wall of panels that each summarise a
- * page under it, and a student who has used the portal twice stops reading
- * it - they know what is on the jobs page, they came here to find out
- * whether anything has changed.
+ *   Profile → Verified → Applied → Rounds → Offer → Day one
  *
- * So this is a home screen. Three movements, in the order somebody would
- * actually ask them:
+ * That path is the product's own promise drawn on the screen - Apli.ai
+ * follows a student from a finished profile to their first day at work - so
+ * the page is about where this student is on it rather than a grid of
+ * widgets. Done milestones are filled in, "you are here" pulses, and the
+ * one thing to do now hangs from it. Nothing else competes.
  *
- *   Your name, and one line       - said plainly, in type big enough that it
- *                                   is the answer rather than a header.
- *   Anything with a clock on it   - a deck of cards you push sideways. An
- *                                   interview lives on one page, a closing
- *                                   date on another, an unanswered offer on
- *                                   a third; nothing but this screen can put
- *                                   the three in time order, and time order
- *                                   is the only order that says what to do
- *                                   today.
- *   Everything else, as tiles     - different sizes, different weights, one
- *                                   of them dark. A grid where every tile is
- *                                   the same white rectangle is read as a
- *                                   form; a grid with a hierarchy is read.
- *
- * It is built around what the waiting does to somebody. A placement portal
- * judges a person repeatedly, by strangers, on a timetable they do not
- * control, and most of what it has to say is a refusal. So nothing here
- * ranks them against their cohort, and the stages are named as a process
- * running rather than as a verdict being passed.
+ * It never looks empty: a new student still sees the whole road, with the
+ * marker at its start.
  */
 
 /** The statuses that still have somewhere to go. */
-const LIVE = new Set([
-  'APPLIED',
-  'UNDER_REVIEW',
-  'SHORTLISTED',
-  'IN_ROUND',
-  'WAITLISTED',
-  'OFFERED',
-]);
+const LIVE = new Set(['APPLIED', 'UNDER_REVIEW', 'SHORTLISTED', 'IN_ROUND', 'WAITLISTED', 'OFFERED']);
+const MOVED = new Set(['SHORTLISTED', 'IN_ROUND', 'WAITLISTED', 'OFFERED', 'ACCEPTED', 'HIRED']);
+const OFFERED = new Set(['OFFERED', 'ACCEPTED', 'HIRED']);
 
-/** Said as a stage in a process, never as a judgement on the person. */
-const WHERE: Record<string, string> = {
-  APPLIED: 'Waiting to be opened',
-  UNDER_REVIEW: 'Being read',
+const STATUS: Record<string, string> = {
+  APPLIED: 'Applied',
+  UNDER_REVIEW: 'Being reviewed',
   SHORTLISTED: 'Shortlisted',
   IN_ROUND: 'In a round',
-  WAITLISTED: 'Held on a waitlist',
-  OFFERED: 'You have an offer',
-  ACCEPTED: 'You accepted',
-  HIRED: 'Hired',
-  REJECTED: 'Not taken forward',
-  DECLINED: 'You declined',
-  WITHDRAWN: 'You withdrew',
+  WAITLISTED: 'Waitlisted',
+  OFFERED: 'Offer waiting',
 };
 
 const daysTo = (iso: string) => Math.ceil((new Date(iso).getTime() - Date.now()) / 86_400_000);
+const dateOf = (at: number) => new Date(at).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+const timeOf = (at: number) => new Date(at).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' });
 
-/** "Today", "Tomorrow", or a short date - the form the answer is needed in. */
-function dayOf(at: number): string {
-  const midnight = new Date();
-  midnight.setHours(0, 0, 0, 0);
-  const d = Math.floor((at - midnight.getTime()) / 86_400_000);
-  if (d <= 0) return 'Today';
-  if (d === 1) return 'Tomorrow';
-  return new Date(at).toLocaleDateString('en-IN', { weekday: 'long' });
+/** Rupees a year, as a student reads a package: "₹6.2 L". */
+function lakhs(v: string | null | undefined): string | null {
+  const n = Number(v);
+  if (!v || !Number.isFinite(n) || n <= 0) return null;
+  return `₹${(n / 100000).toFixed(n % 100000 === 0 ? 0 : 1)} L`;
 }
 
-const timeOf = (at: number) =>
-  new Date(at).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' });
+function pay(j: JobCard): string | null {
+  const lo = lakhs(j.ctcMin);
+  const hi = lakhs(j.ctcMax);
+  if (lo && hi && lo !== hi) return `${lo} – ${hi}`;
+  return lo ?? hi;
+}
 
-const dateOf = (at: number) =>
-  new Date(at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
-
-/** "Good morning" and the rest, which is the one thing a clock is good for. */
 function partOfDay(): string {
   const h = new Date().getHours();
   if (h < 12) return 'Good morning';
@@ -99,53 +69,24 @@ function partOfDay(): string {
   return 'Good evening';
 }
 
-/**
- * A number that counts up to its figure the first time it arrives.
- *
- * Not decoration: a figure that moves is one a person reads. It counts once,
- * on the way in - a number that re-animates on every render is a distraction
- * rather than an arrival - and jumps straight to the figure for anybody who
- * has asked for less motion.
- */
-function useCountUp(to: number, ms = 800): number {
-  const [n, setN] = useState(0);
-  const done = useRef(false);
-
-  useEffect(() => {
-    if (done.current || to === 0) {
-      setN(to);
-      return;
-    }
-    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
-      setN(to);
-      done.current = true;
-      return;
-    }
-
-    let raf = 0;
-    const from = performance.now();
-    const tick = (now: number) => {
-      const p = Math.min(1, (now - from) / ms);
-      setN(Math.round(to * (1 - Math.pow(1 - p, 3))));
-      if (p < 1) raf = requestAnimationFrame(tick);
-      else done.current = true;
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [to, ms]);
-
-  return n;
-}
-
-/** One dated thing, whatever kind it is. */
 interface Due {
   key: string;
   at: number;
-  kind: 'interview' | 'offer' | 'closes';
+  kind: 'interview' | 'closes';
   title: string;
-  sub: string;
   to: string;
 }
+
+const MILESTONES = [
+  { key: 'profile', label: 'Profile' },
+  { key: 'verified', label: 'Verified' },
+  { key: 'applied', label: 'Applied' },
+  { key: 'rounds', label: 'Rounds' },
+  { key: 'offer', label: 'Offer' },
+  { key: 'dayone', label: 'Day one' },
+] as const;
+
+type Stage = (typeof MILESTONES)[number]['key'] | 'done';
 
 export default function StudentDashboard() {
   const { t } = useT();
@@ -160,12 +101,10 @@ export default function StudentDashboard() {
       .then(setProfile)
       // '' stands for "our own message", which is translated when shown.
       .catch((err: unknown) => setError(err instanceof ApiError ? err.message : ''));
-
     studentJobsApi
       .list()
       .then((r) => setJobs(r.jobs))
       .catch(() => setJobs([]));
-
     studentJobsApi
       .applications()
       .then(setApps)
@@ -177,146 +116,48 @@ export default function StudentDashboard() {
   const verified = profile?.batch?.isFrozen ?? false;
   const percent = profile?.completion.percent ?? 0;
   const sections = profile?.completion.sections ?? [];
-  const nextUp = sections.find((s) => !s.done);
+  const all = apps ?? [];
 
   const open = useMemo(() => (jobs ?? []).filter((j) => !j.applicationStatus), [jobs]);
-  const live = useMemo(() => (apps ?? []).filter((a) => LIVE.has(a.status)), [apps]);
-  const shortlisted = useMemo(
-    () => (apps ?? []).filter((a) => a.status === 'SHORTLISTED'),
-    [apps],
-  );
-  const inRounds = useMemo(() => (apps ?? []).filter((a) => a.status === 'IN_ROUND'), [apps]);
-  const offers = useMemo(
-    () => (apps ?? []).filter((a) => ['OFFERED', 'ACCEPTED', 'HIRED'].includes(a.status)),
-    [apps],
-  );
+  const live = useMemo(() => all.filter((a) => LIVE.has(a.status)), [all]);
+  const best = useMemo(() => [...open].sort((a, b) => b.match.score - a.match.score).slice(0, 8), [open]);
 
-  /** The best of the open roles first, since only four of them are shown. */
-  const best = useMemo(
-    () => [...open].sort((a, b) => b.match.score - a.match.score).slice(0, 4),
-    [open],
-  );
+  /** Which milestones are behind them. Not strictly in order: a record can be verified before the profile is finished. */
+  const done: Record<(typeof MILESTONES)[number]['key'], boolean> = {
+    profile: percent === 100,
+    verified,
+    applied: all.some((a) => a.status !== 'WITHDRAWN'),
+    rounds: all.some((a) => MOVED.has(a.status)),
+    offer: all.some((a) => OFFERED.has(a.status)),
+    dayone: all.some((a) => a.status === 'HIRED'),
+  };
+  const hereIndex = MILESTONES.findIndex((m) => !done[m.key]);
+  const stage: Stage = hereIndex === -1 ? 'done' : MILESTONES[hereIndex]!.key;
 
-  /**
-   * Everything with a clock on it, in one list.
-   *
-   * Interviews live on one page, closing dates on another and an unanswered
-   * offer on a third. Nothing but this screen can put them in time order.
-   */
+  /** Interviews and closing dates in the next week, in time order. */
   const due = useMemo<Due[]>(() => {
     const out: Due[] = [];
     const now = Date.now();
-
-    for (const a of apps ?? []) {
-      if (a.status === 'IN_ROUND') {
-        const round = a.rounds.find((r) => r.id === a.currentRound?.id);
-        if (round?.scheduledAt) {
-          const at = new Date(round.scheduledAt).getTime();
-          if (at > now) {
-            out.push({
-              key: `iv-${a.id}`,
-              at,
-              kind: 'interview',
-              title: round.name,
-              sub: `${a.companyName} · ${round.isOnline ? 'Online' : 'In person'}`,
-              to: '/student/interviews',
-            });
-          }
-        }
-      }
-      // An offer has no clock of its own, but it is the most urgent thing a
-      // student can be holding, so it sits at the head of the deck.
-      if (a.status === 'OFFERED') {
-        out.push({
-          key: `of-${a.id}`,
-          at: 0,
-          kind: 'offer',
-          title: 'An offer is waiting on you',
-          sub: `${a.title} · ${a.companyName}`,
-          to: '/student/applications',
-        });
+    for (const a of all) {
+      if (a.status !== 'IN_ROUND') continue;
+      const round = a.rounds.find((r) => r.id === a.currentRound?.id);
+      if (!round?.scheduledAt) continue;
+      const at = new Date(round.scheduledAt).getTime();
+      if (at > now && at - now < 7 * 86_400_000) {
+        out.push({ key: `iv-${a.id}`, at, kind: 'interview', title: `${timeOf(at)} · ${round.name}, ${a.companyName}`, to: '/student/interviews' });
       }
     }
-
     for (const j of open) {
       const d = daysTo(j.deadline);
       if (d >= 0 && d <= 7) {
-        out.push({
-          key: `cl-${j.id}`,
-          at: new Date(j.deadline).getTime(),
-          kind: 'closes',
-          title: j.title,
-          sub: `${j.companyName} · applications close`,
-          to: `/student/jobs/${j.id}`,
-        });
+        out.push({ key: `cl-${j.id}`, at: new Date(j.deadline).getTime(), kind: 'closes', title: `${j.companyName} closes`, to: `/student/jobs/${j.id}` });
       }
     }
-
-    return out.sort((a, b) => a.at - b.at).slice(0, 8);
-  }, [apps, open]);
-
-  /**
-   * What the open roles keep asking for and this student has not listed.
-   *
-   * Counted across every role at once, which no single job page can do. It
-   * is the one thing on this screen that changes what they can reach rather
-   * than reporting on it.
-   */
-  const asked = useMemo(() => {
-    const count = new Map<string, number>();
-    for (const j of open) {
-      for (const skill of j.match.missing) {
-        count.set(skill, (count.get(skill) ?? 0) + 1);
-      }
-    }
-    return [...count.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 7)
-      .map(([name, n]) => ({ name, n }));
-  }, [open]);
-
-  /** One line under the name. The whole state of play, said once. */
-  function theLine(): { mood: Mood; text: string } {
-    if (!verified) {
-      return {
-        mood: 'think',
-        text: 'Your college has not verified your record yet, so applying is closed. None of the work below is wasted — have it finished for the day they unlock it.',
-      };
-    }
-    if (offers.some((a) => a.status === 'OFFERED')) {
-      return { mood: 'proud', text: 'You have an offer waiting for an answer. That is the only thing on this page that matters today.' };
-    }
-    if (percent < 60) {
-      return {
-        mood: 'nudge',
-        text: `Your profile is ${percent}% done, and the missing parts are the ones a recruiter reads first. Ten minutes changes what you can reach.`,
-      };
-    }
-    if (live.length > 0 && open.length > 0) {
-      return {
-        mood: 'cheer',
-        text: `${live.length} application${live.length === 1 ? ' is' : 's are'} with a company, and ${open.length} more role${open.length === 1 ? ' is' : 's are'} open to you.`,
-      };
-    }
-    if (live.length > 0) {
-      return {
-        mood: 'cheer',
-        text: `${live.length} application${live.length === 1 ? ' is' : 's are'} with a company now. That part is out of your hands — keep going while you wait.`,
-      };
-    }
-    if (open.length > 0) {
-      return {
-        mood: 'cheer',
-        text: `${open.length} role${open.length === 1 ? '' : 's'} open to you, every one already matching your course, your marks and your batch.`,
-      };
-    }
-    return {
-      mood: 'hello',
-      text: 'Nothing is open this minute. That changes as companies arrive, and how ready your profile is decides how much of it you can reach.',
-    };
-  }
+    return out.sort((a, b) => a.at - b.at).slice(0, 6);
+  }, [all, open]);
 
   const loading = !profile && error === null;
+  const first = profile?.fullName.split(' ')[0] ?? '';
 
   return (
     <StudentLayout>
@@ -326,409 +167,544 @@ export default function StudentDashboard() {
       {error !== null && <p className="alert alert-error">{error || t('dash.loadError')}</p>}
 
       {loading && (
-        <>
-          <div className="sk ov-sk-hail" />
-          <div className="ov-sk-rail">
-            <div className="sk" />
-            <div className="sk" />
-            <div className="sk" />
-          </div>
-          <div className="ov-sk-bento">
-            <div className="sk" />
-            <div className="sk" />
-          </div>
-        </>
+        <div className="jy" aria-busy="true">
+          <div className="sk jy-sk-head" />
+          <div className="sk jy-sk-path" />
+          <div className="sk jy-sk-card" />
+        </div>
       )}
 
       {profile && (
-        <>
-          <Hail profile={profile} verified={verified} says={theLine()} />
+        <div className="jy">
+          <header className="jy-head">
+            <p className="jy-when">{partOfDay()}</p>
+            <h1>
+              {first}
+              <span className="jy-sub">
+                {[profile.batch?.course, profile.batch?.graduationYear].filter(Boolean).join(' · ')}
+                {profile.cgpa ? ` · CGPA ${profile.cgpa}` : ''}
+              </span>
+            </h1>
+          </header>
 
-          <Deck due={due} />
+          {/* --- the path -------------------------------------------------- */}
+          <section
+            className="jy-road"
+            aria-label="Your placement journey"
+            style={{ '--here': Math.max(0, hereIndex === -1 ? MILESTONES.length - 1 : hereIndex), '--n': MILESTONES.length } as CSSProperties}
+          >
+            <ol className="jy-path">
+              {MILESTONES.map((m, i) => {
+                const isHere = i === hereIndex;
+                const isDone = done[m.key];
+                return (
+                  <li
+                    key={m.key}
+                    className={`jy-stop ${isDone ? 'is-done' : ''} ${isHere ? 'is-here' : ''} ${i < hereIndex || hereIndex === -1 ? 'is-behind' : ''}`}
+                    aria-current={isHere ? 'step' : undefined}
+                  >
+                    <span className="jy-node" aria-hidden="true">
+                      {isDone ? '✓' : i + 1}
+                    </span>
+                    <span className="jy-label">{m.label}</span>
+                    {isHere && <span className="jy-here">You are here</span>}
+                  </li>
+                );
+              })}
+            </ol>
 
-          <div className="ov-bento">
-            <Ready percent={percent} nextUp={nextUp?.label ?? null} verified={verified} />
+            {/* The one thing to do, hanging from "you are here". */}
+            <div className="jy-next">
+              <span className="jy-caret" aria-hidden="true" />
+              <Next
+                stage={stage}
+                profile={profile}
+                sections={sections}
+                percent={percent}
+                verified={verified}
+                roles={best}
+                openCount={open.length}
+                live={live}
+                due={due}
+                apps={all}
+                onSkillAdded={() => {
+                  load();
+                  refreshMe();
+                }}
+              />
+            </div>
+          </section>
 
-            <Roles roles={best} total={open.length} />
+          {/* --- what is waiting: while the profile or the record is not done -- */}
+          {(stage === 'profile' || stage === 'verified') && (
+            <Waiting roles={best.slice(0, 3)} total={open.length} stage={stage} />
+          )}
 
-            <Journey
-              percent={percent}
-              openCount={open.length}
-              live={live.length}
-              rounds={shortlisted.length + inRounds.length}
-              offers={offers.length}
-            />
+          {/* --- this week ------------------------------------------------- */}
+          {due.length > 0 && (
+            <section className="jy-week" aria-label="This week">
+              <span className="jy-week-tag">This week</span>
+              <ul>
+                {due.map((d) => (
+                  <li key={d.key} className={`is-${d.kind}`}>
+                    <Link to={d.to}>
+                      <b>{dateOf(d.at)}</b>
+                      <span>{d.title}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
-            <Sent live={live} />
-
-            {asked.length > 0 && (
-              <Skills asked={asked} held={profile.skills} total={open.length} onAdded={() => {
-                load();
-                refreshMe();
-              }} />
-            )}
-          </div>
-        </>
+          {/* --- in motion: once anything has been sent -------------------- */}
+          {live.length > 0 && stage !== 'applied' && stage !== 'rounds' && (
+            <section className="jy-motion" aria-label="Your applications">
+              <header>
+                <h3>In motion</h3>
+                <Link to="/student/applications">All applications →</Link>
+              </header>
+              <ul>
+                {live.slice(0, 4).map((a) => (
+                  <li key={a.id}>
+                    <Link to="/student/applications">
+                      <span className="jy-logo" aria-hidden="true">
+                        {a.companyName.slice(0, 1)}
+                      </span>
+                      <span className="jy-text">
+                        <b>{a.title}</b>
+                        <small>{a.companyName}</small>
+                      </span>
+                      <span className={`jy-pill is-${a.status.toLowerCase()}`}>{STATUS[a.status] ?? a.status}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </div>
       )}
     </StudentLayout>
   );
 }
 
-/* ==========================================================================
-   Their name, and one line
-   ========================================================================== */
+/* -------------------------------------------------------------------------- */
+/* What to do now, by stage                                                    */
+/* -------------------------------------------------------------------------- */
 
-/**
- * Bare on the canvas, not in a card.
- *
- * The first thing on the screen should be the answer, not a container for
- * the answer. A heading inside a bordered panel is a document; a name in
- * 46px type with one sentence under it is somebody being spoken to.
- */
-function Hail({
+function Next({
+  stage,
   profile,
+  sections,
+  percent,
   verified,
-  says,
+  roles,
+  openCount,
+  live,
+  due,
+  apps,
+  onSkillAdded,
 }: {
+  stage: Stage;
   profile: Profile;
+  sections: { key: string; label: string; done: boolean; hint: string }[];
+  percent: number;
   verified: boolean;
-  says: { mood: Mood; text: string };
+  roles: JobCard[];
+  openCount: number;
+  live: MyApplication[];
+  due: Due[];
+  apps: MyApplication[];
+  onSkillAdded: () => void;
 }) {
-  const name = profile.fullName.split(' ')[0] ?? '';
+  if (stage === 'profile') {
+    const left = sections.filter((s) => !s.done);
+    return (
+      <Shell
+        eyebrow="Next · Finish your profile"
+        title={`${left.length} step${left.length === 1 ? '' : 's'} left before recruiters can find you`}
+        aside={<Meter percent={percent} />}
+      >
+        <ul className="jy-todo">
+          {left.map((s, i) => (
+            <li key={s.key} className={i === 0 ? 'is-first' : ''}>
+              <Link to={s.key === 'resume' ? '/student/resume' : '/student/profile'}>
+                <span className="jy-todo-dot" aria-hidden="true" />
+                <span className="jy-text">
+                  <b>{s.label}</b>
+                  <small>{s.hint}</small>
+                </span>
+                <span className="jy-go">{i === 0 ? 'Start' : 'Add'}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </Shell>
+    );
+  }
 
-  return (
-    <header className="ov-hail">
-      <div className="ov-hail-said">
-        <p className="ov-hail-when">{partOfDay()}</p>
-        <h1>
-          {name}
-          <span aria-hidden="true">.</span>
-        </h1>
-        <p className="ov-hail-line">{says.text}</p>
+  if (stage === 'verified') {
+    return (
+      <Shell
+        eyebrow="Next · Your college verifies your record"
+        title="Nothing to do here - your placement cell confirms your marks."
+        body="Applying opens the moment they do. Meanwhile, look at what is open and get ready for it."
+      >
+        {roles.length > 0 && <Stack roles={roles} locked />}
+        <p className="jy-links">
+          <Link to="/student/prepare">Prepare for interviews →</Link>
+          <Link to="/student/jobs">Browse jobs →</Link>
+        </p>
+      </Shell>
+    );
+  }
 
-        <p className="ov-hail-facts">
-          <span className={`ov-chip ${verified ? 'is-on' : ''}`}>
-            {verified ? 'Verified by your college' : 'Not verified yet'}
-          </span>
-          {profile.batch && (
-            <span className="ov-chip">
-              {profile.batch.course} · {profile.batch.graduationYear}
-            </span>
-          )}
-          {profile.cgpa && <span className="ov-chip">CGPA {profile.cgpa}</span>}
-          <Link className="ov-chip is-link" to="/student/resume">
-            {profile.resumeUrl ? 'Resume on file' : 'Add a resume'}
+  if (stage === 'applied') {
+    return (
+      <Shell
+        eyebrow={`Next · Apply · ${openCount} role${openCount === 1 ? '' : 's'} open to you`}
+        title={roles.length ? 'Roles that fit you, best match first' : 'No roles open right now'}
+        body={roles.length ? undefined : 'New roles appear here as companies arrive. Your profile is ready for them.'}
+      >
+        {roles.length > 0 && <Stack roles={roles} />}
+        <AskedFor roles={roles} held={profile.skills} onAdded={onSkillAdded} />
+      </Shell>
+    );
+  }
+
+  if (stage === 'rounds') {
+    return (
+      <Shell
+        eyebrow={`Next · Hear back · ${live.length} application${live.length === 1 ? '' : 's'} with companies`}
+        title="Companies have to reply in time - you will see it the moment one moves."
+      >
+        <Motion live={live} />
+        {roles.length > 0 && (
+          <>
+            <p className="jy-mini">While you wait, more roles that fit</p>
+            <Stack roles={roles} />
+          </>
+        )}
+      </Shell>
+    );
+  }
+
+  if (stage === 'offer') {
+    const interview = due.find((d) => d.kind === 'interview');
+    return (
+      <Shell
+        eyebrow="Next · Clear your rounds"
+        title={interview ? `Next interview: ${dateOf(interview.at)}` : 'You are in the rounds'}
+        body={interview ? interview.title : 'Each company shows its rounds and dates on your interviews page.'}
+      >
+        <Motion live={live} />
+        <p className="jy-links">
+          <Link to="/student/interviews">Interview details →</Link>
+          <Link to="/student/prepare">Prepare →</Link>
+        </p>
+      </Shell>
+    );
+  }
+
+  if (stage === 'dayone') {
+    const offer = apps.find((a) => a.status === 'OFFERED');
+    const accepted = apps.find((a) => a.status === 'ACCEPTED');
+    return (
+      <Shell
+        tone="good"
+        eyebrow={offer ? 'Next · Answer your offer' : 'Next · Your first day'}
+        title={
+          offer
+            ? `${offer.companyName} has made you an offer`
+            : accepted
+              ? `You accepted ${accepted.companyName} - we follow it to your first day`
+              : 'Your offer is being followed to your joining date'
+        }
+        body={offer ? `${offer.title}. Read the whole offer, then accept or decline.` : 'Documents, joining date and any changes are tracked on your applications page.'}
+      >
+        <p className="jy-links">
+          <Link className="jy-cta" to="/student/applications">
+            {offer ? 'Review the offer →' : 'Track joining →'}
           </Link>
         </p>
-      </div>
-
-      {/* Apli, at the size a character deserves on the one screen that is
-          about the person rather than about a role. */}
-      <div className="ov-hail-apli" aria-hidden="true">
-        <ApliFace mood={says.mood} size={132} idle />
-      </div>
-    </header>
-  );
-}
-
-/* ==========================================================================
-   Anything with a clock on it
-   ========================================================================== */
-
-/**
- * A deck you push sideways, not a list you scroll past.
- *
- * These are the three or four facts that decide what somebody does today, so
- * they get the whole width, real colour and type big enough to read from
- * across a lecture hall. A row of table rows would say the same thing and be
- * skipped.
- */
-function Deck({ due }: { due: Due[] }) {
-  if (due.length === 0) {
-    return (
-      <section className="ov-deck is-quiet">
-        <p className="ov-tag">On your clock</p>
-        <p className="ov-deck-none">
-          Nothing dated this week. That is not a setback — it is the part that has not started yet.
-        </p>
-      </section>
+      </Shell>
     );
   }
 
   return (
-    <section className="ov-deck">
-      <p className="ov-tag">
-        On your clock
-        <b>{due.length}</b>
+    <Shell tone="good" eyebrow="Journey complete" title="You have joined. Congratulations.">
+      <p className="jy-links">
+        <Link to="/student/alumni">Join the alumni network →</Link>
       </p>
-
-      <div className="rail">
-        {due.map((d) => (
-          <Link key={d.key} to={d.to} className={`ov-due is-${d.kind}`}>
-            <span className="ov-due-kind">
-              {d.kind === 'offer' ? 'Offer' : d.kind === 'interview' ? 'Interview' : 'Closing'}
-            </span>
-
-            <span className="ov-due-when">
-              {d.kind === 'offer' ? (
-                'Waiting on you'
-              ) : (
-                <>
-                  {dayOf(d.at)}
-                  <i>
-                    {d.kind === 'interview'
-                      ? timeOf(d.at)
-                      : `${Math.max(0, Math.ceil((d.at - Date.now()) / 86_400_000))} days left`}
-                  </i>
-                </>
-              )}
-            </span>
-
-            <span className="ov-due-what">{d.title}</span>
-            <span className="ov-due-sub">{d.sub}</span>
-            {d.kind !== 'offer' && <span className="ov-due-date">{dateOf(d.at)}</span>}
-          </Link>
-        ))}
-      </div>
-    </section>
+    </Shell>
   );
 }
 
-/* ==========================================================================
-   The bento
-   ========================================================================== */
+function Shell({
+  eyebrow,
+  title,
+  body,
+  aside,
+  tone,
+  children,
+}: {
+  eyebrow: string;
+  title: string;
+  body?: string;
+  aside?: ReactNode;
+  tone?: 'good';
+  children?: ReactNode;
+}) {
+  return (
+    <div className={`jy-card ${tone ? `is-${tone}` : ''}`}>
+      <div className="jy-card-head">
+        <div>
+          <p className="jy-eyebrow">{eyebrow}</p>
+          <h2>{title}</h2>
+          {body && <p className="jy-body">{body}</p>}
+        </div>
+        {aside}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function Meter({ percent }: { percent: number }) {
+  return (
+    <div className="jy-meter" aria-hidden="true">
+      <svg viewBox="0 0 64 64">
+        <circle cx="32" cy="32" r="27" className="jy-meter-track" />
+        <circle cx="32" cy="32" r="27" className="jy-meter-fill" pathLength={100} strokeDasharray={`${percent} 100`} />
+      </svg>
+      <b>{percent}%</b>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* The role stack                                                              */
+/* -------------------------------------------------------------------------- */
 
 /**
- * How ready their own record is - the one dark tile on the screen.
- *
- * Dark on purpose. It is the only number here a student can move by
- * themselves this afternoon, and one tile that does not look like the others
- * is worth more than any amount of colour spread evenly across all of them.
+ * Roles as a small deck: one card on top, the next ones peeking out behind.
+ * Skip sends the top card away; Apply opens the role. Arrow keys work when
+ * the deck has focus. `locked` is for a record not yet verified: the deck is
+ * there to look at, and says why it cannot be applied to yet.
  */
-function Ready({
-  percent,
-  nextUp,
-  verified,
-}: {
-  percent: number;
-  nextUp: string | null;
-  verified: boolean;
-}) {
-  const n = useCountUp(percent);
-  const r = 46;
-  const c = 2 * Math.PI * r;
+function Stack({ roles, locked = false }: { roles: JobCard[]; locked?: boolean }) {
+  const navigate = useNavigate();
+  const [top, setTop] = useState(0);
+  const [leaving, setLeaving] = useState(false);
+
+  const left = roles.length - top;
+  const current = roles[top];
+
+  function skip() {
+    if (!current || leaving) return;
+    setLeaving(true);
+    window.setTimeout(() => {
+      setTop((n) => n + 1);
+      setLeaving(false);
+    }, 260);
+  }
+
+  function openRole() {
+    if (current) navigate(`/student/jobs/${current.id}`);
+  }
+
+  if (!current) {
+    return (
+      <div className="jy-stack-end">
+        <p>That is every role on top of the pile.</p>
+        <button type="button" className="jy-ghost" onClick={() => setTop(0)}>
+          Start again
+        </button>
+        <Link to="/student/jobs" className="jy-ghost">
+          All jobs →
+        </Link>
+      </div>
+    );
+  }
+
+  const d = daysTo(current.deadline);
 
   return (
-    <Link className="bx bx-ready" to="/student/profile">
-      <p className="ov-tag is-inverse">Your record</p>
+    <div
+      className="jy-stack"
+      tabIndex={0}
+      aria-label={`Role ${top + 1} of ${roles.length}. Left arrow to skip, right arrow to open.`}
+      onKeyDown={(e) => {
+        if (e.key === 'ArrowLeft') skip();
+        if (e.key === 'ArrowRight') openRole();
+      }}
+    >
+      <div className="jy-deck">
+        {/* The ones behind, for depth. */}
+        {left > 2 && <span className="jy-ghostcard is-2" aria-hidden="true" />}
+        {left > 1 && <span className="jy-ghostcard is-1" aria-hidden="true" />}
 
-      <div className="ov-ready-ring">
-        <svg viewBox="0 0 110 110" aria-hidden="true">
-          <defs>
-            {/* The stops are coloured from CSS: a `var()` in a presentation
-                attribute is not resolved, so the ring came out black. */}
-            <linearGradient id="ov-ready-grad" x1="0" y1="0" x2="1" y2="1">
-              <stop className="ov-ring-a" offset="0%" />
-              <stop className="ov-ring-b" offset="100%" />
-            </linearGradient>
-          </defs>
-          <circle className="ov-ready-track" cx="55" cy="55" r={r} />
-          <circle
-            className="ov-ready-value"
-            cx="55"
-            cy="55"
-            r={r}
-            strokeDasharray={c}
-            strokeDashoffset={c * (1 - n / 100)}
-          />
-        </svg>
-        <b>
-          {n}
-          <i>%</i>
-        </b>
+        <article key={current.id} className={`jy-role ${leaving ? 'is-leaving' : ''}`}>
+          <div className="jy-role-top">
+            <span className="jy-logo is-big" aria-hidden="true">
+              {current.companyName.slice(0, 1)}
+            </span>
+            <span className="jy-text">
+              <b>{current.title}</b>
+              <small>{[current.companyName, current.location].filter(Boolean).join(' · ')}</small>
+            </span>
+            <span
+              className={`jy-match ${current.match.score >= 75 ? 'is-high' : ''}`}
+              style={{ '--p': `${current.match.score}%` } as CSSProperties}
+            >
+              <i>{current.match.score}%</i>
+            </span>
+          </div>
+
+          <dl className="jy-role-facts">
+            {pay(current) && (
+              <div>
+                <dt>Package</dt>
+                <dd>{pay(current)}</dd>
+              </div>
+            )}
+            <div>
+              <dt>Closes</dt>
+              <dd className={d <= 3 ? 'is-soon' : ''}>{d <= 0 ? 'Today' : `In ${d} day${d === 1 ? '' : 's'}`}</dd>
+            </div>
+            <div>
+              <dt>Rounds</dt>
+              <dd>{current.roundCount || '—'}</dd>
+            </div>
+          </dl>
+
+          {current.skills.length > 0 && (
+            <p className="jy-role-skills">
+              {current.skills.slice(0, 5).map((s) => (
+                <span key={s} className={current.match.missing.includes(s) ? 'is-missing' : 'is-have'}>
+                  {s}
+                </span>
+              ))}
+            </p>
+          )}
+        </article>
       </div>
 
-      <p className="ov-ready-say">
-        {percent === 100
-          ? verified
-            ? 'Complete, and verified. Every filter a recruiter sets, you clear on paper.'
-            : 'Complete. Your college verifies it next — that is what unlocks applying.'
-          : `Next up: ${nextUp ?? 'a few details'}.`}
-      </p>
-      <span className="ov-go">{percent === 100 ? 'Look it over' : 'Finish it'}</span>
-    </Link>
+      <div className="jy-stack-actions">
+        <button type="button" className="jy-act is-skip" onClick={skip} aria-label="Skip this role">
+          ✕
+        </button>
+        <span className="jy-count">
+          {top + 1} / {roles.length}
+        </span>
+        {locked ? (
+          <button type="button" className="jy-act is-open" onClick={openRole}>
+            View
+          </button>
+        ) : (
+          <button type="button" className="jy-act is-apply" onClick={openRole}>
+            Apply →
+          </button>
+        )}
+      </div>
+    </div>
   );
 }
 
-/** The roles that fit best, as a short list rather than a page of cards. */
-function Roles({ roles, total }: { roles: JobCard[]; total: number }) {
+/**
+ * The roles that open up once the profile is finished (or the record is
+ * verified): a few of them, shown but not yet actionable, so finishing has a
+ * visible reward. With nothing open yet, it says what happens instead.
+ */
+function Waiting({ roles, total, stage }: { roles: JobCard[]; total: number; stage: 'profile' | 'verified' }) {
+  const why = stage === 'profile' ? 'Finish your profile to apply' : 'Opens once your college verifies you';
   return (
-    <section className="bx bx-roles">
-      <p className="ov-tag">
-        Open to you
-        {total > 0 && <b>{total}</b>}
-      </p>
-
+    <section className="jy-wait" aria-label="Roles waiting for you">
+      <header>
+        <h3>
+          Waiting for you
+          {total > 0 && <span className="jy-wait-n">{total} open</span>}
+        </h3>
+        {total > 0 && <Link to="/student/jobs">See all →</Link>}
+      </header>
       {roles.length === 0 ? (
-        <p className="ov-none">
-          Nothing open this minute. It changes as companies arrive — your profile decides how much
-          of it you can reach.
+        <p className="jy-wait-none">
+          No roles are open at your college yet. When companies arrive, the ones that match your course
+          and marks appear here first.
         </p>
       ) : (
-        <ul className="ov-roles">
+        <ul>
           {roles.map((j) => (
             <li key={j.id}>
               <Link to={`/student/jobs/${j.id}`}>
-                <span
-                  className="ov-role-match"
-                  style={{ ['--p' as string]: `${j.match.score}%` }}
-                  aria-label={`${j.match.score}% match`}
-                >
-                  <i>{j.match.score}</i>
+                <span className="jy-wait-top">
+                  <span className="jy-logo" aria-hidden="true">
+                    {j.companyName.slice(0, 1)}
+                  </span>
+                  <span className={`jy-wait-match ${j.match.score >= 75 ? 'is-high' : ''}`}>{j.match.score}%</span>
                 </span>
-                <span className="ov-role-who">
-                  <b>{j.title}</b>
-                  <small>{j.companyName}</small>
-                </span>
-                <span className="ov-role-left">
-                  {Math.max(0, daysTo(j.deadline))}d
-                </span>
+                <b>{j.title}</b>
+                <small>{[j.companyName, pay(j)].filter(Boolean).join(' · ')}</small>
+                <span className="jy-wait-lock">🔒 {why}</span>
               </Link>
             </li>
           ))}
         </ul>
       )}
-
-      <Link className="ov-go" to="/student/jobs">
-        {total > roles.length ? `See all ${total}` : 'Open the jobs page'}
-      </Link>
     </section>
+  );
+}
+
+/** Applications with a company, compact. */
+function Motion({ live }: { live: MyApplication[] }) {
+  if (live.length === 0) return null;
+  return (
+    <ul className="jy-motion-list">
+      {live.slice(0, 4).map((a) => (
+        <li key={a.id}>
+          <Link to="/student/applications">
+            <span className="jy-logo" aria-hidden="true">
+              {a.companyName.slice(0, 1)}
+            </span>
+            <span className="jy-text">
+              <b>{a.title}</b>
+              <small>
+                {a.companyName}
+                {a.currentRound ? ` · Round ${a.currentRound.order}: ${a.currentRound.name}` : ''}
+              </small>
+            </span>
+            <span className={`jy-pill is-${a.status.toLowerCase()}`}>{STATUS[a.status] ?? a.status}</span>
+          </Link>
+        </li>
+      ))}
+    </ul>
   );
 }
 
 /**
- * The five things that actually happen, with their own numbers in them.
- *
- * Drawn rather than written, because a student reading "we help you get
- * placed" learns nothing. Named as a process running, never as a verdict:
- * "Sent" and "Rounds", not "Success rate".
+ * Skills the roles keep asking for that the student has not listed. Worded
+ * as a question: a skill added because a number went up is a lie the first
+ * interview finds.
  */
-function Journey({
-  percent,
-  openCount,
-  live,
-  rounds,
-  offers,
-}: {
-  percent: number;
-  openCount: number;
-  live: number;
-  rounds: number;
-  offers: number;
-}) {
-  const stages = [
-    { key: 'ready', label: 'Ready', n: percent, suffix: '%', to: '/student/profile' },
-    { key: 'apply', label: 'Open', n: openCount, to: '/student/jobs' },
-    { key: 'sent', label: 'Sent', n: live, to: '/student/applications' },
-    { key: 'rounds', label: 'Rounds', n: rounds, to: '/student/interviews' },
-    { key: 'offer', label: 'Offers', n: offers, to: '/student/applications' },
-  ] as const;
-
-  /* The furthest stage with anything in it - the one worth lighting. */
-  const at = stages.reduce((best, st, i) => (st.n > 0 ? i : best), 0);
-
-  return (
-    <section className="bx bx-journey">
-      <p className="ov-tag">Where you are</p>
-      <ol>
-        {stages.map((st, i) => (
-          <li
-            key={st.key}
-            className={`${i === at ? 'is-here' : ''} ${i < at ? 'is-done' : ''}`}
-          >
-            <Link to={st.to}>
-              <b>
-                <Counted n={st.n} />
-                {'suffix' in st ? st.suffix : ''}
-              </b>
-              <span>{st.label}</span>
-            </Link>
-          </li>
-        ))}
-      </ol>
-    </section>
-  );
-}
-
-/** The ones already with a company, and where each has got to. */
-function Sent({ live }: { live: MyApplication[] }) {
-  return (
-    <section className="bx bx-sent">
-      <p className="ov-tag">
-        With a company
-        {live.length > 0 && <b>{live.length}</b>}
-      </p>
-
-      {live.length === 0 ? (
-        <p className="ov-none">
-          Nothing sent yet. Every role you can see is one you are already eligible for.
-        </p>
-      ) : (
-        <ul className="ov-sent">
-          {live.slice(0, 4).map((a) => (
-            <li key={a.id}>
-              <Link to="/student/applications">
-                <span className={`ov-dot is-${a.status.toLowerCase()}`} aria-hidden="true" />
-                <span className="ov-sent-who">
-                  <b>{a.title}</b>
-                  <small>{a.companyName}</small>
-                </span>
-                <span className="ov-sent-at">{WHERE[a.status] ?? a.status}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <Link className="ov-go" to="/student/applications">
-        {live.length > 4 ? `All ${live.length}` : 'Track them'}
-      </Link>
-    </section>
-  );
-}
-
-/**
- * What the open roles keep asking for.
- *
- * Counted across every role at once, which no single job page can do - and
- * the only thing on this screen that changes what a student can reach rather
- * than reporting on it.
- *
- * Worded as a question, never as a button that "unlocks" anything. A skill
- * added because a number went up is a lie told to a recruiter, and the first
- * interview finds it.
- */
-function Skills({
-  asked,
-  held,
-  total,
-  onAdded,
-}: {
-  asked: { name: string; n: number }[];
-  held: string[];
-  total: number;
-  onAdded: () => void;
-}) {
+function AskedFor({ roles, held, onAdded }: { roles: JobCard[]; held: string[]; onAdded: () => void }) {
   const [busy, setBusy] = useState<string | null>(null);
-  const [gone, setGone] = useState<Set<string>>(new Set());
+  const [added, setAdded] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
+
+  const asked = useMemo(() => {
+    const count = new Map<string, number>();
+    for (const j of roles) for (const s of j.match.missing) count.set(s, (count.get(s) ?? 0) + 1);
+    return [...count.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([name]) => name);
+  }, [roles]);
+
+  if (asked.length === 0) return null;
 
   async function add(name: string) {
     setBusy(name);
     setError(null);
     try {
       await candidateApi.saveSkills([...held, name]);
-      setGone((s) => new Set(s).add(name));
+      setAdded((s) => new Set(s).add(name));
       onAdded();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'That did not save.');
@@ -738,36 +714,22 @@ function Skills({
   }
 
   return (
-    <section className="bx bx-skills">
-      <p className="ov-tag">Asked for most</p>
-      <p className="ov-skills-lede">
-        Counted across all {total} role{total === 1 ? '' : 's'} open to you. Tap one you already
-        know and it changes what you match. If you do not know it, that is a straight answer about
-        what to learn next.
-      </p>
-
+    <div className="jy-asked">
+      <p className="jy-mini">Roles keep asking for these. Already know one? Add it.</p>
       {error && <p className="alert alert-error">{error}</p>}
-
-      <div className="ov-skills">
+      <div className="jy-asked-list">
         {asked.map((s) => (
           <button
-            key={s.name}
+            key={s}
             type="button"
-            className={`ov-skill ${gone.has(s.name) ? 'is-added' : ''}`}
-            disabled={busy !== null || gone.has(s.name)}
-            onClick={() => void add(s.name)}
-            title={`Asked for by ${s.n} role${s.n === 1 ? '' : 's'}`}
+            className={added.has(s) ? 'is-added' : ''}
+            disabled={busy !== null || added.has(s)}
+            onClick={() => void add(s)}
           >
-            <span className="ov-skill-name">{s.name}</span>
-            <span className="ov-skill-n">{gone.has(s.name) ? 'added' : s.n}</span>
+            {added.has(s) ? '✓' : '+'} {s}
           </button>
         ))}
       </div>
-    </section>
+    </div>
   );
-}
-
-/** A figure that counts up on the way in. */
-function Counted({ n }: { n: number }) {
-  return <>{useCountUp(n)}</>;
 }

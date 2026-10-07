@@ -5,6 +5,7 @@ import NotificationBell from '../../components/NotificationBell';
 import TenantSwitcher, { PickTenantFirst } from '../../components/TenantSwitcher';
 import { CollapseIcon, NAV_ICONS } from './navIcons';
 import './AdminLayout.css';
+import ApliLogo from '../../components/ApliLogo';
 
 interface NavItem {
   to: string;
@@ -152,9 +153,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     <div className={`admin ${collapsed ? 'is-collapsed' : ''}`}>
       <aside className="admin-nav">
         <div className="admin-nav-head">
-          <Link to="/" className="admin-brand" title="Apli.ai">
-            <span className="brand-mark" aria-hidden="true" />
-            <span className="admin-brand-text">Apli.ai</span>
+          <Link to="/" className="admin-brand" aria-label="Apli.ai, home">
+            {/* The real mark, not the placeholder square it used to be. */}
+            <ApliLogo className="brand-logo" />
           </Link>
           <button
             type="button"

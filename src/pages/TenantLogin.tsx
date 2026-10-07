@@ -3,6 +3,7 @@ import { Link, Navigate, useParams } from 'react-router-dom';
 import { ApiError } from '../api/client';
 import { publicTenantApi, type PublicTenant } from '../api/publicTenant';
 import { homeFor, useAuth } from '../auth/AuthContext';
+import ApliLogo from '../components/ApliLogo';
 import { applyTenantFavicon, applyTenantTheme, monogram } from '../lib/brand';
 import './Login.css';
 import './TenantLogin.css';
@@ -94,7 +95,9 @@ export default function TenantLogin() {
     return (
       <div className="tenant-missing">
         <div className="tenant-missing-card">
-          <span className="brand-mark" aria-hidden="true" />
+          {/* No institution to wear here, so this is Apli's own page and wears
+              Apli's own mark. */}
+          <ApliLogo className="brand-logo" title="Apli.ai" />
           <h1>Portal not found</h1>
           <p>{load.message}</p>
           <p className="tenant-missing-actions">

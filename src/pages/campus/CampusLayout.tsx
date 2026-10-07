@@ -3,6 +3,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 import NotificationBell from '../../components/NotificationBell';
 import '../admin/AdminLayout.css';
+import ApliLogo from '../../components/ApliLogo';
 
 type Section = { to: string; label: string; end: boolean; needs?: string; module?: string };
 
@@ -69,9 +70,9 @@ export default function CampusLayout({ children }: { children: ReactNode }) {
   return (
     <div className="admin">
       <aside className="admin-nav">
-        <Link to="/" className="admin-brand">
-          <span className="brand-mark" aria-hidden="true" />
-          <span>Apli.ai</span>
+        <Link to="/" className="admin-brand" aria-label="Apli.ai, home">
+          {/* The real mark, not the placeholder square it used to be. */}
+          <ApliLogo className="brand-logo" />
         </Link>
 
         <nav aria-label="Campus sections">

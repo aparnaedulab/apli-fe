@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { ApiError } from '../api/client';
 import { homeFor, useAuth } from '../auth/AuthContext';
-import { ApliFace } from './student/Apli';
+import ApliLogo from '../components/ApliLogo';
 import './Login.css';
 
 export default function Login() {
@@ -52,13 +52,13 @@ export default function Login() {
   return (
     <div className="login">
       <div className="login-panel">
-        <Link to="/" className="login-brand">
-          {/* The same lockup the portal's own header carries, so the name
-              does not change shape at the moment somebody signs in. */}
-          <ApliFace size={26} />
-          <span>
-            Apli<i>.ai</i>
-          </span>
+        <Link to="/" className="login-brand" aria-label="Apli.ai, home">
+          {/* The same lockup the landing page carries, which is the whole point
+              of it: this is the screen where somebody crosses from the site into
+              the product, and it is the worst possible moment for the name to
+              change shape. It used to be the mascot's face beside the name here,
+              and the real mark on the page they had just come from. */}
+          <ApliLogo className="brand-logo" />
         </Link>
 
         <h1>Sign in</h1>

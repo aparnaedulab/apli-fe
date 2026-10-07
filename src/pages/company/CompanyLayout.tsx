@@ -4,6 +4,7 @@ import { useAuth } from '../../auth/AuthContext';
 import NotificationBell from '../../components/NotificationBell';
 import { companyDrivesApi } from '../../api/drives';
 import '../admin/AdminLayout.css';
+import ApliLogo from '../../components/ApliLogo';
 
 const SECTIONS: { to: string; label: string; end: boolean; needs?: string; badge?: 'invitations' }[] = [
   { to: '/company', label: 'Overview', end: true },
@@ -52,9 +53,9 @@ export default function CompanyLayout({ children }: { children: ReactNode }) {
   return (
     <div className="admin">
       <aside className="admin-nav">
-        <Link to="/" className="admin-brand">
-          <span className="brand-mark" aria-hidden="true" />
-          <span>Apli.ai</span>
+        <Link to="/" className="admin-brand" aria-label="Apli.ai, home">
+          {/* The real mark, not the placeholder square it used to be. */}
+          <ApliLogo className="brand-logo" />
         </Link>
 
         <p className="admin-nav-label">Recruiter</p>

@@ -1199,3 +1199,313 @@
   content: '✓';
   font-weight: 700;
 }
+
+/* ===========================================================================
+   Jobs, restructured: one quiet filter row, match on every row, the facts
+   and the fit at the top of the role.
+   ======================================================================== */
+
+/* Filters: a row of pills, no card, no labels on screen. */
+.jb-bar {
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  margin-bottom: 14px;
+  border: 0;
+  background: none;
+}
+
+.jb-field select {
+  padding: 8px 30px 8px 14px;
+  border-radius: 999px;
+  border-color: var(--rule);
+  background-color: var(--surface);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.jb-field select:hover {
+  border-color: var(--rule-2);
+  color: var(--ink);
+}
+
+.jb-toggle {
+  font-weight: 600;
+}
+
+/* Match on each row, in place of a "yet to apply" pill on every one. */
+.jb-fitpill {
+  flex: none;
+  margin-left: auto;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  font-size: 12.5px;
+  font-weight: 750;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.jb-fitpill small {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+
+.jb-fitpill.is-mid {
+  border-color: color-mix(in srgb, var(--brand) 30%, transparent);
+  color: var(--brand);
+}
+
+.jb-fitpill.is-high {
+  border-color: transparent;
+  background: var(--pass-soft);
+  color: var(--pass);
+}
+
+.jb-fitpill.is-high small {
+  color: var(--pass);
+}
+
+/* The role pane: taller, so less of it sits behind its own scrollbar. */
+.jb-pane {
+  position: sticky;
+  top: 90px;
+  max-height: calc(100vh / var(--s-zoom, 1) - 120px);
+  scrollbar-width: thin;
+}
+
+/* --- the role's head ------------------------------------------------------- */
+
+.jd-head h1 {
+  margin-bottom: 8px;
+}
+
+.jd-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 6px;
+  padding: 0;
+  list-style: none;
+}
+
+.jd-facts li {
+  padding: 4px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--rule);
+  background: var(--paper-2);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.jd-facts li.is-pay {
+  border-color: transparent;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 750;
+}
+
+.jd-facts li.is-soon {
+  border-color: transparent;
+  background: var(--stop-soft);
+  color: var(--stop);
+}
+
+/* --- your fit ------------------------------------------------------------- */
+
+.jd-fit {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 4px 0 18px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--rule);
+  background: linear-gradient(120deg, var(--brand-soft), transparent 70%);
+}
+
+.jd-fit-ring {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: conic-gradient(var(--brand) var(--p), color-mix(in srgb, var(--brand) 14%, transparent) 0);
+}
+
+.jd-fit-ring.is-high {
+  background: conic-gradient(var(--pass) var(--p), var(--pass-soft) 0);
+}
+
+.jd-fit-ring::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: var(--surface);
+}
+
+.jd-fit-ring b {
+  position: relative;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.jd-fit-text {
+  min-width: 0;
+}
+
+.jd-fit-text > b {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.jd-fit-ok {
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--pass);
+}
+
+.jd-fit-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 8px 0 0;
+}
+
+.jd-fit-skills span {
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.jd-fit-skills .is-have {
+  background: var(--pass-soft);
+  color: var(--pass);
+}
+
+.jd-fit-skills .is-missing {
+  border: 1px dashed var(--rule-2);
+  color: var(--ink-3);
+}
+
+/* Conditions inside the apply dialog. */
+.apply-terms {
+  margin: 4px 0 10px;
+  padding-left: 18px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+@media (max-width: 900px) {
+  .jb-pane {
+    position: static;
+    max-height: none;
+  }
+}
+
+/* On a wide screen the list gets a little more room; the role takes the rest. */
+.jb-split {
+  grid-template-columns: minmax(320px, 460px) minmax(0, 1fr);
+}
+
+/* ---------------------------------------------------------------------------
+   Sections inside the role pane: flat, evenly spaced, no stray shadows.
+
+   The portal's `.sh .card` (and its hover shadow) outranked the pane's own
+   flattening, so a section kept a half-card look: a shadow on two edges and
+   text flush against them. Scoped under `.sh` so it wins.
+--------------------------------------------------------------------------- */
+.sh .jb-pane .card,
+.sh .jb-pane .card:hover {
+  margin: 0;
+  padding: 20px 0;
+  border: 0;
+  border-top: 1px solid var(--s-line);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.sh .jb-pane .card:first-of-type {
+  border-top: 0;
+}
+
+.sh .jb-pane .card h2 {
+  margin: 0 0 10px;
+}
+
+/* ---------------------------------------------------------------------------
+   Key facts as small tiles.
+
+   The grid's look came from the admin stylesheet - monospace capitals for
+   the labels, every value forced into Title Case ("Within 14 Days Of
+   Results"), and a rule across the top. In the student portal it is a set of
+   quiet tiles instead.
+--------------------------------------------------------------------------- */
+.sh .facts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+  margin: 16px 0;
+  padding: 0;
+  border: 0;
+}
+
+.sh .facts-grid > div {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--s-card-2);
+  border: 1px solid var(--s-line);
+}
+
+.sh .facts-grid dt {
+  margin: 0 0 3px;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-3);
+}
+
+.sh .facts-grid dd {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.35;
+  text-transform: none;
+  color: var(--ink);
+}
+
+.sh .facts-grid dd .row-sub {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-3);
+}
+
+/* Text after the tiles gets room to breathe. */
+.sh .facts-grid + .prose,
+.sh .jb-pane .card .prose + .prose {
+  margin-top: 10px;
+}
+
+.sh .jb-pane .card .sub-heading {
+  margin: 18px 0 8px;
+}

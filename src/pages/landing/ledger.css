@@ -1,0 +1,462 @@
+/* ---------------------------------------------------------------------------
+   The audit trail.
+
+   The look is deliberate and it is not a terminal. A green-on-black console
+   would say "for engineers", and the people who most need to believe this
+   section are a placement officer and a parent. So it is a ledger: ruled rows,
+   tabular figures, a stamp in the margin. The thing it is imitating is a
+   register, because that is the promise - a record written in ink, in order,
+   that nobody goes back and tidies.
+
+   Three states carry the whole meaning and each has exactly one colour:
+
+       written    a legal move, appended                      mint
+       refused    an illegal move, rejected, nothing written  coral
+       withdrawn  closed by the cascade, not by a person      neutral, struck
+
+   Rows arrive by transition rather than by animation, so a row that is already
+   past simply is in place - which matters because `useLoopingSteps` restarts
+   the run, and a keyframe would replay on every row at once.
+
+   Everything stops under prefers-reduced-motion at the foot, where the hook
+   also pins the run to its final step: the finished ledger, the refusal and
+   the closed siblings, all readable, none of it moving.
+--------------------------------------------------------------------------- */
+
+.lg {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  gap: clamp(1rem, 2.4vw, 1.75rem);
+  align-items: start;
+}
+
+/* ===========================================================================
+   The ledger itself
+   ======================================================================== */
+
+.lg-main {
+  border: 1px solid var(--rule);
+  border-radius: var(--r-lg);
+  background: var(--glass);
+  box-shadow:
+    inset 0 1px 0 var(--glass-edge),
+    var(--lift);
+  overflow: hidden;
+}
+
+.lg-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(0.9rem, 2vw, 1.2rem) clamp(1rem, 2.2vw, 1.4rem);
+  border-bottom: 1px solid var(--rule);
+  background: color-mix(in srgb, var(--paper) 45%, transparent);
+}
+
+.lg-head-k {
+  margin: 0;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.lg-head-v {
+  margin: 0.15rem 0 0;
+  font-size: 1rem;
+  font-weight: 650;
+  color: var(--ink);
+}
+
+.lg-head-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--pass) 40%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--pass) 12%, transparent);
+  font-size: 0.74rem;
+  font-weight: 680;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--pass);
+}
+
+.lg-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--pass);
+  /* The one heartbeat on the panel: the ledger is open and accepting writes. */
+  animation: lgPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes lgPulse {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--pass) 45%, transparent);
+  }
+  50% {
+    opacity: 0.55;
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--pass) 0%, transparent);
+  }
+}
+
+/* --- rows ---------------------------------------------------------------- */
+
+.lg-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lg-row {
+  display: grid;
+  grid-template-columns: 7.6rem minmax(0, 1fr) minmax(0, 1.05fr) auto;
+  gap: 0.6rem 0.9rem;
+  align-items: baseline;
+  padding: 0.62rem clamp(1rem, 2.2vw, 1.4rem);
+  border-bottom: 1px solid color-mix(in srgb, var(--rule) 55%, transparent);
+  font-size: 0.86rem;
+
+  /*
+     Not yet written: present in the DOM, invisible, and not read out. The row
+     is laid out from the first paint so the panel never changes height as the
+     run proceeds - a ledger that grows would push the page around under
+     somebody who is reading it.
+  */
+  opacity: 0;
+  transform: translateY(-3px);
+  transition:
+    opacity 0.34s var(--ease),
+    transform 0.34s var(--ease);
+}
+
+.lg-row.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+.lg-row:last-child {
+  border-bottom: 0;
+}
+
+.lg-at {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.lg-move {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  font-family: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.01em;
+}
+
+.lg-from {
+  color: var(--ink-3);
+}
+
+.lg-arrow {
+  color: var(--rule-2);
+}
+
+.lg-to {
+  padding: 0.12rem 0.44rem;
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--brand) 16%, transparent);
+  color: var(--brand-hover);
+  font-weight: 600;
+}
+
+.lg-to.is-refused {
+  background: color-mix(in srgb, var(--stop) 15%, transparent);
+  color: var(--stop);
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+}
+
+.lg-by {
+  display: grid;
+  gap: 0.1rem;
+  color: var(--ink-2);
+  font-size: 0.84rem;
+  min-width: 0;
+}
+
+.lg-note {
+  font-style: normal;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: var(--ink-3);
+}
+
+.lg-stamp {
+  justify-self: end;
+  padding: 0.18rem 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--pass) 35%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--pass) 10%, transparent);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--pass);
+  white-space: nowrap;
+}
+
+.lg-stamp.is-refused {
+  border-color: color-mix(in srgb, var(--stop) 45%, transparent);
+  background: color-mix(in srgb, var(--stop) 12%, transparent);
+  color: var(--stop);
+}
+
+/*
+  The refused row. Tinted across its whole width, because the point is that
+  this line is not part of the record - it is the attempt, kept visible only
+  so the reader can see it was turned away.
+*/
+.lg-row.is-refused {
+  background: color-mix(in srgb, var(--stop) 7%, transparent);
+  border-left: 2px solid var(--stop);
+  padding-left: calc(clamp(1rem, 2.2vw, 1.4rem) - 2px);
+}
+
+.lg-row.is-refused.is-in {
+  animation: lgShake 0.4s var(--ease);
+}
+
+@keyframes lgShake {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  55% {
+    transform: translateX(3px);
+  }
+  80% {
+    transform: translateX(-1px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.lg-foot {
+  padding: clamp(0.8rem, 1.9vw, 1.05rem) clamp(1rem, 2.2vw, 1.4rem);
+  border-top: 1px solid var(--rule);
+  background: color-mix(in srgb, var(--paper) 40%, transparent);
+}
+
+.lg-foot p {
+  margin: 0;
+  max-width: 64ch;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+/* ===========================================================================
+   The cascade
+   ======================================================================== */
+
+.lg-side {
+  display: grid;
+  gap: 0.55rem;
+  padding: clamp(1rem, 2.2vw, 1.35rem);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-lg);
+  background: color-mix(in srgb, var(--surface) 50%, transparent);
+  box-shadow: inset 0 1px 0 var(--glass-edge);
+  transition: border-color 0.4s ease;
+}
+
+.lg-side.is-closed {
+  border-color: color-mix(in srgb, var(--hold) 40%, var(--rule));
+}
+
+.lg-side-k {
+  margin: 0;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.lg-side-sub {
+  margin: 0;
+  font-size: 0.87rem;
+  line-height: 1.55;
+  color: var(--ink-2);
+  min-height: 2.7em;
+}
+
+.lg-sibs {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0.2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lg-sib {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--paper) 40%, transparent);
+  transition:
+    opacity 0.45s var(--ease),
+    border-color 0.45s ease,
+    background 0.45s ease;
+}
+
+.lg-sib-role {
+  display: grid;
+  gap: 0.05rem;
+  font-size: 0.85rem;
+  font-weight: 620;
+  color: var(--ink);
+  min-width: 0;
+}
+
+.lg-sib-role em {
+  font-style: normal;
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--ink-3);
+}
+
+.lg-sib-state {
+  flex: none;
+  font-family: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Menlo, Consolas, monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.16rem 0.44rem;
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--brand) 14%, transparent);
+  color: var(--brand-hover);
+  transition:
+    background 0.45s ease,
+    color 0.45s ease;
+}
+
+/*
+  Withdrawn. Struck through and dimmed rather than removed: the student can
+  still see the application and why it closed, which is the difference between
+  a cascade and a deletion.
+*/
+.lg-sib.is-withdrawn {
+  opacity: 0.55;
+  border-color: color-mix(in srgb, var(--hold) 28%, var(--rule));
+  background: color-mix(in srgb, var(--hold) 7%, transparent);
+}
+
+.lg-sib.is-withdrawn .lg-sib-role {
+  text-decoration: line-through;
+  text-decoration-color: var(--ink-3);
+  text-decoration-thickness: 1px;
+}
+
+.lg-sib.is-withdrawn .lg-sib-state {
+  background: color-mix(in srgb, var(--hold) 16%, transparent);
+  color: var(--hold);
+}
+
+.lg-side-note {
+  margin: 0.25rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--ink-3);
+}
+
+/* ===========================================================================
+   Narrower
+   ======================================================================== */
+
+@media (max-width: 1020px) {
+  .lg {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 680px) {
+  /*
+     The four-column row cannot survive a phone, so it becomes two lines: the
+     move and its stamp on the first, the time and the actor on the second.
+     Nothing is dropped - a ledger with a column missing is not a ledger.
+  */
+  .lg-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 0.3rem;
+    padding-block: 0.75rem;
+  }
+
+  .lg-move {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .lg-stamp {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .lg-at {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .lg-by {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+
+  .lg-side-sub {
+    min-height: 0;
+  }
+}
+
+/* ===========================================================================
+   Off
+   ======================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  /*
+     `useLoopingSteps` puts a reduced-motion visitor on the final step, so
+     every row is written, the refusal is shown refused and the siblings are
+     shown withdrawn. Removing the transitions is all that is left to do.
+  */
+  .lg-row,
+  .lg-sib,
+  .lg-sib-state,
+  .lg-side {
+    transition: none;
+  }
+
+  .lg-row.is-refused.is-in {
+    animation: none;
+  }
+
+  .lg-dot {
+    animation: none;
+  }
+}

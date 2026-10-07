@@ -269,6 +269,13 @@
   align-items: center;
   gap: 8px;
   flex: none;
+  /* Keeps the buttons on the right when nothing sits between them and the
+     logo. The compact persona switch already pushes them there itself. */
+  margin-left: auto;
+}
+
+.psw.is-compact + .site-header-actions {
+  margin-left: 0;
 }
 
 .btn-lg {

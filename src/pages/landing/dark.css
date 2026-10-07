@@ -34,31 +34,106 @@
    ======================================================================== */
 
 .landing {
-  /* Deeper and cooler than the app's own dark mode. This is a page somebody
-     looks at once, not a screen they work in for eight hours. */
-  --paper: #070b14;
-  --paper-2: #0d1423;
-  --surface: #131c2e;
+  /* ---------------------------------------------------------------------------
+     The palette, and the reasoning behind it.
 
-  --ink: #f4f7fd;
-  --ink-2: #b9c4da;
-  --ink-3: #8593ac;
+     This page used to be navy. Navy is the default setting of institutional
+     software, chosen so often for "trust" that it has stopped signifying
+     anything: it is what a product looks like when nobody decided what it
+     should look like. Worse, here it was working against the argument. Blue is
+     a cold hue. The whole pitch of this product is that a student will not be
+     left in the dark, ignored, guessing - and the page was making that promise
+     in the coldest, most distant colour available.
 
-  --rule: #1f2a40;
-  --rule-2: #32405f;
+     So the colour does a job now, and the job is split in two.
 
-  /* Two accents and no more. Indigo carries the brand, mint carries anything
-     that has gone right; everything else is neutral, which is what keeps the
-     two of them meaning something. */
-  --brand: #7c9cff;
-  --brand-hover: #9db3ff;
-  --brand-soft: #16203a;
-  --brand-deep: #3d5bd9;
-  --violet: #a78bfa;
-  --on-brand: #060912;
+     WARMTH LIVES IN THE NEUTRALS. The canvas is a warm graphite rather than a
+     navy-black: the same darkness, a few degrees of hue warmer, and only 2% of
+     chroma. A cold near-black reads clinical and surveilled; a warm one reads
+     intimate and safe. This is the largest lever on the page and it costs
+     nothing, because no component knows what colour the canvas is.
+
+     IDENTITY IS VIOLET, QUIETLY. A muted lavender carries the brand, with a
+     soft orchid beside it for the gradients. Violet is the colour of aspiration
+     and dignity - what a first job means to a person, rather than what a
+     procurement form means to an institution. It is also nobody else's:
+     Superset is blue, Unstop is orange and blue. A student can tell which
+     portal they are looking at from across a room. How saturated it should be
+     is a separate question, answered in the block below.
+
+     MEANING STAYS ON THE TRAFFIC LIGHTS. Green, amber and coral are untouched
+     and stay reserved for state - cleared, waiting, stopped. That separation is
+     the discipline that keeps the page legible: the violet family only ever
+     says "this is us", the warm family only ever says "this is what is
+     happening to you", and nothing carries two meanings.
+
+     Which is why the brand's second colour is an orchid pink and not the obvious
+     warm gold. Gold would have been prettier and would have collided head-on
+     with amber, which already means "you are waiting" - and a product about not
+     being left waiting cannot afford to blur that one.
+
+     Every pair was measured before it was committed: body text 18.1, secondary
+     11.6, muted 6.3, brand 7.8, and every state colour above 8. All AA or
+     better, and better than the navy it replaces.
+  --------------------------------------------------------------------------- */
+
+  /* The canvas: as dark as it was, with barely any hue in it at all - 2% of
+     chroma, which is enough to stop it reading as grey and not enough to read
+     as purple. It is a warm graphite that happens to lean violet. */
+  --paper: #0b0a0e;
+  --paper-2: #131218;
+  --surface: #1a1822;
+
+  --ink: #f6f4f8;
+  --ink-2: #c9c4d1;
+  --ink-3: #968fa2;
+
+  --rule: #262330;
+  --rule-2: #3c3849;
+
+  /* ---------------------------------------------------------------------------
+     Identity, held back.
+
+     The first version of this palette was right about the hue and wrong about
+     the volume. Amethyst at 42% chroma and fuchsia at 50% is a lot of colour to
+     put on a page that is mostly text, and the effect was that the page read as
+     "purple" before it read as anything else - which is the same failure as
+     reading as "navy", just in a different direction.
+
+     So every value here is about half as saturated as it was. Dusty lavender
+     rather than amethyst, soft orchid rather than fuchsia. The hue is unchanged,
+     and so is the reasoning for it; what changed is how loudly it is said.
+
+     A restrained colour also does something a loud one cannot: it leaves room
+     for green, amber and coral to be the brightest things on the page. Those
+     carry the meaning, so they should win the eye - and against a vivid fuchsia
+     they simply could not.
+  --------------------------------------------------------------------------- */
+  --brand: #a99bd4;
+  --brand-hover: #c3b8e6;
+  --brand-soft: #1e1a28;
+  --brand-deep: #6d5bb8;
+  --accent: #c49ad4;
+  --on-brand: #0d0b11;
+
+  /*
+    The primary buttons are painted with --grad, which styles.css builds from
+    the app's own accents - and one of those is cyan. Left inherited, every call
+    to action on this page would still finish in blue, which is the single thing
+    this palette exists to remove. It is overridden here rather than at the five
+    places --grad is used, so there is still exactly one place in the codebase
+    where this page's colour is decided.
+
+    The ramp is one hue family walked from deep to light, and all three stops are
+    muted to match the rest of the palette. No stop changes temperature, which is
+    why it reads as light falling across one colour rather than as a rainbow.
+  */
+  --accent-2: #8f7fc4;
+  --accent-3: var(--accent);
+  --grad: linear-gradient(118deg, var(--brand-deep), var(--accent-2) 56%, var(--accent));
 
   --pass: #3ddc97;
-  --pass-soft: #0d2b20;
+  --pass-soft: #0c2b21;
   --hold: #f0b429;
   --hold-soft: #2c2210;
   --stop: #f2867f;
@@ -109,12 +184,16 @@
 .landing .backdrop-aurora {
   position: absolute;
   inset: -25%;
+  /* Turned down twice over: each bloom carries less colour, and the whole layer
+     sits at lower opacity. This is the largest coloured area on the page by far,
+     so it is where "too much purple" was mostly coming from - a tint this wide
+     does not need to be strong to be felt. */
   background:
-    radial-gradient(38% 42% at 18% 12%, color-mix(in srgb, var(--brand-deep) 42%, transparent), transparent 70%),
-    radial-gradient(34% 40% at 86% 28%, color-mix(in srgb, var(--violet) 30%, transparent), transparent 72%),
-    radial-gradient(40% 44% at 60% 88%, color-mix(in srgb, var(--pass) 16%, transparent), transparent 74%);
+    radial-gradient(38% 42% at 18% 12%, color-mix(in srgb, var(--brand-deep) 26%, transparent), transparent 70%),
+    radial-gradient(34% 40% at 86% 28%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 72%),
+    radial-gradient(40% 44% at 60% 88%, color-mix(in srgb, var(--pass) 13%, transparent), transparent 74%);
   filter: blur(30px);
-  opacity: 0.55;
+  opacity: 0.38;
   animation: drift 44s ease-in-out infinite alternate;
 }
 
@@ -155,7 +234,7 @@
 
 .landing .hero h1 em {
   font-style: normal;
-  background: linear-gradient(100deg, var(--brand) 0%, var(--violet) 52%, var(--pass) 100%);
+  background: linear-gradient(100deg, var(--brand) 0%, var(--accent) 52%, var(--pass) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -187,7 +266,7 @@
 }
 
 .landing .site-header.is-scrolled {
-  background: color-mix(in srgb, #070b14 78%, transparent);
+  background: color-mix(in srgb, #0b0a0e 78%, transparent);
   backdrop-filter: blur(16px) saturate(140%);
   border-bottom-color: var(--rule);
   box-shadow: 0 12px 30px -24px rgb(0 0 0 / 90%);
@@ -195,7 +274,7 @@
 
 /* The reading-progress bar, which is the only place the two accents meet. */
 .landing .site-progress {
-  background: linear-gradient(90deg, var(--brand), var(--violet) 55%, var(--pass));
+  background: linear-gradient(90deg, var(--brand), var(--accent) 55%, var(--pass));
   transform-origin: 0 50%;
   height: 2px;
 }
@@ -287,7 +366,7 @@
 .landing .band-dark {
   background:
     radial-gradient(58% 60% at 82% 4%, color-mix(in srgb, var(--brand-deep) 24%, transparent), transparent 68%),
-    linear-gradient(180deg, #050810, #070b14 55%, #050810);
+    linear-gradient(180deg, #070609, #0b0a0e 55%, #070609);
   box-shadow: 0 40px 90px -70px rgb(0 0 0 / 100%) inset;
 }
 
@@ -347,9 +426,9 @@
   padding: 104px 0 112px;
   border-bottom: 0;
   background:
-    radial-gradient(64% 72% at 78% 6%, color-mix(in srgb, var(--brand-deep) 32%, transparent), transparent 64%),
+    radial-gradient(64% 72% at 78% 6%, color-mix(in srgb, var(--brand-deep) 24%, transparent), transparent 64%),
     radial-gradient(52% 62% at 6% 94%, color-mix(in srgb, var(--pass) 12%, transparent), transparent 70%),
-    linear-gradient(168deg, #0a1122 0%, #070b14 48%, #080d19 100%);
+    linear-gradient(168deg, #16141c 0%, #0b0a0e 48%, #121017 100%);
 }
 
 .landing .hero::after {
@@ -417,7 +496,7 @@
 .landing .ticker {
   border-top: 0;
   border-bottom: 1px solid var(--rule);
-  background: linear-gradient(180deg, #070b14, #0a1020);
+  background: linear-gradient(180deg, #0b0a0e, #141219);
 }
 
 .landing .ticker-item {
@@ -434,7 +513,7 @@
 
 .landing .supporters {
   background:
-    radial-gradient(50% 54% at 50% 0%, color-mix(in srgb, var(--violet) 14%, transparent), transparent 70%),
+    radial-gradient(50% 54% at 50% 0%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 70%),
     transparent;
 }
 
@@ -503,7 +582,7 @@
   overflow: hidden;
   color: #fff;
   background:
-    radial-gradient(60% 120% at 12% 0%, color-mix(in srgb, var(--violet) 55%, transparent), transparent 62%),
+    radial-gradient(60% 120% at 12% 0%, color-mix(in srgb, var(--accent) 55%, transparent), transparent 62%),
     linear-gradient(120deg, var(--brand-deep) 0%, #2b3fae 46%, #1b2a7a 100%);
   border-block: 1px solid color-mix(in srgb, #fff 16%, transparent);
   padding: 76px 0;
@@ -537,7 +616,7 @@
   color: rgb(255 255 255 / 82%);
 }
 
-/* On the brand band the primary button must invert - a blue button on blue
+/* On the brand band the primary button must invert - a violet button on violet
    is the commonest way a call to action disappears. */
 .landing .cta .btn-primary {
   background: #fff;
@@ -567,12 +646,12 @@
   border-top: 1px solid var(--rule);
   background:
     radial-gradient(50% 60% at 15% 0%, color-mix(in srgb, var(--brand-deep) 16%, transparent), transparent 70%),
-    #050810;
+    #070609;
   padding-top: 56px;
 }
 
 .landing .site-footer .brand-mark::after {
-  background: #050810;
+  background: #070609;
 }
 
 .landing .foot-col a,

@@ -1,0 +1,282 @@
+/* ---------------------------------------------------------------------------
+   The arrival overlay.
+
+   One timeline, 1.8 seconds, and the logo's own animation lives in logo.css
+   because the mark is reusable and this overlay is not.
+
+       0.00 - 0.82   the mark performs itself   plane in, trails behind it,
+                                                letters settling, dot last
+       0.88 - 1.18   the stamp lands            APPLIED, hard, with a shockwave
+       1.20 - 1.80   the curtain lifts          and the hero assembles behind it
+
+   The third beat overlaps the second on purpose. `Intro.tsx` releases the page
+   at 1.2s, while the veil is still on its way up, so the hero is already
+   assembling as it is uncovered. Telling the page only at 1.8s was a bug: the
+   curtain rose on a finished hero which then blinked out and rebuilt itself.
+
+   Nothing here is content and nothing waits on it. The page is rendered
+   underneath from the first frame, this sits on top of it, and the component
+   removes itself when the timeline ends. Delete this file and the landing page
+   opens instantly.
+--------------------------------------------------------------------------- */
+
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  cursor: pointer;
+
+  /* Deeper than the page it is covering, so the page appears to come up out of
+     it rather than to be uncovered behind it. */
+  background:
+    radial-gradient(
+      120% 90% at 50% 45%,
+      color-mix(in srgb, var(--brand-deep) 26%, transparent),
+      transparent 62%
+    ),
+    #060508;
+
+  animation: introVeil 1.8s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+/*
+  The veil leaves upward, and it leaves as a shape rather than a fade: a fade is
+  a slide transition, a wipe is a curtain, and a curtain is what makes the hero
+  feel like it was there all along waiting.
+
+  It holds until two-thirds through, which is the 1.2s that `REVEAL_MS` in
+  Intro.tsx has to agree with.
+*/
+@keyframes introVeil {
+  0%,
+  66.7% {
+    clip-path: inset(0 0 0 0);
+  }
+  100% {
+    clip-path: inset(0 0 100% 0);
+  }
+}
+
+/* ===========================================================================
+   The stage
+   ======================================================================== */
+
+.intro-stage {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: clamp(1.1rem, 3.6vh, 1.9rem);
+  width: min(340px, 80vw);
+
+  /* The whole assembly withdraws as the curtain goes, so it leaves with it
+     instead of being sliced in half by it. */
+  animation: introStage 1.8s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+@keyframes introStage {
+  0%,
+  62% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.94) translateY(-16px);
+  }
+}
+
+/* ===========================================================================
+   1. The mark  (the animation itself is in logo.css)
+   ======================================================================== */
+
+/* Size and colour only. Which parts move, and when, belongs with the logo. */
+
+/* ===========================================================================
+   2. The stamp
+   ======================================================================== */
+
+.intro-seal {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.intro-stamp {
+  position: relative;
+  display: grid;
+  gap: 0.3rem;
+  place-items: center;
+  padding: 0.55rem 1.1rem 0.65rem;
+  border: 2.5px solid var(--pass);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--pass) 9%, transparent);
+
+  /* Off-square, the way a hand-held stamp lands. Four degrees is enough to read
+     as pressed rather than placed. */
+  transform: rotate(-4deg) scale(2.4);
+  opacity: 0;
+  animation: introStamp 0.34s cubic-bezier(0.2, 1.5, 0.4, 1) 0.88s forwards;
+}
+
+/*
+  Overshoot on the way down and no bounce back up. A stamp hits paper and stops;
+  anything springier reads as a balloon.
+*/
+@keyframes introStamp {
+  0% {
+    opacity: 0;
+    transform: rotate(-11deg) scale(2.4);
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(-4deg) scale(1);
+  }
+}
+
+.intro-stamp-word {
+  font-family: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Menlo, Consolas, monospace;
+  font-size: clamp(1.35rem, 5.2vw, 1.85rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  color: var(--pass);
+  /* Ink, not light: a stamp does not glow. The faint spread is the bleed into
+     the fibres of the paper. */
+  text-shadow: 0 0 22px color-mix(in srgb, var(--pass) 30%, transparent);
+}
+
+.intro-stamp-sub {
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+  color: color-mix(in srgb, var(--pass) 72%, var(--ink));
+  opacity: 0;
+  animation: introSub 0.3s ease-out 1.14s forwards;
+}
+
+@keyframes introSub {
+  to {
+    opacity: 0.78;
+  }
+}
+
+/* --- the shockwave -------------------------------------------------------- */
+
+.intro-ring {
+  position: absolute;
+  width: 150px;
+  height: 64px;
+  border: 2px solid color-mix(in srgb, var(--pass) 55%, transparent);
+  border-radius: 14px;
+  opacity: 0;
+  animation: introRing 0.6s cubic-bezier(0.2, 0.7, 0.3, 1) 0.9s forwards;
+}
+
+.intro-ring.is-second {
+  animation-delay: 0.99s;
+  border-color: color-mix(in srgb, var(--brand) 45%, transparent);
+}
+
+@keyframes introRing {
+  0% {
+    opacity: 0.85;
+    transform: scale(0.72) rotate(-4deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.7) rotate(-4deg);
+  }
+}
+
+/* ===========================================================================
+   3. The sweep that takes the veil
+   ======================================================================== */
+
+.intro-sweep {
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  height: 2px;
+  top: 50%;
+  border-radius: 2px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--brand) 32%,
+    var(--pass) 52%,
+    var(--accent) 70%,
+    transparent
+  );
+  opacity: 0;
+  transform: scaleX(0.2);
+  animation: introSweep 0.7s cubic-bezier(0.55, 0, 0.3, 1) 1.06s forwards;
+}
+
+@keyframes introSweep {
+  0% {
+    opacity: 0;
+    transform: scaleX(0.2);
+    filter: blur(0);
+  }
+  38% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleX(1) scaleY(26);
+    filter: blur(9px);
+  }
+}
+
+/* ===========================================================================
+   4. The way out
+   ======================================================================== */
+
+.intro-skip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(1.4rem, 5vh, 2.6rem);
+  margin: 0;
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--ink) 42%, transparent);
+  opacity: 0;
+  /* Late, and quiet. Offered to anybody still waiting, not advertised to
+     somebody who is enjoying it. */
+  animation: introSkip 0.5s ease-out 0.75s forwards;
+}
+
+@keyframes introSkip {
+  to {
+    opacity: 1;
+  }
+}
+
+/* ===========================================================================
+   Off
+   ======================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  /*
+     `Intro` does not mount under this preference, so these rules are only
+     reached by somebody who changed the setting mid-visit. They end the
+     animation rather than freezing a half-drawn overlay over the page.
+  */
+  .intro {
+    display: none;
+  }
+}

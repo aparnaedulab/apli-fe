@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { ApiError } from '../api/client';
 import { fmtDate, internshipApi, type ReviewPreview } from '../api/internships';
 import './MentorReview.css';
+import ApliLogo from '../components/ApliLogo';
 
 const SCORES: { value: number; label: string }[] = [
   { value: 1, label: 'Did not meet expectations' },
@@ -56,9 +57,8 @@ export default function MentorReview() {
   return (
     <main className="mentor">
       <div className="mentor-panel">
-        <Link to="/" className="mentor-brand">
-          <span className="brand-mark" aria-hidden="true" />
-          <span>Apli.ai</span>
+        <Link to="/" className="mentor-brand" aria-label="Apli.ai, home">
+          <ApliLogo className="brand-logo" />
         </Link>
 
         {loadError && (

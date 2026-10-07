@@ -1,0 +1,249 @@
+/* ---------------------------------------------------------------------------
+   Arrival, and momentum.
+
+   Two things live here, and they are both about the page having a body.
+
+   1. THE ARRIVAL. After the stamp lifts, the hero does not simply exist - it
+      assembles, in reading order, over about a second. The question first, then
+      the control that answers it, then the demo, then the invitation to scroll.
+      A page that appears all at once has no opinion about what to look at
+      first; this one does.
+
+   2. THE MOMENTUM. `useScrollEnergy` publishes how fast the reader is moving
+      (`--sv`) and how far down they are (`--sy`), and the backdrop spends both:
+      it drifts against the scroll, and it sharpens while they move and settles
+      while they read.
+
+   Section seams are not here, and there is a note further down saying why they
+   were removed rather than kept.
+
+   What is deliberately NOT here:
+
+      The hero copy. `.hero-said` already has its own `rise` in
+      interactive.css, and that one has to keep working because it replays every
+      time the persona changes. Adding a second animation to the same element
+      would mean one of them silently losing. The choreography below sequences
+      everything around it instead.
+
+      The pins. `.pin.is-hold` carries the waiting pulse from motion.css, and an
+      arrival animation on `.pin` would override it and kill the one piece of
+      motion on this page that is genuinely load-bearing. The stage they sit on
+      is animated instead, which brings them with it.
+
+   Defaults are the finished state. Every rule below is scoped to
+   `.landing.has-entered`, a class added only once JavaScript is running and the
+   intro has finished, so a page with no JavaScript renders complete and still.
+--------------------------------------------------------------------------- */
+
+/* ===========================================================================
+   1. The arrival
+   ======================================================================== */
+
+/*
+  One curve for the whole sequence. Reused rather than varied, because a
+  choreography where each element eases differently reads as several unrelated
+  animations that happen to overlap.
+*/
+@keyframes arrive {
+  from {
+    opacity: 0;
+    translate: 0 14px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* The demo arrives with a little depth as well, since it is an object. */
+@keyframes arriveStage {
+  from {
+    opacity: 0;
+    translate: 0 26px;
+    scale: 0.965;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+}
+
+.landing.has-entered .site-header-inner,
+.landing.has-entered .hero-ask,
+.landing.has-entered .hero .psw,
+.landing.has-entered .hero-caption,
+.landing.has-entered .hero-scroll {
+  animation: arrive 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.landing.has-entered .hero-stage {
+  animation: arriveStage 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.18s both;
+}
+
+/*
+  Reading order, in delays. The header is first because it is the frame, and the
+  scroll hint is last because it is the only thing asking for something.
+*/
+.landing.has-entered .site-header-inner {
+  animation-delay: 0s;
+}
+
+.landing.has-entered .hero-ask {
+  animation-delay: 0.08s;
+}
+
+.landing.has-entered .hero .psw {
+  animation-delay: 0.16s;
+}
+
+/* `.hero-said` runs its own rise here, unassisted - see the note at the top. */
+
+.landing.has-entered .hero-caption {
+  animation-delay: 0.62s;
+}
+
+.landing.has-entered .hero-scroll {
+  animation-delay: 0.9s;
+}
+
+/*
+  The rule under the question draws itself rather than fading, so the eye is
+  pulled left to right into the control beneath it. It is already a scaled
+  element in Landing.css; this only gives it a delay that fits the sequence.
+*/
+.landing.has-entered .hero-ask-rule {
+  animation: arriveRule 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
+
+@keyframes arriveRule {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* ===========================================================================
+   2. Momentum
+   ======================================================================== */
+
+/*
+  Defaults that mean "still". The hook overwrites both while the reader moves,
+  and never runs at all under reduced motion - so these are also the values a
+  reduced-motion visitor keeps for the whole visit.
+*/
+.landing {
+  --sv: 0;
+  --sy: 0;
+}
+
+/*
+  The ruled grid drifts against the scroll, slowly. 0.045 of the distance is
+  under a pixel for every twenty the reader travels, which is not noticed as
+  movement and is very much noticed as depth when it is removed.
+
+  `translate` rather than `transform`, because the aurora below needs the same
+  treatment and its `transform` is already spoken for by the drift keyframes.
+  The independent properties compose with `transform` instead of replacing it.
+*/
+.landing .backdrop-grid {
+  translate: 0 calc(var(--sy) * 0.045px);
+  /* A touch more present at speed, so movement has a texture. */
+  opacity: calc(1 + var(--sv) * 0.5);
+}
+
+/*
+  The aurora moves the other way and further, which is what separates the two
+  layers into a foreground and a background. It also sharpens and warms as the
+  reader moves: 30px of blur at rest, about 19px at full speed, and half a step
+  more saturation - so the brand light resolves when they are travelling and
+  melts back into weather when they stop to read.
+*/
+.landing .backdrop-aurora {
+  translate: 0 calc(var(--sy) * -0.07px);
+  filter: blur(calc(30px - var(--sv) * 11px)) saturate(calc(1 + var(--sv) * 0.3));
+  /* These two numbers have to agree with the aurora's own opacity in dark.css -
+     this rule wins, so turning the aurora down there and not here would have
+     quietly undone it. */
+  opacity: calc(0.38 + var(--sv) * 0.12);
+}
+
+/*
+  The grain is the one layer that does not move. It is meant to read as the
+  surface of the screen rather than as anything in the picture, and a moving
+  grain is a dirty window.
+*/
+
+/* --- the progress bar knows it is being pushed ---------------------------- */
+
+/*
+  The bar in the header already reports position. Giving it a glow that tracks
+  velocity makes the one piece of chrome that is always visible respond to the
+  reader, which is a cheap way for the whole page to feel alive rather than
+  observed.
+*/
+.landing .site-progress {
+  box-shadow: 0 0 calc(var(--sv) * 14px) calc(var(--sv) * 2px)
+    color-mix(in srgb, var(--brand) calc(var(--sv) * 55%), transparent);
+}
+
+/* ===========================================================================
+   Section seams are deliberately NOT here
+   ======================================================================== */
+
+/*
+  A centred hairline between every band was tried and removed, and the reason is
+  worth keeping so it is not tried again.
+
+  dark.css already answers this question, and answers it better. A band-alt is a
+  plate: raised off the base, `border-block` on both edges, lit inside the top.
+  A band-dark is a hole: sunk below the base, with a brand hairline at top and
+  bottom. A plain band is the base itself, and has no seam *on purpose* -
+  because there is nothing for it to be a seam between.
+
+  So the boundaries are already designed, per band type, and a uniform rule
+  across all of them would have flattened three deliberate treatments into one.
+  It would also have overridden `.band-dark::before` outright on specificity,
+  silently removing the top hairline from the two sections about silence and
+  doubt - the ones where the treatment is doing the most work.
+*/
+
+/* ===========================================================================
+   Off
+   ======================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  /*
+     The arrival is removed rather than shortened: a visitor who has asked for
+     less motion should get the finished hero, not a faster version of it being
+     built. `--sv` and `--sy` stay at their defaults because the hook never
+     attaches, so the backdrop rules below resolve to no drift and no change in
+     blur - but they are neutralised explicitly anyway, so nothing depends on
+     a hook's good behaviour to be correct.
+  */
+  .landing.has-entered .site-header-inner,
+  .landing.has-entered .hero-ask,
+  .landing.has-entered .hero .psw,
+  .landing.has-entered .hero-stage,
+  .landing.has-entered .hero-caption,
+  .landing.has-entered .hero-scroll,
+  .landing.has-entered .hero-ask-rule {
+    animation: none;
+  }
+
+  .landing .backdrop-grid,
+  .landing .backdrop-aurora {
+    translate: none;
+  }
+
+  .landing .backdrop-aurora {
+    filter: blur(30px);
+    opacity: 0.38;
+  }
+
+  .landing .site-progress {
+    box-shadow: none;
+  }
+}

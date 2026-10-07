@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link, NavLink, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
-import ApliBubble, { ApliFace } from './Apli';
+import ApliBubble from './Apli';
+import ApliLogo from '../../components/ApliLogo';
 import NotificationBell from '../../components/NotificationBell';
 import { iconFor, GridIcon, CloseIcon, SignOutIcon } from './navIcons';
 import { forgetMe, initialsOf, firstNameOf, useMe } from './me';
@@ -392,11 +393,13 @@ export default function StudentLayout({ children }: { children: ReactNode }) {
       */}
       <header className="sh-top">
         <div className="sh-top-in">
-          <Link to="/student" className="sh-brand">
-            <ApliFace size={30} />
-            <span>
-              Apli<i>.ai</i>
-            </span>
+          <Link to="/student" className="sh-brand" aria-label="Apli.ai, home">
+            {/* The mark, not the mascot. Apli the character is still here - in
+                the bubble at the corner and in the empty states - but the brand
+                lockup is a different thing that happens to share the name, and
+                using the face for both left the student portal looking like a
+                different product from the site they signed in from. */}
+            <ApliLogo className="brand-logo" />
           </Link>
 
           <nav className="sh-bar" aria-label="Student sections">

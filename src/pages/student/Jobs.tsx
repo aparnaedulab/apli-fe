@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import StudentLayout from './StudentLayout';
 import {
@@ -76,6 +76,12 @@ interface Filters {
 }
 
 const EMPTY: Filters = { q: '', kind: 'all', place: '', posted: 0, closingSoon: false };
+
+/** "FULL_TIME" → "Full time": a stored code, said the way a person would. */
+const sentence = (code: string) => {
+  const words = code.replace(/_/g, ' ').toLowerCase();
+  return words.charAt(0).toUpperCase() + words.slice(1);
+};
 
 const daysTo = (iso: string) => Math.ceil((new Date(iso).getTime() - Date.now()) / 86_400_000);
 
@@ -218,7 +224,7 @@ export function StudentJobs() {
         <>
           <div className="jb-bar">
             <label className="jb-field">
-              <span>{t('jobs.kind')}</span>
+              <span className="sr-only">{t('jobs.kind')}</span>
               <select
                 value={f.kind}
                 onChange={(e) => setF({ ...f, kind: e.target.value as Filters['kind'] })}
@@ -231,7 +237,7 @@ export function StudentJobs() {
 
             {places.length > 1 && (
               <label className="jb-field">
-                <span>{t('jobs.place')}</span>
+                <span className="sr-only">{t('jobs.place')}</span>
                 <select value={f.place} onChange={(e) => setF({ ...f, place: e.target.value })}>
                   <option value="">{t('jobs.placeAll')}</option>
                   {places.map((p) => (
@@ -244,7 +250,7 @@ export function StudentJobs() {
             )}
 
             <label className="jb-field">
-              <span>{t('jobs.posted')}</span>
+              <span className="sr-only">{t('jobs.posted')}</span>
               <select
                 value={String(f.posted)}
                 onChange={(e) => setF({ ...f, posted: Number(e.target.value) })}
@@ -258,7 +264,7 @@ export function StudentJobs() {
             </label>
 
             <label className="jb-field">
-              <span>{t('jobs.sort')}</span>
+              <span className="sr-only">{t('jobs.sort')}</span>
               <select value={sort} onChange={(e) => setSort(e.target.value as Sort)}>
                 <option value="match">{t('jobs.sortMatch')}</option>
                 <option value="deadline">{t('jobs.sortDeadline')}</option>
@@ -350,11 +356,13 @@ export function StudentJobs() {
                             </small>
                           </span>
 
-                          <span
-                            className={`jb-state ${j.applicationStatus ? 'is-in' : ''}`}
-                          >
-                            {j.applicationStatus ? t('jobs.stateIn') : t('jobs.stateOut')}
-                          </span>
+                          {j.applicationStatus ? (
+                            <span className="jb-state is-in">{t('jobs.stateIn')}</span>
+                          ) : (
+                            <span className={`jb-fitpill ${j.match.score >= 75 ? 'is-high' : j.match.score >= 50 ? 'is-mid' : ''}`}>
+                              {j.match.score}%<small> match</small>
+                            </span>
+                          )}
                         </button>
                       </li>
                     );
@@ -367,7 +375,7 @@ export function StudentJobs() {
                 uses, so the two can never drift apart. */}
             <section className="jb-pane" aria-live="polite">
               {picked ? (
-                <StudentJobDetailPage key={picked} paneId={picked} />
+                <StudentJobDetailPage key={picked} paneId={picked} card={jobs.find((j) => j.id === picked)} />
               ) : (
                 <div className="jb-none">
                   <p>{t('jobs.pickOne')}</p>
@@ -453,7 +461,7 @@ function NotEligible() {
  * differs - a second copy of a screen this size is a second copy to keep in
  * step, and the one that drifts is always the one nobody is looking at.
  */
-export function StudentJobDetailPage({ paneId }: { paneId?: string } = {}) {
+export function StudentJobDetailPage({ paneId, card }: { paneId?: string; card?: JobCard } = {}) {
   const { hasModule } = useAuth();
   const { t, date, time } = useT();
   const { id: routeId = '' } = useParams();
@@ -583,11 +591,13 @@ export function StudentJobDetailPage({ paneId }: { paneId?: string } = {}) {
 
   return (
     <Frame>
-      <p className="crumb">
-        <Link to="/student/jobs">{t('job.allJobs')}</Link>
-      </p>
+      {!paneId && (
+        <p className="crumb">
+          <Link to="/student/jobs">{t('job.allJobs')}</Link>
+        </p>
+      )}
 
-      <header className="page-head">
+      <header className="page-head jd-head">
         <div>
           <p className="eyebrow">
             {job.company.name}
@@ -598,10 +608,13 @@ export function StudentJobDetailPage({ paneId }: { paneId?: string } = {}) {
             )}
           </p>
           <h1>{job.title}</h1>
-          <p className="page-lede">
-            {ctc(t, job.ctcMin, job.ctcMax, job.payPeriod)}
-            {job.location ? ` · ${job.location}` : ''} · {t('job.applyBy', { date: date(job.deadline) })}
-          </p>
+          <ul className="jd-facts">
+            <li className="is-pay">{ctc(t, job.ctcMin, job.ctcMax, job.payPeriod)}</li>
+            {job.location && <li>{job.location}</li>}
+            <li className={daysTo(job.deadline) <= 3 ? 'is-soon' : ''}>
+              {t('job.applyBy', { date: date(job.deadline) })}
+            </li>
+          </ul>
           {/* How fresh it is and how crowded, said before the detail. */}
           <p className="job-card-when">
             {posted(t, job.postedAt)}
@@ -627,6 +640,38 @@ export function StudentJobDetailPage({ paneId }: { paneId?: string } = {}) {
         )}
       </header>
 
+      {card && !application && (
+        <div className="jd-fit">
+          <span
+            className={`jd-fit-ring ${card.match.score >= 75 ? 'is-high' : ''}`}
+            style={{ '--p': `${card.match.score}%` } as CSSProperties}
+            aria-hidden="true"
+          >
+            <b>{card.match.score}%</b>
+          </span>
+          <div className="jd-fit-text">
+            <b>
+              {card.match.score >= 75 ? 'Strong match' : card.match.score >= 50 ? 'Good match' : 'Partial match'}
+              <span className="jd-fit-ok">✓ You meet the eligibility</span>
+            </b>
+            {(card.match.have.length > 0 || card.match.missing.length > 0) && (
+              <p className="jd-fit-skills">
+                {card.match.have.slice(0, 5).map((s) => (
+                  <span key={s} className="is-have">
+                    {s}
+                  </span>
+                ))}
+                {card.match.missing.slice(0, 4).map((s) => (
+                  <span key={s} className="is-missing" title="Asked for - not on your profile yet">
+                    {s}
+                  </span>
+                ))}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
       {error && <p className="alert alert-error">{error}</p>}
 
       {/*
@@ -648,6 +693,8 @@ export function StudentJobDetailPage({ paneId }: { paneId?: string } = {}) {
           onSend={() => void apply()}
           busy={busy}
           ready={ready}
+          accepted={accepted}
+          onAccept={setAccepted}
         />
       )}
 
@@ -675,7 +722,7 @@ export function StudentJobDetailPage({ paneId }: { paneId?: string } = {}) {
         <p className="alert alert-warn">{blockedReason}</p>
       )}
 
-      {!application && (test || terms.length > 0) && (
+      {!application && test && (
         <section className="card before-applying">
           <h2>{t('before.title')}</h2>
 
@@ -725,30 +772,6 @@ export function StudentJobDetailPage({ paneId }: { paneId?: string } = {}) {
             </div>
           )}
 
-          {terms.length > 0 && (
-            <div className="before-block">
-              <h3 className="sub-heading">{t('before.conditions')}</h3>
-              <p className="muted">{t('before.conditionsNote')}</p>
-              <ol className="prose term-conditions">
-                {terms.map((t, i) => (
-                  <li key={i}>{t}</li>
-                ))}
-              </ol>
-
-              <label className="check-row">
-                <input
-                  type="checkbox"
-                  checked={accepted}
-                  onChange={(e) => setAccepted(e.target.checked)}
-                  disabled={busy}
-                />
-                <span>
-                  <b>{t('before.accept')}</b>
-                  <span className="check-hint">{t('before.acceptHint')}</span>
-                </span>
-              </label>
-            </div>
-          )}
         </section>
       )}
 
@@ -793,7 +816,7 @@ export function StudentJobDetailPage({ paneId }: { paneId?: string } = {}) {
         <dl className="facts-grid">
           <div>
             <dt>{t('role.type')}</dt>
-            <dd>{job.jobTypeLabel ?? job.jobType.replace('_', ' ').toLowerCase()}</dd>
+            <dd>{job.jobTypeLabel ?? sentence(job.jobType)}</dd>
           </div>
           <div>
             <dt>{t('role.openings')}</dt>
@@ -915,6 +938,17 @@ export function StudentJobDetailPage({ paneId }: { paneId?: string } = {}) {
         )}
         {job.nightShiftSafety && <p className="prose">{job.nightShiftSafety}</p>}
         {job.noFeeDeclaredAt && <p className="prose muted">{t('role.noFee')}</p>}
+
+        {terms.length > 0 && (
+          <>
+            <h3 className="sub-heading">{t('before.conditions')}</h3>
+            <ol className="prose term-conditions">
+              {terms.map((c, i) => (
+                <li key={i}>{c}</li>
+              ))}
+            </ol>
+          </>
+        )}
 
         {/* Whether the job is open to a person with a disability - the first
             thing such a student needs to know, and almost never said. */}
@@ -1133,6 +1167,8 @@ function ApplyConfirm({
   onSend,
   busy,
   ready,
+  accepted,
+  onAccept,
 }: {
   job: StudentJobDetail['job'];
   me: Profile | null;
@@ -1147,6 +1183,8 @@ function ApplyConfirm({
   onSend: () => void;
   busy: boolean;
   ready: boolean;
+  accepted: boolean;
+  onAccept: (v: boolean) => void;
 }) {
   const { t, date } = useT();
   const chosen = resumes.find((r) => r.id === chosenId) ?? resumes[0] ?? null;
@@ -1300,6 +1338,25 @@ function ApplyConfirm({
               </>
             )}
           </section>
+
+          {/* The company's conditions, accepted here - the moment they matter. */}
+          {terms.length > 0 && (
+            <section className="apply-block">
+              <p className="apply-label">{t('before.conditions')}</p>
+              <ol className="apply-terms">
+                {terms.map((c, i) => (
+                  <li key={i}>{c}</li>
+                ))}
+              </ol>
+              <label className="round-check apply-default">
+                <input type="checkbox" checked={accepted} onChange={(e) => onAccept(e.target.checked)} disabled={busy} />
+                <span>
+                  <b>{t('before.accept')}</b>
+                  <small>{t('before.acceptHint')}</small>
+                </span>
+              </label>
+            </section>
+          )}
 
           {/* What is still in the way, named rather than left to a disabled
               button nobody can explain. */}

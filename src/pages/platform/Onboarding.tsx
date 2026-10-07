@@ -64,11 +64,11 @@ export const STEPS: StepMeta[] = [
   {
     key: 'academics',
     title: 'What they teach',
-    lede: 'The courses and branches they run, and their placement rules.',
+    lede: 'The courses and branches they run.',
     todo: [
-      'Tick the courses this university runs. Anything missing can be added here.',
-      'Inside each course, tick the branches of it.',
-      'Set the grading scale and when its academic year turns over.',
+      'Tick every course this university runs - search to find one, or tick all from the header. A ticked course runs all its branches.',
+      'If it runs only some branches of a course, click “Choose branches” in its row.',
+      'A course missing from the list? Use “New course”, or upload a list from Excel.',
     ],
     note: 'Colleges pick only from this list, so every college spells B.E. — Computer Engineering the same way.',
   },
@@ -88,8 +88,8 @@ export const STEPS: StepMeta[] = [
     title: 'Map courses to colleges',
     lede: 'Which college runs which of the courses and branches above.',
     todo: [
-      'Pick a college on the left.',
-      'Tick the course-and-branch pairs it actually runs.',
+      'Click a college in the table - “Not mapped” shows the ones still to do.',
+      'In the panel, tick the course-and-branch pairs it runs, add seats if known, and save.',
     ],
     note: 'Optional — a college can do its own once it signs in. But a roster uploaded before this is done lands unmapped, and an unmapped student is invisible to every role that filters on a course.',
   },
@@ -98,8 +98,8 @@ export const STEPS: StepMeta[] = [
     title: 'Their batches',
     lede: 'Group students the way this university does.',
     todo: [
-      'Choose who the batch is for: the whole university, every college, or the ones you pick.',
-      'Add any of course, branch and year. The name writes itself, and you can change it.',
+      'Click “Create from mapping”, pick the passing years, and create - one batch per college, course, branch and year.',
+      'For any other group, use “Make one by hand”. Filter the table by college or year to check what exists.',
     ],
     note: 'Optional — placement cells can create their own later.',
   },

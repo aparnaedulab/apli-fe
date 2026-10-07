@@ -266,7 +266,39 @@
 }
 
 /* ===========================================================================
-   8. Off, on request
+   8. A control that notices you
+   ======================================================================== */
+
+/*
+  This is the most decorative thing in the file and it is worth saying why it
+  is allowed to stay, because the rule at the top is otherwise clear.
+
+  The argument of the page is the difference between an answer and silence -
+  "nobody minds a no, everybody minds nothing". A primary action that leans
+  towards the reader from a short distance out is the smallest possible
+  instance of that: the system acknowledges them before they have committed to
+  anything. It is a thin justification compared with a wait that breathes, and
+  it is included on that basis and nowhere else on the page - two buttons, the
+  hero's and the closing one.
+
+  `useMagnetic` writes --tx and --ty. The wrapper is what moves, so the
+  button's own hover lift is left alone rather than fought over: two rules
+  setting `transform` on one element means the last one wins and the other is
+  silently lost.
+*/
+.landing .mag {
+  --tx: 0px;
+  --ty: 0px;
+  display: inline-flex;
+  /* Short, so the control settles towards the cursor instead of snapping to
+     each sampled position. This is what turns sixty style writes a second
+     into one smooth lean. */
+  transition: transform 0.19s var(--ease);
+  transform: translate3d(var(--tx), var(--ty), 0);
+}
+
+/* ===========================================================================
+   9. Off, on request
    ======================================================================== */
 
 @media (prefers-reduced-motion: reduce) {
@@ -297,6 +329,14 @@
   .landing .fear-side,
   .landing .btn-primary,
   .landing .btn-secondary {
+    transition: none;
+  }
+
+  /* The hook attaches no listener in this mode, so --tx and --ty never move.
+     Neutralised here as well, so the wrapper is not left holding a transform
+     it can no longer be talked out of. */
+  .landing .mag {
+    transform: none;
     transition: none;
   }
 

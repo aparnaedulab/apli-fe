@@ -1,0 +1,1644 @@
+/* ---------------------------------------------------------------------------
+   The landing page. Everything is scoped to `.home` so nothing leaks into the
+   portal. See the comment at the top of Landing.tsx for why these colours.
+--------------------------------------------------------------------------- */
+
+.home {
+  /* deep sky blue: trust, calm */
+  --h-indigo: #1f4fa3;
+  --h-indigo-deep: #0b1f45;
+  /* airy pale blue: a light, low-stress page */
+  --h-bg: #f5f9ff;
+  --h-bg-2: #e9f1fd;
+  --h-surface: #ffffff;
+  /* blush pink-coral: warm and friendly; actions only */
+  --h-coral: #e8456b;
+  --h-coral-hover: #d02f56;
+  --h-coral-soft: #fde2e9;
+  /* verified sage: safety; only where something was checked */
+  --h-sage: #13a37a;
+  --h-sage-soft: #d8f4ea;
+  /* soft blue wash: calm backgrounds */
+  --h-lavender: #e3eefe;
+
+  --h-ink: #10223f;
+  --h-ink-2: #4c5d78;
+  --h-ink-3: #8b9ab3;
+  --h-rule: #dfe7f2;
+
+  --h-on-dark: #f0f5ff;
+  --h-on-dark-2: #adc0e3;
+
+  /* the dark bands, the light accent on them, and the role colours */
+  --h-night-1: #1f4fa3;
+  --h-night-2: #0b1f45;
+  --h-glow: #ff9bb0;
+  --h-warm-2: #ff9a62;
+  --h-on-go: #ffffff;
+  --h-sage-deep-1: #13876a;
+  --h-sage-deep-2: #074233;
+  --h-coral-deep-1: #e8456b;
+  --h-coral-deep-2: #8c1f3c;
+
+  --h-shadow: 0 2px 6px rgb(35 33 94 / 0.06), 0 15.5px 34px rgb(35 33 94 / 0.1);
+  --h-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --h-spring: cubic-bezier(0.3, 1.4, 0.4, 1);
+  --h-display: 'Bricolage Grotesque', var(--sans);
+
+  background: var(--h-bg);
+  color: var(--h-ink);
+  font-family: var(--sans);
+  overflow-x: clip;
+}
+
+@media (prefers-color-scheme: dark) {
+  .home {
+    --h-indigo: #a8c6ff;
+    --h-indigo-deep: #050d1d;
+    --h-bg: #0a1428;
+    --h-bg-2: #0f1c36;
+    --h-surface: #142445;
+    --h-coral: #ff7896;
+    --h-coral-hover: #ff95ab;
+    --h-coral-soft: #3d1a26;
+    --h-sage: #4fd1a1;
+    --h-sage-soft: #0f3029;
+    --h-lavender: #1a2b4f;
+    --h-ink: #eef4ff;
+    --h-ink-2: #aebcd6;
+    --h-ink-3: #7586a6;
+    --h-rule: #1e3054;
+    --h-on-go: #250610;
+    --h-shadow: 0 2px 6px rgb(0 0 0 / 0.3), 0 15.5px 34px rgb(0 0 0 / 0.35);
+  }
+}
+
+.h-wrap {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+.h-narrow {
+  max-width: 900px;
+}
+
+/* --- buttons -------------------------------------------------------------- */
+
+.h-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8.5px;
+  padding: 9px 14.5px;
+  border-radius: 849px;
+  border: 1.5px solid transparent;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1;
+  text-decoration: none;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.25s var(--h-spring),
+    box-shadow 0.25s ease;
+}
+
+.h-btn:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--h-coral) 45%, transparent);
+  outline-offset: 3px;
+}
+
+.h-btn-lg {
+  padding: 11px 18px;
+  font-size: 13px;
+}
+
+.h-btn-go {
+  background: var(--h-coral);
+  color: var(--h-on-go);
+  box-shadow: 0 6px 17px color-mix(in srgb, var(--h-coral) 35%, transparent);
+}
+
+.h-btn-go:hover {
+  background: var(--h-coral-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8.5px 24px color-mix(in srgb, var(--h-coral) 45%, transparent);
+}
+
+.h-btn-line {
+  color: var(--h-ink);
+  border-color: color-mix(in srgb, var(--h-ink) 22%, transparent);
+}
+
+.h-btn-line:hover {
+  border-color: var(--h-ink);
+  transform: translateY(-2px);
+}
+
+.h-btn-line-light {
+  color: var(--h-on-dark);
+  border-color: rgb(255 255 255 / 0.3);
+}
+
+.h-btn-line-light:hover {
+  border-color: var(--h-on-dark);
+}
+
+.h-btn-quiet {
+  color: var(--h-ink-2);
+  padding-inline: 12px;
+}
+
+.h-btn-quiet:hover {
+  color: var(--h-ink);
+}
+
+.h-arrow {
+  display: inline-block;
+  transition: transform 0.25s var(--h-spring);
+}
+
+.h-btn:hover .h-arrow {
+  transform: translateX(4px);
+}
+
+/* --- opening: the logo flies in ------------------------------------------- */
+
+.h-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 28px;
+  background: radial-gradient(ellipse at 50% 45%, var(--h-night-1) 0%, var(--h-night-2) 70%);
+  cursor: pointer;
+  animation: homeVeil 2.7s var(--h-ease) forwards;
+}
+
+.h-intro-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+/* A soft light that blooms behind the logo as it lands. */
+.h-intro-halo {
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--h-coral) 30%, transparent), transparent 65%);
+  opacity: 0;
+  transform: scale(0.6);
+  animation: homeHalo 1.2s var(--h-ease) 0.7s forwards;
+}
+
+/* SVG note: the logo's viewBox is 83 x 49, so transform lengths below are in
+   those units - 60px is most of the logo's width, not 60 screen pixels. */
+.h-intro-logo {
+  position: relative;
+  width: min(300px, 64vw);
+  height: auto;
+  overflow: visible;
+  color: #f6f3ee;
+}
+
+.h-intro-logo .al-mark,
+.h-intro-logo .al-dot {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+
+/* The plane: in from far down-left, tilted, slowing as it arrives. */
+.h-intro-logo .al-mark {
+  animation: hlPlane 0.85s cubic-bezier(0.16, 0.85, 0.25, 1) both;
+}
+
+/* Its three trails, coral, stretched out behind it and then settling. */
+.h-intro-logo .al-trail {
+  color: var(--h-glow);
+  animation: hlTrail 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+.h-intro-logo .al-t1 {
+  animation-delay: 0.5s;
+}
+
+.h-intro-logo .al-t3 {
+  animation-delay: 0.58s;
+}
+
+.h-intro-logo .al-t2 {
+  animation-delay: 0.66s;
+}
+
+/* The letters settle, one after another. */
+.h-intro-logo .al-p,
+.h-intro-logo .al-l,
+.h-intro-logo .al-i {
+  animation: hlLetter 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.h-intro-logo .al-p {
+  animation-delay: 0.78s;
+}
+
+.h-intro-logo .al-l {
+  animation-delay: 0.9s;
+}
+
+.h-intro-logo .al-i {
+  animation-delay: 1.02s;
+}
+
+/* The dot drops in last, in coral, with a bounce - the full stop. */
+.h-intro-logo .al-dot {
+  color: var(--h-glow);
+  animation: hlDot 0.6s cubic-bezier(0.3, 1.6, 0.45, 1) 1.15s both;
+}
+
+.h-intro-line {
+  margin: 0;
+  padding: 0 20px;
+  text-align: center;
+  font-family: var(--h-display);
+  font-size: clamp(15px, 1.9vw, 21px);
+  font-weight: 600;
+  color: #f6f3ee;
+  opacity: 0;
+  animation: homeRise 0.6s var(--h-ease) 1.3s forwards;
+}
+
+.h-intro-line span {
+  color: var(--h-glow);
+}
+
+.h-intro-skip {
+  position: absolute;
+  bottom: 22px;
+  left: 0;
+  right: 0;
+  margin: 0;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: rgb(255 255 255 / 0.45);
+}
+
+@keyframes hlPlane {
+  0% {
+    opacity: 0;
+    transform: translate(-70px, 45px) rotate(-14deg) scale(0.7);
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes hlTrail {
+  from {
+    opacity: 0;
+    transform: translate(9px, -9px) scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes hlLetter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes hlDot {
+  0% {
+    opacity: 0;
+    transform: translateY(-22px) scale(0.4);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes homeHalo {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes homeRise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Holds, then lifts upward like a curtain. */
+@keyframes homeVeil {
+  0%,
+  72% {
+    clip-path: inset(0 0 0 0);
+  }
+  100% {
+    clip-path: inset(0 0 100% 0);
+  }
+}
+
+/* --- header --------------------------------------------------------------- */
+
+.h-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  padding: 9.5px 0;
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease,
+    padding 0.3s ease;
+}
+
+.h-header.is-scrolled {
+  padding: 6px 0;
+  background: color-mix(in srgb, var(--h-bg) 82%, transparent);
+  backdrop-filter: blur(12px) saturate(1.4);
+  box-shadow: 0 1px 0 var(--h-rule);
+}
+
+.h-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.h-brand {
+  color: var(--h-indigo);
+  display: inline-flex;
+}
+
+.h-brand-logo {
+  height: 34px;
+  width: auto;
+}
+
+.h-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* --- hero ----------------------------------------------------------------- */
+
+.h-hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding: 75px 0 54.5px;
+  isolation: isolate;
+}
+
+/* The breathing background: three soft lights on a six-second cycle, about
+   the pace of slow, calm breathing. */
+.h-breath {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.h-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(59.5px);
+  opacity: 0.55;
+  animation: homeBreathe 6s ease-in-out infinite;
+}
+
+.h-orb.is-a {
+  width: 357px;
+  height: 357px;
+  right: -102px;
+  top: -68px;
+  background: var(--h-lavender);
+}
+
+.h-orb.is-b {
+  width: 246.5px;
+  height: 246.5px;
+  right: 18%;
+  bottom: -51px;
+  background: var(--h-coral-soft);
+  animation-delay: -2s;
+}
+
+.h-orb.is-c {
+  width: 204px;
+  height: 204px;
+  left: -85px;
+  top: 30%;
+  background: var(--h-sage-soft);
+  animation-delay: -4s;
+}
+
+@keyframes homeBreathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.12);
+  }
+}
+
+.h-hero-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 32px;
+  align-items: center;
+}
+
+.h-hero-art {
+  justify-self: start;
+}
+
+/* Reassurance, right where people decide. */
+.h-assure {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--h-ink-2);
+}
+
+.h-assure li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.h-assure li::before {
+  content: '✓';
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--h-sage-soft);
+  color: var(--h-sage);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.h-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8.5px;
+  margin: 0 0 15.5px;
+  padding: 6px 10px 6px 9px;
+  border-radius: 849px;
+  background: var(--h-surface);
+  box-shadow: var(--h-shadow);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--h-ink-2);
+}
+
+.h-kicker-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--h-sage);
+  box-shadow: 0 0 0 4px var(--h-sage-soft);
+}
+
+.h-title {
+  font-family: var(--h-display);
+  font-size: clamp(27px, 3.82vw, 49.5px);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  font-weight: 700;
+  margin: 0 0 15.5px;
+  color: var(--h-indigo);
+}
+
+@media (prefers-color-scheme: dark) {
+  .h-title {
+    color: var(--h-ink);
+  }
+}
+
+.h-title-warm {
+  background: linear-gradient(100deg, var(--h-coral), var(--h-warm-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.h-lede {
+  font-size: clamp(13px, 0.98vw, 13.5px);
+  line-height: 1.6;
+  color: var(--h-ink-2);
+  max-width: 34em;
+  margin: 0 0 22px;
+}
+
+.h-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8.5px;
+}
+
+.h-actions.is-center {
+  justify-content: center;
+}
+
+/* The hero assembles as the curtain lifts. */
+.h-arrive {
+  opacity: 0;
+  transform: translateY(15.5px);
+}
+
+.has-entered .h-arrive {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.7s var(--h-ease),
+    transform 0.7s var(--h-ease);
+  transition-delay: calc(var(--i, 0) * 110ms);
+}
+
+.h-scroll {
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  width: 17px;
+  height: 27px;
+  margin-left: -10px;
+  border: 2px solid color-mix(in srgb, var(--h-ink) 25%, transparent);
+  border-radius: 12px;
+}
+
+.h-scroll span {
+  position: absolute;
+  left: 50%;
+  top: 7px;
+  width: 4px;
+  height: 8px;
+  margin-left: -2px;
+  border-radius: 2px;
+  background: var(--h-coral);
+  animation: homeScroll 1.8s ease-in-out infinite;
+}
+
+@keyframes homeScroll {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* --- the application story (hero phone) ---------------------------------- */
+
+.h-story {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 24px 72px;
+}
+
+/* A visible light behind the phone, so the middle of the hero has depth. */
+.h-story-glow {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  max-width: 120%;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 200deg,
+    color-mix(in srgb, var(--h-indigo) 28%, transparent),
+    color-mix(in srgb, var(--h-coral) 30%, transparent),
+    color-mix(in srgb, var(--h-sage) 18%, transparent),
+    color-mix(in srgb, var(--h-indigo) 28%, transparent)
+  );
+  filter: blur(56px);
+  opacity: 0.8;
+  animation: homeSpin 18s linear infinite;
+}
+
+/* Facts pinned to the phone's edges, overlapping it. */
+.h-float {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px 10px 10px;
+  border-radius: 14px;
+  background: var(--h-surface);
+  border: 1px solid var(--h-rule);
+  box-shadow: 0 12px 32px rgb(16 34 63 / 0.14);
+  white-space: nowrap;
+  animation: hlFloat 6s ease-in-out infinite;
+}
+
+.h-float.is-offer {
+  top: 22%;
+  left: 0;
+}
+
+.h-float.is-clock {
+  bottom: 18%;
+  right: 0;
+  animation-delay: -3s;
+}
+
+.h-float-icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.h-float.is-offer .h-float-icon {
+  background: var(--h-sage-soft);
+  color: var(--h-sage);
+}
+
+.h-float.is-clock .h-float-icon {
+  background: var(--h-coral-soft);
+  color: var(--h-coral);
+}
+
+.h-float b {
+  display: block;
+  font-size: 13px;
+  color: var(--h-ink);
+}
+
+.h-float i {
+  display: block;
+  font-style: normal;
+  font-size: 11px;
+  color: var(--h-ink-3);
+}
+
+@keyframes hlFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes homeSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.h-phone {
+  position: relative;
+  width: 236px;
+  max-width: 100%;
+  padding: 30px 12px 14px;
+  border-radius: 32px;
+  background: var(--h-surface);
+  border: 5px solid var(--h-indigo-deep);
+  box-shadow:
+    0 30px 60px -12px rgb(16 34 63 / 0.28),
+    0 10px 20px -8px rgb(16 34 63 / 0.12);
+  overflow: hidden;
+  transition: transform 0.5s var(--h-spring);
+}
+
+.h-story:hover .h-phone {
+  transform: translateY(-6px);
+}
+
+@media (prefers-color-scheme: dark) {
+  .h-phone {
+    border-color: var(--h-night-1);
+  }
+}
+
+.h-phone-notch {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  width: 54px;
+  height: 13px;
+  margin-left: -27px;
+  border-radius: 849px;
+  background: var(--h-indigo-deep);
+}
+
+.h-phone-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.h-phone-logo {
+  height: 15.5px;
+  width: auto;
+  color: var(--h-indigo);
+}
+
+.h-phone-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--h-sage);
+}
+
+.h-phone-live i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--h-sage);
+  animation: homeBlink 1.6s ease-in-out infinite;
+}
+
+@keyframes homeBlink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.h-phone-hello {
+  margin: 18.5px 0 8.5px;
+  font-family: var(--h-display);
+  font-size: 15.5px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.h-phone-bar {
+  height: 5px;
+  border-radius: 6px;
+  background: var(--h-bg-2);
+  overflow: hidden;
+}
+
+.h-phone-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--h-sage), var(--h-coral));
+  transition: width 0.7s var(--h-ease);
+}
+
+.h-phone-step {
+  margin: 8px 0 13.5px;
+  font-size: 10.5px;
+  color: var(--h-ink-3);
+}
+
+.h-feed {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.h-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8.5px;
+  padding: 8.5px;
+  border-radius: 13.5px;
+  background: var(--h-bg);
+  border: 1px solid var(--h-rule);
+  animation: homeNote 0.55s var(--h-spring) both;
+}
+
+/* The newest arrives with a little more presence than the rest. */
+.h-note:first-child {
+  background: var(--h-surface);
+  box-shadow: var(--h-shadow);
+}
+
+.h-note:not(:first-child) {
+  opacity: 0.75;
+}
+
+@keyframes homeNote {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.96);
+  }
+  to {
+    transform: none;
+  }
+}
+
+.h-note-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 8.5px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.h-note.is-sage .h-note-icon {
+  background: var(--h-sage-soft);
+  color: var(--h-sage);
+}
+
+.h-note.is-coral .h-note-icon {
+  background: var(--h-coral-soft);
+  color: var(--h-coral);
+}
+
+.h-note.is-indigo .h-note-icon {
+  background: var(--h-lavender);
+  color: var(--h-indigo);
+}
+
+.h-note-text {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.h-note-text b {
+  font-size: 10.5px;
+  line-height: 1.25;
+}
+
+.h-note-text i {
+  font-style: normal;
+  font-size: 10.5px;
+  line-height: 1.35;
+  color: var(--h-ink-3);
+}
+
+/* --- shared section pieces ------------------------------------------------ */
+
+.h-label {
+  margin: 0 0 12px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--h-coral);
+}
+
+.h-head {
+  max-width: 459px;
+  margin-bottom: 47.5px;
+}
+
+.h-h2 {
+  font-family: var(--h-display);
+  font-size: clamp(22px, 2.55vw, 32.5px);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  margin: 0;
+  color: var(--h-ink);
+}
+
+/* --- the problem ---------------------------------------------------------- */
+
+.h-problem {
+  padding: 93.5px 0;
+  background: var(--h-bg-2);
+}
+
+.h-focus {
+  margin: 0 0 22px;
+  font-family: var(--h-display);
+  font-size: clamp(22px, 2.98vw, 37.5px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+
+.h-focus span {
+  color: color-mix(in srgb, var(--h-ink) 16%, transparent);
+  filter: blur(1.5px);
+  transition:
+    color 0.4s ease,
+    filter 0.4s ease;
+}
+
+.h-focus span.is-lit {
+  color: var(--h-ink);
+  filter: none;
+}
+
+.h-answer {
+  margin: 0;
+  font-size: clamp(13.5px, 1.23vw, 15.5px);
+  color: var(--h-ink-2);
+  opacity: 0;
+  transform: translateY(8.5px);
+  transition:
+    opacity 0.6s var(--h-ease),
+    transform 0.6s var(--h-ease);
+}
+
+.h-answer.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+.h-answer strong {
+  color: var(--h-coral);
+}
+
+/* --- how it works: the thread --------------------------------------------- */
+
+.h-how {
+  padding: 85px 0;
+}
+
+.h-thread {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 47.5px;
+  display: grid;
+  gap: 47.5px;
+}
+
+.h-thread-line {
+  position: absolute;
+  left: 15.5px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 3px;
+  background: var(--h-rule);
+  overflow: hidden;
+}
+
+.h-thread-line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(var(--h-indigo), var(--h-sage) 50%, var(--h-coral));
+  transform-origin: top;
+  transform: scaleY(var(--p, 0));
+}
+
+.h-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 27px;
+  align-items: center;
+  opacity: 0.35;
+  transform: translateX(-8px);
+  transition:
+    opacity 0.6s var(--h-ease),
+    transform 0.6s var(--h-ease);
+}
+
+.h-step.is-on {
+  opacity: 1;
+  transform: none;
+}
+
+.h-step-num {
+  position: absolute;
+  left: -47.5px;
+  top: 0;
+  width: 32.5px;
+  height: 32.5px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--h-bg);
+  border: 2px solid var(--h-rule);
+  font-family: var(--h-display);
+  font-weight: 700;
+  color: var(--h-ink-3);
+  transition:
+    background-color 0.4s ease,
+    border-color 0.4s ease,
+    color 0.4s ease,
+    transform 0.4s var(--h-spring);
+}
+
+.h-step.is-on .h-step-num {
+  background: var(--h-indigo);
+  border-color: var(--h-indigo);
+  color: var(--h-bg);
+  transform: scale(1.08);
+}
+
+.h-step-text h3 {
+  margin: 6px 0 10px;
+  font-family: var(--h-display);
+  font-size: clamp(16px, 1.57vw, 20.5px);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.h-step-text p {
+  margin: 0;
+  max-width: 32em;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--h-ink-2);
+}
+
+/* the small pictures beside each step */
+
+.a-card {
+  position: relative;
+  padding: 13.5px;
+  border-radius: 17px;
+  background: var(--h-surface);
+  box-shadow: var(--h-shadow);
+  border: 1px solid var(--h-rule);
+}
+
+.a-row,
+.a-clock {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.a-avatar {
+  display: grid;
+  place-items: center;
+  width: 30.5px;
+  height: 30.5px;
+  border-radius: 50%;
+  background: var(--h-lavender);
+  color: var(--h-indigo);
+  font-weight: 700;
+  font-size: 10.5px;
+}
+
+.a-lines {
+  display: grid;
+  gap: 3px;
+}
+
+.a-lines b {
+  font-size: 12px;
+}
+
+.a-lines i {
+  font-style: normal;
+  font-size: 10.5px;
+  color: var(--h-ink-3);
+}
+
+.a-stamp {
+  display: inline-block;
+  margin-top: 13.5px;
+  padding: 7px 10px;
+  border: 2px solid var(--h-sage);
+  border-radius: 8px;
+  color: var(--h-sage);
+  font-weight: 700;
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  transform: scale(1.6) rotate(-8deg);
+}
+
+.h-step.is-on .a-stamp {
+  opacity: 1;
+  transform: rotate(-4deg);
+  transition:
+    opacity 0.25s ease 0.35s,
+    transform 0.45s var(--h-spring) 0.35s;
+}
+
+.a-ring {
+  width: 39px;
+  height: 39px;
+  flex: none;
+  transform: rotate(-90deg);
+}
+
+.a-ring-track,
+.a-ring-fill {
+  fill: none;
+  stroke-width: 6;
+}
+
+.a-ring-track {
+  stroke: var(--h-coral-soft);
+}
+
+.a-ring-fill {
+  stroke: var(--h-coral);
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.h-step.is-on .a-ring-fill {
+  stroke-dashoffset: 0.43;
+  transition: stroke-dashoffset 1.2s var(--h-ease) 0.3s;
+}
+
+.a-journey {
+  display: flex;
+  justify-content: space-between;
+  padding: 22px 17px 17px;
+}
+
+.a-journey::before {
+  content: '';
+  position: absolute;
+  left: 30.5px;
+  right: 30.5px;
+  top: 28px;
+  height: 2px;
+  background: var(--h-rule);
+}
+
+.a-stop {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 8.5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--h-ink-2);
+}
+
+.a-stop i {
+  width: 13.5px;
+  height: 13.5px;
+  border-radius: 50%;
+  background: var(--h-surface);
+  border: 2px solid var(--h-sage);
+}
+
+.a-stop:last-of-type i {
+  background: var(--h-sage);
+}
+
+.a-runner {
+  position: absolute;
+  left: 30.5px;
+  top: 24px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--h-coral);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--h-coral) 22%, transparent);
+  opacity: 0;
+}
+
+.h-step.is-on .a-runner {
+  opacity: 1;
+  animation: homeRun 3.6s var(--h-ease) 0.4s infinite;
+}
+
+@keyframes homeRun {
+  0% {
+    transform: translateX(0);
+  }
+  80%,
+  100% {
+    transform: translateX(calc(300px - 71.5px));
+  }
+}
+
+/* --- who it is for: the doors --------------------------------------------- */
+
+.h-doors-band {
+  padding: 81.5px 0;
+  background: var(--h-bg-2);
+}
+
+.h-doors {
+  display: flex;
+  gap: 13.5px;
+  min-height: 238px;
+}
+
+.h-door {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20.5px;
+  border-radius: 22px;
+  overflow: hidden;
+  background: var(--h-surface);
+  border: 1px solid var(--h-rule);
+  cursor: default;
+  opacity: 0;
+  transform: translateY(20.5px);
+  transition:
+    flex-grow 0.6s var(--h-ease),
+    background-color 0.4s ease,
+    color 0.4s ease,
+    border-color 0.4s ease;
+}
+
+.h-doors.is-in .h-door {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.6s var(--h-ease) calc(var(--i) * 120ms),
+    transform 0.6s var(--h-ease) calc(var(--i) * 120ms),
+    flex-grow 0.6s var(--h-ease),
+    background-color 0.4s ease,
+    color 0.4s ease,
+    border-color 0.4s ease;
+}
+
+.h-door.is-open {
+  flex-grow: 2.1;
+  color: var(--h-on-dark);
+  border-color: transparent;
+}
+
+.h-door.is-open.is-student {
+  background: linear-gradient(150deg, var(--h-night-1), var(--h-night-2));
+}
+
+.h-door.is-open.is-college {
+  background: linear-gradient(150deg, var(--h-sage-deep-1), var(--h-sage-deep-2));
+}
+
+.h-door.is-open.is-company {
+  background: linear-gradient(150deg, var(--h-coral-deep-1), var(--h-coral-deep-2));
+}
+
+.h-door-who {
+  margin: 0 0 auto;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--h-ink-3);
+  transition: color 0.4s ease;
+}
+
+.h-door.is-open .h-door-who {
+  color: rgb(255 255 255 / 0.7);
+}
+
+.h-door-line {
+  margin: 20.5px 0 0;
+  font-family: var(--h-display);
+  font-size: clamp(16px, 1.53vw, 20.5px);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+}
+
+.h-door-more {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 0.5s var(--h-ease),
+    opacity 0.4s ease;
+}
+
+.h-door-more > * {
+  min-height: 0;
+}
+
+.h-door-more {
+  overflow: hidden;
+}
+
+.h-door.is-open .h-door-more {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition-delay: 0.15s;
+}
+
+.h-door-more p {
+  margin: 12px 0 0;
+  max-width: 30em;
+  font-size: 13px;
+  line-height: 1.55;
+  color: rgb(255 255 255 / 0.82);
+}
+
+.h-door-cta {
+  display: inline-flex;
+  gap: 8px;
+  margin-top: 15.5px;
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+}
+
+.h-door-cta span {
+  transition: transform 0.25s var(--h-spring);
+}
+
+.h-door-cta:hover span {
+  transform: translateX(4px);
+}
+
+.h-door-cta:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+/* --- close ---------------------------------------------------------------- */
+
+.h-close {
+  padding: 85px 0;
+  background: radial-gradient(ellipse at 50% 0%, var(--h-night-1) 0%, var(--h-night-2) 65%);
+  color: var(--h-on-dark);
+  text-align: center;
+}
+
+.h-refuse {
+  list-style: none;
+  margin: 0 0 18.5px;
+  padding: 0;
+  font-family: var(--h-display);
+  font-size: clamp(24px, 3.4vw, 42.5px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.h-refuse li {
+  opacity: 0;
+  transform: translateY(17px);
+}
+
+.h-refuse li:last-child {
+  color: var(--h-glow);
+}
+
+.h-close-inner.is-in .h-refuse li {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.6s var(--h-ease) calc(var(--i) * 180ms),
+    transform 0.6s var(--h-ease) calc(var(--i) * 180ms);
+}
+
+.h-close-sub {
+  margin: 0 0 24px;
+  font-size: 13.5px;
+  color: var(--h-on-dark-2);
+}
+
+/* --- footer --------------------------------------------------------------- */
+
+.h-footer {
+  padding: 34px 0 20.5px;
+  background: var(--h-indigo-deep);
+  color: var(--h-on-dark-2);
+}
+
+.h-footer-inner {
+  display: flex;
+  justify-content: space-between;
+  gap: 27px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.h-foot-logo {
+  height: 30px;
+  width: auto;
+  color: var(--h-on-dark);
+}
+
+.h-foot-line {
+  margin: 10px 0 0;
+  font-size: 11px;
+}
+
+.h-foot-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8.5px 22px;
+}
+
+.h-foot-links a {
+  color: var(--h-on-dark-2);
+  text-decoration: none;
+  font-size: 11px;
+}
+
+.h-foot-links a:hover {
+  color: var(--h-on-dark);
+}
+
+.h-foot-note {
+  margin-top: 27px;
+  padding-top: 15.5px;
+  border-top: 1px solid rgb(255 255 255 / 0.1);
+  font-size: 10.5px;
+  color: rgb(255 255 255 / 0.4);
+}
+
+/* --- small screens -------------------------------------------------------- */
+
+@media (max-width: 920px) {
+  .h-hero-art {
+    justify-self: center;
+  }
+
+  .h-hero-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .h-phone {
+    width: 220px;
+  }
+
+  .h-step {
+    grid-template-columns: 1fr;
+    gap: 18.5px;
+  }
+
+  .h-step-art {
+    max-width: 300px;
+  }
+
+  .h-doors {
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  /* On a phone every door is open; there is nothing to point at. */
+  .h-door,
+  .h-door.is-open {
+    flex-grow: 0;
+    color: var(--h-on-dark);
+    border-color: transparent;
+  }
+
+  .h-door.is-student {
+    background: linear-gradient(150deg, var(--h-night-1), var(--h-night-2));
+  }
+
+  .h-door.is-college {
+    background: linear-gradient(150deg, var(--h-sage-deep-1), var(--h-sage-deep-2));
+  }
+
+  .h-door.is-company {
+    background: linear-gradient(150deg, var(--h-coral-deep-1), var(--h-coral-deep-2));
+  }
+
+  .h-door .h-door-who {
+    color: rgb(255 255 255 / 0.7);
+  }
+
+  .h-door .h-door-more {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+}
+
+@media (max-width: 560px) {
+  .h-float {
+    display: none;
+  }
+
+  .h-story {
+    padding: 16px 0;
+  }
+
+  .h-wrap {
+    padding: 0 13.5px;
+  }
+
+  .h-header-actions .h-btn-quiet {
+    display: none;
+  }
+
+  .h-hero {
+    padding-top: 81.5px;
+  }
+
+  .h-actions .h-btn {
+    flex: 1 1 100%;
+  }
+
+  .h-phone {
+    width: 210px;
+    transform: none;
+  }
+
+  .h-thread {
+    padding-left: 44px;
+    gap: 47.5px;
+  }
+
+  .h-thread-line {
+    left: 14.5px;
+  }
+
+  .h-step-num {
+    left: -44px;
+    width: 31.5px;
+    height: 31.5px;
+  }
+
+  .h-problem,
+  .h-how,
+  .h-doors-band,
+  .h-close {
+    padding: 76.5px 0;
+  }
+
+  .h-step-art {
+    max-width: 100%;
+  }
+
+  @keyframes homeRun {
+    0% {
+      transform: translateX(0);
+    }
+    80%,
+    100% {
+      transform: translateX(calc(100vw - 27px - 44px - 71.5px));
+    }
+  }
+}
+
+/* --- less motion ---------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .h-arrive,
+  .h-door,
+  .h-refuse li,
+  .h-answer,
+  .h-step {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .h-orb,
+  .h-float,
+  .h-story-glow,
+  .h-phone-live i,
+  .h-note,
+  .h-scroll span,
+  .a-runner {
+    animation: none !important;
+  }
+
+  .h-focus span {
+    filter: none;
+  }
+}

@@ -9,6 +9,7 @@ import CompanyFields, {
 import { homeFor, useAuth } from '../auth/AuthContext';
 import './Login.css';
 import './RegisterCompany.css';
+import ApliLogo from '../components/ApliLogo';
 
 /**
  * The one open front door on the platform.
@@ -114,9 +115,8 @@ export default function RegisterCompany() {
   return (
     <div className="login register">
       <div className="login-panel register-panel">
-        <Link to="/" className="login-brand">
-          <span className="brand-mark" aria-hidden="true" />
-          <span>Apli.ai</span>
+        <Link to="/" className="login-brand" aria-label="Apli.ai, home">
+          <ApliLogo className="brand-logo" />
         </Link>
 
         <h1>{step === 3 ? 'Registration received' : 'Register your company'}</h1>

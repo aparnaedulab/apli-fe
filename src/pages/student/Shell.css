@@ -43,23 +43,41 @@
      `--brand` stays the institution's, so a college that set its colour
      still sees it. The accents beside it are ours: a portal that is only
      ever one navy is why this side read as a government form. */
+  /* The landing page's "Sky & Blush" palette, so the portal a student signs
+     into looks like the page that brought them there: an airy blue canvas,
+     deep blue ink, blush for actions and sage for anything verified. The
+     main accent stays the institution's own colour. */
   --s-accent: var(--brand);
-  --s-accent-2: var(--accent-2);
-  --s-accent-3: var(--accent-3);
-  --s-mint: var(--mint);
+  --s-accent-2: #e8456b; /* blush - Apli's own accent */
+  --s-accent-3: #ff9a62; /* warm peach, beside it */
+  --s-mint: #13a37a; /* sage: verified, done */
   --s-amber: var(--amber);
   --s-coral: var(--coral);
-  --s-pink: #e64980;
+  --s-pink: #e8456b;
 
-  --s-grad: var(--grad);
-  --s-grad-soft: var(--grad-soft);
+  /* The action colour: every primary button, as on the landing page. */
+  --s-go: #e8456b;
+  --s-go-hover: #d02f56;
 
-  --s-canvas: #f4f5fa;
+  /* Blue into blush, for fills: progress, the journey path, the avatar. */
+  --s-grad: linear-gradient(118deg, var(--s-accent), color-mix(in srgb, var(--s-accent) 35%, var(--s-accent-2)) 70%, var(--s-accent-2));
+  --s-grad-soft: linear-gradient(
+    118deg,
+    color-mix(in srgb, var(--s-accent) 10%, transparent),
+    color-mix(in srgb, var(--s-accent-2) 9%, transparent)
+  );
+
+  --s-canvas: #f5f9ff;
   --s-card: #ffffff;
-  --s-card-2: #fafbfe;
-  --s-line: #e6e9f2;
-  --s-line-2: #d3d9e8;
-  --s-glass: rgb(255 255 255 / 0.72);
+  --s-card-2: #f8fbff;
+  --s-line: #dfe7f2;
+  --s-line-2: #c9d6ea;
+  --s-glass: rgb(255 255 255 / 0.74);
+
+  /* Ink from the landing page: deep blue rather than grey-black. */
+  --ink: #10223f;
+  --ink-2: #4c5d78;
+  --ink-3: #8b9ab3;
 
   --s-r-xl: var(--r-xl);
   --s-r-lg: var(--r-lg);
@@ -73,7 +91,10 @@
     0 2px 6px rgb(16 24 40 / 0.06),
     0 14px 34px rgb(16 24 40 / 0.14);
 
-  --s-wide: 1220px;
+  /* Wide enough to use a large screen, not so wide that a line of text runs
+     across a whole monitor. Side padding grows with the screen. */
+  --s-wide: 1760px;
+  --s-gutter: clamp(16px, 3vw, 48px);
   --s-dock: 78px;
   --s-ease: var(--ease);
   --s-spring: var(--spring);
@@ -102,7 +123,18 @@
   --stop: var(--s-coral);
   --stop-soft: color-mix(in srgb, var(--s-coral) 12%, transparent);
 
-  min-height: 100vh;
+  /*
+    The whole student portal at 86% of its drawn size. It was built large,
+    and at a normal laptop width it read as zoomed in. One scale on the shell
+    keeps every page in proportion - type, cards, icons and spacing alike -
+    instead of re-tuning thirty stylesheets, five of which the college and
+    company portals share. Viewport heights inside are divided by it so a
+    full-height canvas is still full height.
+  */
+  --s-zoom: 0.86;
+  zoom: var(--s-zoom);
+
+  min-height: calc(100vh / var(--s-zoom));
   /*
     A canvas rather than a page.
 
@@ -113,17 +145,17 @@
   background:
     radial-gradient(
       44rem 30rem at 8% -6%,
-      color-mix(in srgb, var(--s-accent) 20%, transparent),
+      color-mix(in srgb, var(--s-accent) 12%, transparent),
       transparent 60%
     ),
     radial-gradient(
       38rem 26rem at 92% 0%,
-      color-mix(in srgb, var(--s-accent-2) 17%, transparent),
+      color-mix(in srgb, var(--s-accent-2) 9%, transparent),
       transparent 62%
     ),
     radial-gradient(
-      32rem 26rem at 78% 34%,
-      color-mix(in srgb, var(--s-accent-3) 11%, transparent),
+      32rem 26rem at 70% 40%,
+      color-mix(in srgb, var(--s-mint) 6%, transparent),
       transparent 60%
     ),
     var(--s-canvas);
@@ -134,14 +166,22 @@
   .sh {
     /* The accents and the shadow scale flip at :root, which both sides
        share. Only what is this side's own is restated here. */
-    --s-pink: #faa2c1;
+    --s-pink: #ff7896;
+    --s-accent-2: #ff7896;
+    --s-mint: #4fd1a1;
+    --s-go: #ff7896;
+    --s-go-hover: #ff95ab;
 
-    --s-canvas: #0a0d14;
-    --s-card: #151a24;
-    --s-card-2: #1a202c;
-    --s-line: #242c3a;
-    --s-line-2: #353f52;
-    --s-glass: rgb(21 26 36 / 0.72);
+    --s-canvas: #0a1428;
+    --s-card: #142445;
+    --s-card-2: #0f1c36;
+    --s-line: #1e3054;
+    --s-line-2: #2b4170;
+    --s-glass: rgb(20 36 69 / 0.74);
+
+    --ink: #eef4ff;
+    --ink-2: #aebcd6;
+    --ink-3: #7586a6;
 
     --s-shadow-float:
       0 2px 6px rgb(0 0 0 / 0.4),
@@ -169,7 +209,7 @@
   width: 100%;
   max-width: var(--s-wide);
   margin: 0 auto;
-  padding: 11px 26px;
+  padding: 11px var(--s-gutter);
 }
 
 .sh-brand {
@@ -369,6 +409,26 @@
   border-color: color-mix(in srgb, var(--s-accent) 45%, transparent);
 }
 
+/* The bell's "Notifications" word is drawn by ::after for the full-width
+   sidebar row. In this 38px circle it spilled out under the avatar. */
+.sh .bell {
+  position: relative;
+  justify-content: center;
+  padding: 0;
+}
+
+.sh .bell::after {
+  content: none;
+}
+
+.sh .bell-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  margin: 0;
+  font-size: 10.5px;
+}
+
 .sh .bell-panel {
   border-radius: var(--s-r-lg);
   border: 1px solid var(--s-line);
@@ -502,7 +562,7 @@
   width: 100%;
   max-width: var(--s-wide);
   margin: 0 auto;
-  padding: 26px 26px 80px;
+  padding: 26px var(--s-gutter) 80px;
 }
 
 /*
@@ -948,14 +1008,16 @@
 }
 
 .sh .btn-primary {
-  background: var(--s-grad);
+  background: var(--s-go);
   border-color: transparent;
-  box-shadow: 0 2px 12px color-mix(in srgb, var(--s-accent) 32%, transparent);
+  color: #fff;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--s-go) 32%, transparent);
 }
 
 .sh .btn-primary:hover:not(:disabled) {
+  background: var(--s-go-hover);
   transform: translateY(-2px);
-  box-shadow: 0 8px 22px color-mix(in srgb, var(--s-accent) 40%, transparent);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--s-go) 42%, transparent);
 }
 
 .sh .btn-primary:active:not(:disabled) {

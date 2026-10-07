@@ -45,6 +45,72 @@ export function useSpotlight<T extends HTMLElement>() {
 }
 
 /**
+ * A control that leans towards the pointer before it is clicked.
+ *
+ * The page's primary buttons already lift 2px on hover, which happens the
+ * instant the pointer crosses the edge and says nothing on the way there. This
+ * reaches further: from a short distance out the button drifts towards the
+ * cursor, so the reader feels it noticing them a moment before they arrive.
+ *
+ * Kept deliberately small - six pixels of travel over a hundred of approach.
+ * A button that chases the cursor is a toy and, worse, a moving target; a
+ * button that leans is a button that was waiting for you.
+ *
+ * The listener is on the window rather than the element, because the whole
+ * point is to react outside the element's own bounds, where it would never see
+ * a pointer event of its own. One shared rAF, one style write, no React work -
+ * the same contract as `useSpotlight` above.
+ */
+export function useMagnetic<T extends HTMLElement>(pull = 6, reach = 110) {
+  const ref = useRef<T | null>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || prefersReducedMotion()) return;
+    if (window.matchMedia && !window.matchMedia('(pointer: fine)').matches) return;
+
+    let frame = 0;
+
+    const onMove = (e: PointerEvent) => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        const r = el.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        const dx = e.clientX - cx;
+        const dy = e.clientY - cy;
+        const distance = Math.hypot(dx, dy);
+
+        // Beyond reach the control sits still. Inside it, the lean grows as
+        // the pointer closes, and the unit vector keeps the direction honest
+        // for a wide button approached from the side.
+        if (distance > reach) {
+          el.style.setProperty('--tx', '0px');
+          el.style.setProperty('--ty', '0px');
+          return;
+        }
+
+        const strength = (1 - distance / reach) * pull;
+        // Guard the origin: dx and dy are both zero when the pointer is dead
+        // centre, and normalising that is a division by zero.
+        const unit = distance || 1;
+        el.style.setProperty('--tx', `${((dx / unit) * strength).toFixed(2)}px`);
+        el.style.setProperty('--ty', `${((dy / unit) * strength).toFixed(2)}px`);
+      });
+    };
+
+    window.addEventListener('pointermove', onMove, { passive: true });
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, [pull, reach]);
+
+  return ref;
+}
+
+/**
  * A card that leans towards the pointer.
  *
  * Small angles on purpose - four degrees, not fifteen. Enough that the demo

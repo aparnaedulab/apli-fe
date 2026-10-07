@@ -1,0 +1,221 @@
+/* ---------------------------------------------------------------------------
+   The logo, moving.
+
+   The mark was already the right shape for this and nobody had noticed. It is a
+   paper plane with three speed lines behind it - the trails are *in the
+   artwork*, as three separate paths. So the animation does not have to be
+   invented and stuck on: it is the thing the logo is already drawing, finally
+   allowed to happen.
+
+       the plane flies in from the lower left
+       its three trails are left behind it
+       the wordmark settles after it, letter by letter
+       the dot of the i lands last
+
+   Which is also, conveniently, exactly what the product claims to do: something
+   moves, and a record of where it has been stays visible afterwards.
+
+   Two places use it, and they are the two moments a logo is worth animating:
+
+       .intro      once, when the portal is opened
+       .brand:hover  every time somebody points at it
+
+   The parts are labelled in ApliLogo.tsx - `al-mark`, `al-trail`, `al-p`,
+   `al-l`, `al-i`, `al-dot`. Nothing here touches the geometry, and the logo
+   renders complete and still wherever these rules do not apply, which is every
+   other place it is used in the product.
+
+   SVG note: lengths in `transform` on an SVG child are user units, not screen
+   pixels, and this viewBox is 83 x 49 - so 6 units is a seventh of the logo's
+   width. The numbers below look small because they are not small.
+--------------------------------------------------------------------------- */
+
+/* ===========================================================================
+   The parts, and how each one arrives
+   ======================================================================== */
+
+/* The plane, in from the lower left along the line its own trails describe. */
+@keyframes alMark {
+  from {
+    opacity: 0;
+    transform: translate(-7px, 7px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+/*
+  A trail starts bunched up near the plane and stretches back to where it
+  belongs, which is what makes it read as something being left behind rather
+  than as a line fading up.
+*/
+@keyframes alTrail {
+  from {
+    opacity: 0;
+    transform: translate(4.5px, -4.5px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
+/* The letters do not fly. They settle, which is the opposite gesture, and the
+   contrast is what stops the whole lockup looking like confetti. */
+@keyframes alLetter {
+  from {
+    opacity: 0;
+    transform: translate(0, 3px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
+/* The dot is the only part that gets a spring, because it is the only part
+   small enough for one to be legible. */
+@keyframes alDot {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ===========================================================================
+   1. On opening the portal
+   ======================================================================== */
+
+.intro-logo {
+  width: min(280px, 62vw);
+  height: auto;
+  color: var(--ink);
+}
+
+/* Scale and rotate need an origin inside the shape; the default for SVG is the
+   corner of the viewBox, which sends a scaling part across the artwork. */
+.intro-logo .al-mark,
+.intro-logo .al-dot {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+
+.intro-logo .al-trail {
+  animation: alTrail 0.38s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+.intro-logo .al-t1 {
+  animation-delay: 0s;
+}
+
+.intro-logo .al-t2 {
+  animation-delay: 0.06s;
+}
+
+.intro-logo .al-t3 {
+  animation-delay: 0.12s;
+}
+
+.intro-logo .al-mark {
+  animation: alMark 0.46s cubic-bezier(0.18, 0.9, 0.28, 1) 0.14s both;
+}
+
+.intro-logo .al-p,
+.intro-logo .al-l,
+.intro-logo .al-i {
+  animation: alLetter 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.intro-logo .al-p {
+  animation-delay: 0.4s;
+}
+
+.intro-logo .al-l {
+  animation-delay: 0.5s;
+}
+
+.intro-logo .al-i {
+  animation-delay: 0.6s;
+}
+
+.intro-logo .al-dot {
+  /* Overshoot, and it is the last thing to move - the full stop on the word. */
+  animation: alDot 0.42s cubic-bezier(0.2, 1.7, 0.4, 1) 0.74s both;
+}
+
+/* ===========================================================================
+   2. Whenever somebody points at it
+   ======================================================================== */
+
+/*
+  Transitions rather than keyframes, so it reverses when the pointer leaves. A
+  hover that plays an animation and then has to play it backwards is two
+  animations fighting over one property.
+
+  Tiny on purpose: the plane creeps forward about a pixel and a half and the
+  trails stretch away from it. Enough that the logo feels alive under the
+  cursor, not so much that a header appears to be coming apart.
+*/
+.brand-logo .al-mark,
+.brand-logo .al-trail {
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.brand:hover .brand-logo .al-mark,
+.brand:focus-visible .brand-logo .al-mark {
+  transform: translate(1.5px, -1.5px);
+}
+
+.brand:hover .brand-logo .al-trail,
+.brand:focus-visible .brand-logo .al-trail {
+  transform: translate(-1.5px, 1.5px);
+}
+
+/* Furthest trail moves last, so the stretch reads as a ripple down the tail
+   rather than three lines sliding as one block. */
+.brand-logo .al-t2 {
+  transition-delay: 0.04s;
+}
+
+.brand-logo .al-t3 {
+  transition-delay: 0.08s;
+}
+
+/* ===========================================================================
+   Off
+   ======================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  /*
+     `Intro` does not mount at all under this preference, so the first block is
+     unreachable in practice and is neutralised for the visitor who changes the
+     setting mid-visit. The hover is the one that matters here: it is reachable
+     at any time, and it stops.
+  */
+  .intro-logo .al-trail,
+  .intro-logo .al-mark,
+  .intro-logo .al-p,
+  .intro-logo .al-l,
+  .intro-logo .al-i,
+  .intro-logo .al-dot {
+    animation: none;
+  }
+
+  .brand-logo .al-mark,
+  .brand-logo .al-trail {
+    transition: none;
+  }
+
+  .brand:hover .brand-logo .al-mark,
+  .brand:focus-visible .brand-logo .al-mark,
+  .brand:hover .brand-logo .al-trail,
+  .brand:focus-visible .brand-logo .al-trail {
+    transform: none;
+  }
+}

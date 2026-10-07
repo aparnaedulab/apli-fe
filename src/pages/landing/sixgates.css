@@ -1,0 +1,587 @@
+/* ---------------------------------------------------------------------------
+   The six conditions.
+
+   One idea runs through this file and everything else follows from it:
+
+       --local: clamp(0, calc((var(--p) - var(--at)) * var(--rate)), 1)
+
+   `--p` is the reader's position through the section, published on the rail by
+   `useScrollProgress`. `--at` is where this particular gate starts and
+   `--rate` is how quickly it finishes. So every gate turns the one shared
+   number into a private 0-to-1 and animates on that.
+
+   That is what makes this scrub rather than snap. The page already had
+   reveal-on-enter (`Reveal`) and step-by-step demos (`useLoopingSteps`); both
+   are discrete - a thing is in or out, on step three or step four. Here a lock
+   is seven-tenths open because the reader is seven-tenths of the way through
+   its share of the section, and it closes again if they scroll back up. The
+   motion is the scroll, not a reaction to it.
+
+   No JavaScript reads any of this. One style write per frame sets `--p`; the
+   rest is arithmetic the compositor does.
+
+   Colour comes from the tokens redefined on `.landing`, so this file says
+   nothing about the palette and cannot drift from it.
+
+   Everything here stops under prefers-reduced-motion, at the foot of the file,
+   where `--p` is also pinned to 1 by the hook - so the sequence renders
+   finished and the six conditions read as the numbered list they are.
+--------------------------------------------------------------------------- */
+
+.sg {
+  --p: 0;
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+/* ===========================================================================
+   The switch - the one thing the reader changes
+   ======================================================================== */
+
+.sg-switch {
+  display: grid;
+  gap: 0.85rem;
+  justify-items: start;
+  padding: clamp(1.1rem, 2.4vw, 1.6rem);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-lg);
+  background: var(--glass);
+  box-shadow: inset 0 1px 0 var(--glass-edge);
+}
+
+.sg-switch-q {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 650;
+  color: var(--ink);
+}
+
+.sg-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.5rem 0.9rem 0.5rem 0.55rem;
+  border: 1px solid var(--rule-2);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--paper) 55%, transparent);
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    transform 0.16s var(--spring);
+}
+
+.sg-toggle:hover {
+  border-color: var(--brand);
+  transform: translateY(-1px);
+}
+
+.sg-toggle:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
+.sg-toggle-track {
+  position: relative;
+  flex: none;
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--stop-soft);
+  border: 1px solid color-mix(in srgb, var(--stop) 45%, transparent);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.sg-toggle.is-on .sg-toggle-track {
+  background: var(--pass-soft);
+  border-color: color-mix(in srgb, var(--pass) 55%, transparent);
+}
+
+.sg-toggle-knob {
+  position: absolute;
+  inset: 2px auto 2px 2px;
+  width: 18px;
+  border-radius: 999px;
+  background: var(--stop);
+  /* The spring is the whole character of the control: it lands rather than
+     arrives, which is what makes a two-state switch feel mechanical. */
+  transition:
+    transform 0.26s var(--spring),
+    background 0.2s ease;
+}
+
+.sg-toggle.is-on .sg-toggle-knob {
+  transform: translateX(18px);
+  background: var(--pass);
+}
+
+.sg-toggle-label {
+  display: grid;
+  gap: 0.1rem;
+  font-size: 0.9rem;
+  font-weight: 620;
+  text-align: left;
+  line-height: 1.25;
+}
+
+.sg-toggle-label em {
+  font-style: normal;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.sg-toggle.is-on .sg-toggle-label em {
+  color: var(--pass);
+}
+
+.sg:not(.is-refused) .sg-toggle-label em {
+  color: var(--pass);
+}
+
+.sg.is-refused .sg-toggle-label em {
+  color: var(--stop);
+}
+
+.sg-switch-note {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--ink-2);
+  /* Keyed on the state in the component, so the sentence is re-animated
+     rather than swapped underneath somebody mid-read. */
+  animation: sgNote 0.4s var(--ease) both;
+}
+
+@keyframes sgNote {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+/* ===========================================================================
+   The rail and its beam
+   ======================================================================== */
+
+.sg-rail {
+  position: relative;
+  padding-left: clamp(3rem, 6vw, 4.25rem);
+}
+
+.sg-beam {
+  position: absolute;
+  top: 0.9rem;
+  bottom: 0.9rem;
+  left: clamp(1.32rem, 2.85vw, 2rem);
+  width: 2px;
+  border-radius: 2px;
+  background: var(--rule);
+  overflow: visible;
+}
+
+/*
+  The lit part of the beam is the reader's progress, straight through. A
+  transform rather than a height so it is composited and never lays out.
+*/
+.sg-beam-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(to bottom, var(--brand-deep), var(--brand) 60%, var(--accent));
+  transform: scaleY(var(--p));
+  transform-origin: top;
+}
+
+/* The head of the beam, which is where the reader is. */
+.sg-beam-head {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--p) * 100%);
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: var(--brand-hover);
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--brand) 22%, transparent),
+    0 0 18px 2px color-mix(in srgb, var(--brand) 45%, transparent);
+  /* Hidden at the very start and end so it does not sit outside the run. */
+  opacity: clamp(0, calc(var(--p) * 22), 1);
+}
+
+.sg-list {
+  display: grid;
+  gap: clamp(1.15rem, 2.6vw, 1.9rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ===========================================================================
+   One gate
+   ======================================================================== */
+
+.sg-gate {
+  /* The whole mechanism, in one line, once. `--rate` is 1/span, supplied by
+     the component, so this multiplies rather than divides - see SixGates.tsx. */
+  --local: clamp(0, calc((var(--p) - var(--at)) * var(--rate)), 1);
+
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: clamp(0.85rem, 2vw, 1.25rem);
+  align-items: start;
+  padding: clamp(0.95rem, 2.2vw, 1.35rem) clamp(1rem, 2.4vw, 1.5rem);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-lg);
+  background: color-mix(in srgb, var(--surface) calc(38% + var(--local) * 44%), transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff calc(var(--local) * 9%), transparent);
+
+  /* Closed gates sit back and slightly under; opening brings them forward.
+     Both ends are derived from --local, so scrolling back closes them again. */
+  opacity: calc(0.34 + var(--local) * 0.66);
+  transform: translateY(calc((1 - var(--local)) * 10px));
+  border-color: color-mix(in srgb, var(--brand) calc(var(--local) * 38%), var(--rule));
+}
+
+/* A hairline of brand light along the top edge, brightening as it opens. */
+.sg-gate::after {
+  content: '';
+  position: absolute;
+  inset: -1px auto auto 12%;
+  width: 55%;
+  height: 1px;
+  border-radius: 1px;
+  background: linear-gradient(to right, transparent, var(--brand), transparent);
+  opacity: calc(var(--local) * 0.7);
+  pointer-events: none;
+}
+
+/* --- the mark: number and padlock ---------------------------------------- */
+
+.sg-mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 13px;
+  border: 1px solid color-mix(in srgb, var(--brand) calc(20% + var(--local) * 45%), var(--rule));
+  background: color-mix(in srgb, var(--brand-soft) calc(30% + var(--local) * 60%), transparent);
+}
+
+/* The number is what a closed gate shows; the tick takes over as it opens. */
+.sg-n {
+  position: absolute;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+  opacity: calc(1 - var(--local) * 1.6);
+}
+
+.sg-lock {
+  width: 23px;
+  height: 23px;
+  stroke: var(--brand);
+  opacity: clamp(0, calc(var(--local) * 1.8 - 0.15), 1);
+}
+
+/*
+  The shackle lifts and swings clear. transform-box: fill-box puts the origin
+  inside the path rather than at the corner of the viewBox, which is the
+  difference between a hinge and a spin.
+*/
+.sg-shackle {
+  transform-box: fill-box;
+  transform-origin: 85% 100%;
+  transform: rotate(calc(var(--local) * -34deg)) translateY(calc(var(--local) * -1px));
+}
+
+.sg-case {
+  stroke: color-mix(in srgb, var(--brand) 80%, var(--ink));
+}
+
+/* The tick draws itself along its own length as the gate finishes opening. */
+.sg-tick {
+  stroke: var(--pass);
+  stroke-dasharray: 12;
+  stroke-dashoffset: calc(12 - var(--local) * 12);
+  opacity: clamp(0, calc(var(--local) * 2.4 - 1.1), 1);
+}
+
+/* --- the words ----------------------------------------------------------- */
+
+.sg-body {
+  display: grid;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.sg-title {
+  margin: 0;
+  font-size: clamp(1rem, 1.5vw, 1.12rem);
+  font-weight: 660;
+  line-height: 1.35;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.sg-detail {
+  margin: 0;
+  max-width: 64ch;
+  font-size: 0.92rem;
+  line-height: 1.62;
+  color: var(--ink-2);
+}
+
+.sg-source {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.1rem 0 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.sg-source-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--brand);
+  opacity: calc(0.3 + var(--local) * 0.7);
+}
+
+/* ===========================================================================
+   The refusal - what a missing number does
+   ======================================================================== */
+
+.sg-gate.is-stop {
+  /* Refusal is a state, not a position, so it does not wait on the scroll:
+     the reader flipped a switch and the answer is immediate. */
+  opacity: 1;
+  transform: none;
+  border-color: color-mix(in srgb, var(--stop) 55%, var(--rule));
+  background: color-mix(in srgb, var(--stop-soft) 72%, var(--surface));
+  animation: sgRefuse 0.42s var(--ease);
+}
+
+.sg-gate.is-stop::after {
+  background: linear-gradient(to right, transparent, var(--stop), transparent);
+  opacity: 0.8;
+}
+
+.sg-gate.is-stop .sg-mark {
+  border-color: color-mix(in srgb, var(--stop) 60%, transparent);
+  background: color-mix(in srgb, var(--stop) 16%, transparent);
+}
+
+.sg-gate.is-stop .sg-lock {
+  stroke: var(--stop);
+  opacity: 1;
+}
+
+/* Shut again, and the tick withdrawn. */
+.sg-gate.is-stop .sg-shackle {
+  transform: none;
+}
+
+.sg-gate.is-stop .sg-tick {
+  opacity: 0;
+}
+
+.sg-gate.is-stop .sg-n {
+  opacity: 0;
+}
+
+.sg-refusal {
+  margin: 0.45rem 0 0;
+  padding: 0.6rem 0.8rem;
+  border-left: 2px solid var(--stop);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  background: color-mix(in srgb, var(--stop) 10%, transparent);
+  font-size: 0.89rem;
+  line-height: 1.55;
+  color: var(--ink);
+  animation: sgNote 0.4s var(--ease) both;
+}
+
+/* A small shudder - the refusal is a decision being made, not a style. */
+@keyframes sgRefuse {
+  0% {
+    transform: translateX(0);
+  }
+  22% {
+    transform: translateX(-5px);
+  }
+  46% {
+    transform: translateX(4px);
+  }
+  70% {
+    transform: translateX(-2px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/*
+  Everything after the refusal is unreachable, and says so by going quiet
+  rather than by disappearing. The conditions are still there to be read -
+  they are simply never applied, which is exactly what the query does.
+*/
+.sg-gate.is-dark {
+  opacity: 0.3;
+  transform: none;
+  border-color: var(--rule);
+  background: color-mix(in srgb, var(--surface) 30%, transparent);
+  filter: saturate(0.4);
+}
+
+.sg-gate.is-dark::after {
+  opacity: 0;
+}
+
+.sg-gate.is-dark .sg-lock,
+.sg-gate.is-dark .sg-tick {
+  opacity: 0;
+}
+
+.sg-gate.is-dark .sg-n {
+  opacity: 1;
+}
+
+/* The beam stops at the refusal too. */
+.sg.is-refused .sg-beam-fill {
+  background: linear-gradient(to bottom, var(--brand-deep), var(--stop));
+  transform: scaleY(min(var(--p), 0.72));
+}
+
+.sg.is-refused .sg-beam-head {
+  top: calc(min(var(--p), 0.72) * 100%);
+  background: var(--stop);
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--stop) 22%, transparent),
+    0 0 18px 2px color-mix(in srgb, var(--stop) 45%, transparent);
+}
+
+/* ===========================================================================
+   The verdict
+   ======================================================================== */
+
+.sg-verdict {
+  display: grid;
+  gap: 0.3rem;
+  padding: clamp(1rem, 2.4vw, 1.5rem) clamp(1.1rem, 2.6vw, 1.7rem);
+  border: 1px solid var(--rule);
+  border-left-width: 3px;
+  border-radius: var(--r-lg);
+  background: var(--glass);
+  box-shadow: inset 0 1px 0 var(--glass-edge);
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+.sg-verdict.is-pass {
+  border-left-color: var(--pass);
+}
+
+.sg-verdict.is-stop {
+  border-left-color: var(--stop);
+}
+
+.sg-verdict-k {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sg-verdict.is-pass .sg-verdict-k {
+  color: var(--pass);
+}
+
+.sg-verdict.is-stop .sg-verdict-k {
+  color: var(--stop);
+}
+
+.sg-verdict-v {
+  margin: 0;
+  max-width: 68ch;
+  font-size: 0.98rem;
+  line-height: 1.62;
+  color: var(--ink-2);
+}
+
+/* ===========================================================================
+   Small screens
+   ======================================================================== */
+
+@media (max-width: 620px) {
+  .sg-rail {
+    padding-left: 2.4rem;
+  }
+
+  .sg-beam {
+    left: 1.05rem;
+  }
+
+  .sg-gate {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+  }
+
+  /* The mark moves up beside nothing, so it keeps its own row and the words
+     get the full width - which they need at this size more than the padlock
+     needs to be next to them. */
+  .sg-mark {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+/* ===========================================================================
+   Off
+   ======================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  /*
+     The hook pins --p to 1 and attaches no listener, so every gate computes
+     --local as 1 and renders open. These rules remove the arrival and the
+     shudder; the refusal still reads, because it is a state and not a motion.
+  */
+  .sg-gate,
+  .sg-gate.is-stop {
+    animation: none;
+    transform: none;
+  }
+
+  .sg-switch-note,
+  .sg-refusal {
+    animation: none;
+  }
+
+  .sg-toggle,
+  .sg-toggle-knob,
+  .sg-toggle-track,
+  .sg-verdict {
+    transition: none;
+  }
+
+  .sg-toggle:hover {
+    transform: none;
+  }
+}

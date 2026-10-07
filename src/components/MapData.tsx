@@ -25,10 +25,13 @@ export default function MapData({
   collegeName,
   onChanged,
   only,
+  layout = 'cards',
 }: {
   scope: MappingScope;
   offered: Offered;
   collegeName: string;
+  /** 'table' lists every course-and-branch pair as a row - for long catalogues. */
+  layout?: 'cards' | 'table';
   /** Called after any save, so a surrounding list can refresh its counts. */
   onChanged?: () => void;
   /** Show one half without tabs - how Set up walks through it step by step. */
@@ -104,6 +107,7 @@ export default function MapData({
           offered={offered}
           programs={programs}
           collegeName={collegeName}
+          layout={layout}
           save={async (choices) => {
             const next = await scope.savePrograms(choices);
             setPrograms(next);
@@ -144,6 +148,7 @@ export function ProgramsEditor({
   withIntake = true,
   lockedLabel = (n: number) => `${n} students`,
   lockedTitle = 'Students are mapped here',
+  layout = 'cards',
 }: {
   offered: Offered;
   programs: CollegeProgram[];
@@ -155,6 +160,8 @@ export function ProgramsEditor({
   /** What locks a row, in words - students for a college, colleges for the university. */
   lockedLabel?: (n: number) => string;
   lockedTitle?: string;
+  /** 'table': one row per course-and-branch pair, with a ticked-only filter. */
+  layout?: 'cards' | 'table';
 }) {
   const initial = useMemo(() => new Set(programs.map((p) => keyOf(p.courseId, p.branchId))), [programs]);
   const byKey = useMemo(() => new Map(programs.map((p) => [keyOf(p.courseId, p.branchId), p])), [programs]);
@@ -165,6 +172,7 @@ export function ProgramsEditor({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
+  const [tickedOnly, setTickedOnly] = useState(false);
 
   useEffect(() => {
     setChosen(new Set(initial));
@@ -260,7 +268,7 @@ export function ProgramsEditor({
         </p>
       )}
 
-      {offered.courses.length > 6 && (
+      {layout === 'cards' && offered.courses.length > 6 && (
         <input
           className="md-search"
           type="search"
@@ -276,6 +284,25 @@ export function ProgramsEditor({
         </p>
       )}
 
+      {layout === 'table' && (
+        <ProgramsTable
+          offered={offered}
+          filter={filter}
+          setFilter={setFilter}
+          tickedOnly={tickedOnly}
+          setTickedOnly={setTickedOnly}
+          chosen={chosen}
+          setChosen={setChosen}
+          byKey={byKey}
+          intake={intake}
+          setIntake={setIntake}
+          withIntake={withIntake}
+          lockedLabel={lockedLabel}
+          lockedTitle={lockedTitle}
+        />
+      )}
+
+      {layout === 'cards' && (
       <div className="md-courses">
         {courses.map((c) => {
           const keys = c.branches.length ? c.branches.map((b) => keyOf(c.id, b.id)) : [keyOf(c.id, null)];
@@ -350,6 +377,7 @@ export function ProgramsEditor({
           );
         })}
       </div>
+      )}
 
       {orphans.length > 0 && (
         <div className="md-orphans">
@@ -404,6 +432,187 @@ export function ProgramsEditor({
         </span>
       </footer>
     </section>
+  );
+}
+
+/**
+ * The programmes as a table: every course-and-branch pair is a row, so a
+ * university with forty courses is a list to scan and tick, not forty boxes.
+ */
+function ProgramsTable({
+  offered,
+  filter,
+  setFilter,
+  tickedOnly,
+  setTickedOnly,
+  chosen,
+  setChosen,
+  byKey,
+  intake,
+  setIntake,
+  withIntake,
+  lockedLabel,
+  lockedTitle,
+}: {
+  offered: Offered;
+  filter: string;
+  setFilter: (v: string) => void;
+  tickedOnly: boolean;
+  setTickedOnly: (v: boolean) => void;
+  chosen: Set<string>;
+  setChosen: React.Dispatch<React.SetStateAction<Set<string>>>;
+  byKey: Map<string, CollegeProgram>;
+  intake: Record<string, string>;
+  setIntake: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  withIntake: boolean;
+  lockedLabel: (n: number) => string;
+  lockedTitle: string;
+}) {
+  const all = offered.courses.flatMap((c) =>
+    c.branches.length
+      ? c.branches.map((b) => ({ key: keyOf(c.id, b.id), course: c.name, branch: b.name as string | null }))
+      : [{ key: keyOf(c.id, null), course: c.name, branch: null as string | null }],
+  );
+  const f = filter.trim().toLowerCase();
+  const rows = all
+    .filter((r) => !tickedOnly || chosen.has(r.key))
+    .filter((r) => !f || r.course.toLowerCase().includes(f) || (r.branch ?? '').toLowerCase().includes(f));
+
+  const locked = (k: string) => !!byKey.get(k)?.students;
+  const allOn = rows.length > 0 && rows.every((r) => chosen.has(r.key));
+  const someOn = rows.some((r) => chosen.has(r.key));
+
+  function flip(k: string) {
+    if (locked(k)) return;
+    setChosen((prev) => {
+      const next = new Set(prev);
+      if (next.has(k)) next.delete(k);
+      else next.add(k);
+      return next;
+    });
+  }
+
+  function setRows(on: boolean) {
+    setChosen((prev) => {
+      const next = new Set(prev);
+      for (const r of rows) {
+        if (on) next.add(r.key);
+        else if (!locked(r.key)) next.delete(r.key);
+      }
+      return next;
+    });
+  }
+
+  return (
+    <>
+      <div className="cg-bar">
+        <div className="cg-tabs" role="tablist" aria-label="Which programmes to show">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={!tickedOnly}
+            className={!tickedOnly ? 'is-on' : ''}
+            onClick={() => setTickedOnly(false)}
+          >
+            All <span>{all.length}</span>
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tickedOnly}
+            className={tickedOnly ? 'is-on' : ''}
+            onClick={() => setTickedOnly(true)}
+          >
+            Ticked <span>{chosen.size}</span>
+          </button>
+        </div>
+        <input
+          className="md-search cg-search"
+          type="search"
+          placeholder="Find a course or branch"
+          aria-label="Find a course or branch"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+        />
+      </div>
+
+      {rows.length === 0 ? (
+        <div className="cg-empty">
+          <p>{tickedOnly && !f ? 'Nothing ticked yet.' : 'No course or branch matches that.'}</p>
+        </div>
+      ) : (
+        <div className="ct-wrap is-short">
+          <table className="ct">
+            <thead>
+              <tr>
+                <th className="ct-tick">
+                  <input
+                    type="checkbox"
+                    aria-label={allOn ? 'Untick every row shown' : 'Tick every row shown'}
+                    checked={allOn}
+                    ref={(el) => {
+                      if (el) el.indeterminate = someOn && !allOn;
+                    }}
+                    onChange={() => setRows(!allOn)}
+                  />
+                </th>
+                <th>Course</th>
+                <th>Branch</th>
+                {withIntake && <th className="ct-seats">Seats</th>}
+                <th className="ct-num">Students</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r, i) => {
+                const on = chosen.has(r.key);
+                const existing = byKey.get(r.key);
+                const isLocked = locked(r.key);
+                // The course name once per group, so the column reads as headings.
+                const first = i === 0 || rows[i - 1]!.course !== r.course;
+                return (
+                  <tr
+                    key={r.key}
+                    className={`${on ? 'is-on' : ''} ${first ? 'is-first' : 'is-cont'}`}
+                    onClick={() => flip(r.key)}
+                    title={isLocked ? lockedTitle : undefined}
+                  >
+                    <td className="ct-tick">
+                      <input
+                        type="checkbox"
+                        checked={on}
+                        disabled={isLocked}
+                        aria-label={`${r.course}${r.branch ? ` ${r.branch}` : ''}`}
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={() => flip(r.key)}
+                      />
+                    </td>
+                    <td className="ct-name">{first ? r.course : ''}</td>
+                    <td>{r.branch ?? <span className="md-muted">Whole course</span>}</td>
+                    {withIntake && (
+                      <td className="ct-seats" onClick={(e) => e.stopPropagation()}>
+                        {on && (
+                          <input
+                            className="md-intake"
+                            inputMode="numeric"
+                            placeholder="—"
+                            aria-label={`Seats in ${r.course}${r.branch ? ` ${r.branch}` : ''}`}
+                            value={intake[r.key] ?? ''}
+                            onChange={(e) =>
+                              setIntake((v) => ({ ...v, [r.key]: e.target.value.replace(/\D/g, '') }))
+                            }
+                          />
+                        )}
+                      </td>
+                    )}
+                    <td className="ct-num">{existing?.students ? lockedLabel(existing.students) : '—'}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </>
   );
 }
 

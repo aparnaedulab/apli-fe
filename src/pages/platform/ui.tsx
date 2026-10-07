@@ -392,3 +392,55 @@ export function ImageUpload({
     </div>
   );
 }
+
+/** A panel that slides in from the right over the page. Escape or the backdrop closes it. */
+export function SidePanel({
+  title,
+  subtitle,
+  onClose,
+  children,
+  footer,
+}: {
+  title: string;
+  subtitle?: string;
+  /** Pass a stable function (useCallback): the panel re-focuses when it changes. */
+  onClose: () => void;
+  children: ReactNode;
+  /** Pinned to the bottom of the panel - where its main action goes. */
+  footer?: ReactNode;
+}) {
+  const box = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    box.current?.focus();
+    // The page behind should not scroll while the panel is open.
+    const before = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = before;
+    };
+  }, [onClose]);
+
+  return (
+    <div className="sp-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="sp" role="dialog" aria-modal="true" aria-labelledby="sp-title" tabIndex={-1} ref={box}>
+        <header className="sp-head">
+          <div>
+            <h2 id="sp-title">{title}</h2>
+            {subtitle && <p>{subtitle}</p>}
+          </div>
+          <button type="button" className="icon-btn" onClick={onClose} aria-label="Close">
+            ×
+          </button>
+        </header>
+        <div className="sp-body">{children}</div>
+        {footer && <footer className="sp-foot">{footer}</footer>}
+      </div>
+    </div>
+  );
+}
