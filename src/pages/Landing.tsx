@@ -12,8 +12,9 @@ import './landing/home.css';
  * placement cell and companies - where the college verifies every student and
  * approves every job, and every offer is followed until the student joins.
  *
- * Five sections and no more: the hero says it, the problem says why, the
- * thread says how, the doors say who it is for, the close says what we refuse.
+ * Six sections and no more: the hero says it, the problem says why, the
+ * thread says how, the doors say who it is for, the waiting says who else
+ * is counting on the offer, the close says what we refuse.
  *
  * Colour
  * ------
@@ -51,6 +52,7 @@ export default function Landing() {
         <Problem />
         <Thread />
         <Doors />
+        <Waiting />
         <Close />
       </main>
       <Footer />
@@ -568,6 +570,72 @@ function Doors() {
             </article>
           ))}
         </div>
+      </div>
+    </section>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Who is waiting                                                              */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The feeling the rest of the page is careful around: a first job is a whole
+ * household's news. Written in the second person, like the fears in
+ * `landing/content.ts` - no quotes, no invented families, no stock faces.
+ * Each moment is paired with the part of the product that answers it, so the
+ * emotion is never left without a mechanism.
+ */
+const MOMENTS = [
+  {
+    moment: 'You are the first in your family to sit a campus interview.',
+    answer: 'Every round is named before it starts, so nobody has to guess what “technical round” means.',
+  },
+  {
+    moment: 'Every evening, someone at home asks if there is any news.',
+    answer: 'Every application shows where it stands and who it is waiting on. “I don’t know” stops being the answer.',
+  },
+  {
+    moment: 'This degree was paid for with a loan someone is still repaying.',
+    answer: 'Fixed pay, variable pay and any bond are shown before you apply. The number you tell them is the number that arrives.',
+  },
+  {
+    moment: 'By November the silence got loud, and you stopped applying.',
+    answer: 'Your placement cell notices while there is still a season left, without the portal ever labelling you.',
+  },
+] as const;
+
+function Waiting() {
+  const { ref, revealed } = useReveal<HTMLDivElement>();
+
+  return (
+    <section className="h-waiting" id="waiting">
+      <div className={`h-wrap h-waiting-inner ${revealed ? 'is-in' : ''}`} ref={ref}>
+        <div className="h-head">
+          <p className="h-label">Who is waiting on this offer</p>
+          <h2 className="h-h2">A first job is never only yours.</h2>
+          <p className="h-waiting-lede">
+            Behind every application is a phone being checked at home, a fee receipt kept in a drawer, and a
+            student trying not to hope too much. We built for them too.
+          </p>
+        </div>
+
+        <ul className="h-moments">
+          {MOMENTS.map((m, i) => (
+            <li key={m.moment} className="h-moment" style={{ '--i': i } as CSSProperties}>
+              <p className="h-moment-feel">{m.moment}</p>
+              <p className="h-moment-answer">
+                <span aria-hidden="true">✓</span>
+                {m.answer}
+              </p>
+            </li>
+          ))}
+        </ul>
+
+        <p className="h-waiting-end">
+          So when the offer comes, it is one you can <em>tell them about</em> and one that is still there on the
+          day you join.
+        </p>
       </div>
     </section>
   );

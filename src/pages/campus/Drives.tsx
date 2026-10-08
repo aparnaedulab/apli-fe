@@ -66,45 +66,47 @@ export default function Drives() {
       )}
 
       {drives && drives.length > 0 && (
-        <div className="table-wrap">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Drive</th>
-                <th>Type</th>
-                <th className="num">Year</th>
-                <th className="num">Batches</th>
-                <th className="num">Students</th>
-                <th className="num">Jobs</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {drives.map((d) => (
-                <tr key={d.id}>
-                  <td>
-                    <Link to={`/campus/drives/${d.id}`} className="row-link">
-                      {d.name}
-                    </Link>
-                    {d.oneOfferRule && <span className="row-sub">One offer per student</span>}
-                  </td>
-                  <td>{d.type === 'FINAL' ? 'Final placement' : 'Internship'}</td>
-                  <td className="num">{d.year}</td>
-                  <td className="num">{d.batchCount}</td>
-                  <td className="num">{d.studentCount}</td>
-                  <td className="num">{d.jobCount}</td>
-                  <td>
-                    {d.isOpen ? (
-                      <span className="pill pill-pass">Open</span>
-                    ) : (
-                      <span className="pill pill-idle">Closed</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ul className="ecards">
+          {drives.map((d) => (
+            <li key={d.id}>
+              <Link to={`/campus/drives/${d.id}`} className={`ecard ${d.isOpen ? '' : 'is-muted'}`}>
+                <span className="ecard-top">
+                  <span className="ecard-tag">{d.type === 'FINAL' ? 'Final placement' : 'Internship'}</span>
+                  {d.isOpen ? (
+                    <span className="pill pill-pass">Open</span>
+                  ) : (
+                    <span className="pill pill-idle">Closed</span>
+                  )}
+                </span>
+                <b className="ecard-title">{d.name}</b>
+                <span className="ecard-sub">
+                  {d.year}
+                  {d.oneOfferRule && ' · One offer per student'}
+                </span>
+                <dl className="ecard-facts">
+                  <div>
+                    <dt>Batches</dt>
+                    <dd>{d.batchCount}</dd>
+                  </div>
+                  <div>
+                    <dt>Students</dt>
+                    <dd>{d.studentCount}</dd>
+                  </div>
+                  <div>
+                    <dt>Jobs</dt>
+                    <dd>{d.jobCount}</dd>
+                  </div>
+                </dl>
+                <span className="ecard-foot">
+                  <small>
+                    {d.jobCount === 0 ? 'No jobs posted yet' : `${d.jobCount} job${d.jobCount === 1 ? '' : 's'} posted`}
+                  </small>
+                  <span className="ecard-go">Open →</span>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
       )}
     </CampusLayout>
   );

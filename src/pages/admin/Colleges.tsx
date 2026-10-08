@@ -165,30 +165,11 @@ export default function Colleges() {
               </button>
             </div>
           ) : (
-            <div
-              className={`table-wrap ${adding === null ? 'colleges-wrap' : ''} ${
-                loading ? 'is-loading' : ''
-              }`}
-            >
-              <table className="data-table colleges-table">
-                <thead>
-                  <tr>
-                    <th>College</th>
-                    <th>Where</th>
-                    <th>Affiliation</th>
-                    <th className="num">Students</th>
-                    <th className="num">Batches</th>
-                    <th className="num">Seasons</th>
-                    <th>Placement cell</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {colleges.map((c) => (
-                    <CollegeRow key={c.id} college={c} />
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <ul className={`ecards ${loading ? 'is-loading' : ''}`}>
+              {colleges.map((c) => (
+                <CollegeCard key={c.id} college={c} />
+              ))}
+            </ul>
           )}
 
           <Pager
@@ -391,54 +372,57 @@ function Toolbar({
 
 /* -------------------------------------------------------------------------- */
 
-function CollegeRow({ college: c }: { college: CollegeSummary }) {
+function CollegeCard({ college: c }: { college: CollegeSummary }) {
   return (
-    <tr>
-      <td>
-        <Link to={`/admin/colleges/${c.id}`} className="row-link">
-          {c.name}
-        </Link>
-        <span className="row-sub">
-          <span className="mono">{c.code}</span>
+    <li>
+      <Link to={`/admin/colleges/${c.id}`} className="ecard">
+        <span className="ecard-top">
+          <span className="ecard-tag mono">{c.code}</span>
+          {/*
+            The one thing on this card that needs acting on. A college with no
+            account cannot verify a student or run a drive, so it is not just a
+            count of zero - it is work outstanding.
+          */}
+          {c.memberCount === 0 ? (
+            <span className="pill pill-hold">No login yet</span>
+          ) : (
+            <span className="pill pill-pass">
+              {c.memberCount} {c.memberCount === 1 ? 'person' : 'people'}
+            </span>
+          )}
+        </span>
+        <b className="ecard-title">{c.name}</b>
+        <span className="ecard-sub">
+          {c.city}
+          {c.state && <>, {c.state}</>}
           {c.type && <> · {c.type}</>}
           {c.naacGrade && <> · NAAC {c.naacGrade}</>}
         </span>
-      </td>
-      <td>
-        {c.city}
-        <span className="row-sub">{c.state}</span>
-      </td>
-      <td>
-        {c.affiliation ? (
-          <span className="affil" title={c.affiliation}>
-            {c.affiliation}
-          </span>
-        ) : (
-          <span className="pill pill-idle">Autonomous</span>
-        )}
-      </td>
-      <td className="num num-primary">
-        {c.studentCount ? c.studentCount.toLocaleString() : <span className="zero">0</span>}
-      </td>
-      <td className="num num-minor">{c.batchCount || <span className="zero">0</span>}</td>
-      <td className="num num-minor">{c.placementCount || <span className="zero">0</span>}</td>
-      <td>
-        {/*
-          The one thing on this row that needs acting on. A college with no
-          account cannot verify a student or run a drive, so it is not just a
-          count of zero - it is work outstanding.
-        */}
-        {c.memberCount === 0 ? (
-          <Link to={`/admin/colleges/${c.id}`} className="pill pill-hold pill-link">
-            Invite an officer
-          </Link>
-        ) : (
-          <span className="pill pill-pass">
-            {c.memberCount} {c.memberCount === 1 ? 'person' : 'people'}
-          </span>
-        )}
-      </td>
-    </tr>
+        <dl className="ecard-facts">
+          <div>
+            <dt>Students</dt>
+            <dd>{c.studentCount.toLocaleString()}</dd>
+          </div>
+          <div>
+            <dt>Batches</dt>
+            <dd>{c.batchCount}</dd>
+          </div>
+          <div>
+            <dt>Seasons</dt>
+            <dd>{c.placementCount}</dd>
+          </div>
+        </dl>
+        <span className="ecard-note affil" title={c.affiliation ?? undefined}>
+          {c.affiliation ?? 'Autonomous'}
+        </span>
+        <span className="ecard-foot">
+          <small>
+            {c.memberCount === 0 ? 'Invite its placement officer' : 'Placement cell can sign in'}
+          </small>
+          <span className="ecard-go">{c.memberCount === 0 ? 'Invite →' : 'Open →'}</span>
+        </span>
+      </Link>
+    </li>
   );
 }
 

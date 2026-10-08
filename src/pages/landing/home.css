@@ -1396,6 +1396,110 @@
   border-radius: 4px;
 }
 
+/* --- who is waiting -------------------------------------------------------- */
+
+.h-waiting {
+  padding: 93.5px 0;
+  background:
+    radial-gradient(ellipse at 85% 0%, color-mix(in srgb, var(--h-coral-soft) 70%, transparent) 0%, transparent 55%),
+    var(--h-bg);
+}
+
+.h-waiting .h-head {
+  max-width: 560px;
+}
+
+.h-waiting-lede {
+  margin: 14px 0 0;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--h-ink-2);
+}
+
+.h-moments {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15.5px;
+}
+
+.h-moment {
+  padding: 22px 22px 20px;
+  border-radius: 20px;
+  background: var(--h-surface);
+  border: 1px solid var(--h-rule);
+  box-shadow: var(--h-shadow);
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+.h-waiting-inner.is-in .h-moment {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.7s var(--h-ease) calc(var(--i) * 140ms),
+    transform 0.7s var(--h-ease) calc(var(--i) * 140ms);
+}
+
+.h-moment-feel {
+  margin: 0 0 14px;
+  font-family: var(--h-display);
+  font-size: clamp(17px, 1.6vw, 21px);
+  font-weight: 600;
+  line-height: 1.22;
+  letter-spacing: -0.02em;
+  color: var(--h-ink);
+}
+
+.h-moment-answer {
+  display: flex;
+  gap: 10px;
+  margin: 0;
+  padding-top: 13px;
+  border-top: 1px dashed var(--h-rule);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--h-ink-2);
+}
+
+.h-moment-answer span {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--h-sage-soft);
+  color: var(--h-sage);
+}
+
+.h-waiting-end {
+  max-width: 620px;
+  margin: 40px auto 0;
+  text-align: center;
+  font-family: var(--h-display);
+  font-size: clamp(19px, 2.1vw, 26px);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--h-ink);
+  opacity: 0;
+  transition: opacity 0.9s var(--h-ease) 0.7s;
+}
+
+.h-waiting-inner.is-in .h-waiting-end {
+  opacity: 1;
+}
+
+.h-waiting-end em {
+  font-style: normal;
+  color: var(--h-coral);
+}
+
 /* --- close ---------------------------------------------------------------- */
 
 .h-close {
@@ -1597,8 +1701,13 @@
   .h-problem,
   .h-how,
   .h-doors-band,
+  .h-waiting,
   .h-close {
     padding: 76.5px 0;
+  }
+
+  .h-moments {
+    grid-template-columns: 1fr;
   }
 
   .h-step-art {
@@ -1623,7 +1732,9 @@
   .h-door,
   .h-refuse li,
   .h-answer,
-  .h-step {
+  .h-step,
+  .h-moment,
+  .h-waiting-end {
     opacity: 1 !important;
     transform: none !important;
   }

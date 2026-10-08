@@ -1314,3 +1314,98 @@
   font-size: 12.5px;
   color: var(--ink-3);
 }
+
+/* ---------------------------------------------------------------------------
+   Using the width.
+
+   The form was capped at 880px in the middle of the screen, and the preview
+   beside it had lost its layout, so a wide monitor showed a narrow column
+   and two empty margins. Now the form takes the room it is given, and the
+   preview is a column of its own on the right - shown from the start on a
+   wide screen, over the page on a smaller one.
+--------------------------------------------------------------------------- */
+
+.ob.job-wizard {
+  grid-template-columns: 220px minmax(0, 1fr);
+}
+
+.ob.job-wizard.show-preview {
+  grid-template-columns: 220px minmax(0, 1fr) minmax(340px, 420px);
+}
+
+.job-wizard .ob-main {
+  padding-left: clamp(16px, 2vw, 32px);
+  padding-right: clamp(16px, 2vw, 32px);
+}
+
+.job-wizard .ob-head,
+.job-wizard .ob-body.job-wizard-body {
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.job-wizard .ob-preview {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 0 18px 24px;
+  border-left: 1px solid var(--rule);
+  background: var(--surface);
+  scrollbar-width: thin;
+}
+
+.jw-preview-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 -18px 14px;
+  padding: 14px 18px 12px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.jw-preview-x {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Smaller screens: the preview slides over the page instead. */
+@media (max-width: 1280px) {
+  .ob.job-wizard.show-preview {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+
+  .job-wizard .ob-preview {
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 60;
+    width: min(440px, 100vw);
+    box-shadow: -18px 0 50px rgb(0 0 0 / 0.18);
+  }
+}
+
+@media (max-width: 860px) {
+  .ob.job-wizard,
+  .ob.job-wizard.show-preview {
+    grid-template-columns: 1fr;
+  }
+}

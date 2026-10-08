@@ -16,6 +16,7 @@ import BatchesStep from './steps/BatchesStep';
 import StudentsStep from './steps/StudentsStep';
 import MappingStep from './steps/MappingStep';
 import FeaturesStep from './steps/FeaturesStep';
+import HelpStep from './steps/HelpStep';
 import PeopleStep from './steps/PeopleStep';
 import ReviewStep from './steps/ReviewStep';
 import './Platform.css';
@@ -123,6 +124,16 @@ export const STEPS: StepMeta[] = [
       'Switch individual modules on or off from there.',
     ],
     note: 'Some modules need others to work. Anything pulled in is listed when you save.',
+  },
+  {
+    key: 'help',
+    title: 'Student help',
+    lede: 'The questions and answers students see in the help panel on every page.',
+    todo: [
+      'Start from the standard questions - keep, reword or hide each one.',
+      'Add the questions your students actually ask, such as when the season starts.',
+    ],
+    note: 'Optional. Until this is saved, students see the standard questions.',
   },
   {
     key: 'people',
@@ -394,6 +405,7 @@ export default function Onboarding() {
             {step === 'batches' && <BatchesStep {...stepProps} />}
             {step === 'students' && <StudentsStep {...stepProps} />}
             {step === 'features' && <FeaturesStep {...stepProps} />}
+            {step === 'help' && <HelpStep {...stepProps} />}
             {step === 'people' && <PeopleStep {...stepProps} />}
             {step === 'review' && <ReviewStep {...stepProps} />}
           </div>

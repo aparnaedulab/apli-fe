@@ -1,26 +1,45 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 import NotificationBell from '../../components/NotificationBell';
 import { companyDrivesApi } from '../../api/drives';
 import '../admin/AdminLayout.css';
+import './Company.css';
 import ApliLogo from '../../components/ApliLogo';
+import { NAV_ICONS } from '../admin/navIcons';
+import { jobApi } from '../../api/jobs';
 
-const SECTIONS: { to: string; label: string; end: boolean; needs?: string; badge?: 'invitations' }[] = [
-  { to: '/company', label: 'Overview', end: true },
-  { to: '/company/profile', label: 'Company profile', end: false, needs: 'company:profile' },
-  { to: '/company/jobs', label: 'Jobs', end: false, needs: 'job:read' },
-  { to: '/company/invitations', label: 'Campus invitations', end: false, badge: 'invitations' },
-  { to: '/company/applicants', label: 'Applicants', end: false, needs: 'application:read' },
-  { to: '/company/assessments', label: 'Assessments', end: false, needs: 'application:read' },
-  { to: '/company/talent', label: 'Talent', end: false, needs: 'application:read' },
-  { to: '/company/campus-weeks', label: 'Campus weeks', end: false, needs: 'job:read' },
-  { to: '/company/pools', label: 'Pooled drives', end: false, needs: 'posting:target' },
-  { to: '/company/institutions', label: 'Institutions', end: false, needs: 'posting:target' },
-  { to: '/company/team', label: 'Team', end: false, needs: 'team:manage' },
+interface Section {
+  to: string;
+  label: string;
+  end: boolean;
+  icon: string;
+  needs?: string;
+  badge?: 'invitations';
+}
+
+/**
+ * The sections. The everyday ones sit in one flat list, in the order a
+ * recruiter works: roles, the people applying, the colleges, the company.
+ * The occasional tools are folded under "More tools" so the list stays short
+ * enough to read at a glance.
+ */
+const MAIN: Section[] = [
+  { to: '/company', label: 'Overview', end: true, icon: 'overview' },
+  { to: '/company/jobs', label: 'Jobs', end: false, icon: 'jobs', needs: 'job:read' },
+  { to: '/company/applicants', label: 'Applicants', end: false, icon: 'applications', needs: 'application:read' },
+  { to: '/company/invitations', label: 'Invitations', end: false, icon: 'invites', badge: 'invitations' },
+  { to: '/company/institutions', label: 'Colleges', end: false, icon: 'colleges', needs: 'posting:target' },
+  { to: '/company/profile', label: 'Company profile', end: false, icon: 'companies', needs: 'company:profile' },
+  { to: '/company/team', label: 'Team', end: false, icon: 'users', needs: 'team:manage' },
 ];
 
-const SOON: string[] = [];
+const MORE: Section[] = [
+  { to: '/company/assessments', label: 'Assessments', end: false, icon: 'setup', needs: 'application:read' },
+  { to: '/company/talent', label: 'Talent', end: false, icon: 'students', needs: 'application:read' },
+  { to: '/company/campus-weeks', label: 'Campus weeks', end: false, icon: 'drives', needs: 'job:read' },
+  { to: '/company/pools', label: 'Pooled drives', end: false, icon: 'batches', needs: 'posting:target' },
+];
 
 export default function CompanyLayout({ children }: { children: ReactNode }) {
   const { user, logout, can } = useAuth();
@@ -42,8 +61,50 @@ export default function CompanyLayout({ children }: { children: ReactNode }) {
 
   // Only the sections this role can actually open. A link that leads to a
   // refusal tells somebody they have a job they do not have.
-  const sections = SECTIONS.filter((s) => !s.needs || can(s.needs));
+  const main = MAIN.filter((s) => !s.needs || can(s.needs));
+  const more = MORE.filter((s) => !s.needs || can(s.needs));
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  // "More tools" opens itself when one of its pages is the one being viewed.
+  const inMore = more.some((s) => pathname.startsWith(s.to));
+  const [moreOpen, setMoreOpen] = useState(inMore);
+
+  const link = (s: Section) => {
+    const Icon = NAV_ICONS[s.icon];
+    return (
+      <NavLink
+        key={s.to}
+        to={s.to}
+        end={s.end}
+        className={({ isActive }) => `admin-link ${isActive ? 'is-current' : ''}`}
+      >
+        {Icon && <Icon className="admin-link-icon" />}
+        <span className="admin-link-text">{s.label}</span>
+        {s.badge === 'invitations' && pending > 0 && (
+          <span className="admin-badge" aria-label={`${pending} waiting`}>
+            {pending}
+          </span>
+        )}
+      </NavLink>
+    );
+  };
+
+  /** "Post a role", from anywhere: a draft to fill in, as the Jobs page does. */
+  const [creating, setCreating] = useState(false);
+  async function postRole() {
+    setCreating(true);
+    try {
+      const deadline = new Date();
+      deadline.setDate(deadline.getDate() + 30);
+      const job = await jobApi.create({ title: '', description: 'Describe the role here.', deadline: deadline.toISOString() });
+      navigate(`/company/jobs/${job.id}`);
+    } catch {
+      navigate('/company/jobs');
+    } finally {
+      setCreating(false);
+    }
+  }
 
   async function onSignOut() {
     await logout();
@@ -51,35 +112,33 @@ export default function CompanyLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="admin">
+    <div className="admin co is-company">
       <aside className="admin-nav">
         <Link to="/" className="admin-brand" aria-label="Apli.ai, home">
-          {/* The real mark, not the placeholder square it used to be. */}
           <ApliLogo className="brand-logo" />
         </Link>
+        <p className="co-portal">Recruiter portal</p>
 
-        <p className="admin-nav-label">Recruiter</p>
-        <nav aria-label="Company sections">
-          {sections.map((s) => (
-            <NavLink
-              key={s.to}
-              to={s.to}
-              end={s.end}
-              className={({ isActive }) => `admin-link ${isActive ? 'is-current' : ''}`}
-            >
-              {s.label}
-              {s.badge === 'invitations' && pending > 0 && (
-                <span className="admin-badge" aria-label={`${pending} waiting`}>
-                  {pending}
+        <nav aria-label="Company sections" className="co-groups">
+          {main.map(link)}
+
+          {more.length > 0 && (
+            <>
+              <button
+                type="button"
+                className={`admin-link co-more ${moreOpen ? 'is-open' : ''}`}
+                onClick={() => setMoreOpen((v) => !v)}
+                aria-expanded={moreOpen}
+              >
+                <span className="co-more-dots" aria-hidden="true">
+                  ⋯
                 </span>
-              )}
-            </NavLink>
-          ))}
-          {SOON.map((label) => (
-            <span key={label} className="admin-link is-soon">
-              {label} <em>soon</em>
-            </span>
-          ))}
+                <span className="admin-link-text">More tools</span>
+                <span className="co-more-caret" aria-hidden="true" />
+              </button>
+              {moreOpen && <div className="co-more-list">{more.map(link)}</div>}
+            </>
+          )}
         </nav>
 
         <div className="admin-user">
@@ -93,6 +152,11 @@ export default function CompanyLayout({ children }: { children: ReactNode }) {
 
       <main className="admin-main">
         <div className="admin-topbar">
+          {can('job:write') && (
+            <button type="button" className="btn btn-primary co-post" onClick={() => void postRole()} disabled={creating}>
+              {creating ? 'Starting…' : '+ Post a role'}
+            </button>
+          )}
           <NotificationBell />
         </div>
         {children}

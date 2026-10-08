@@ -1078,3 +1078,295 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ===========================================================================
+   Home, restructured to match Jobs and Applications: a compact head with
+   count pills, a slim journey track, then two columns - the next step, and
+   what is going on.
+   ======================================================================== */
+
+.jy {
+  gap: 16px;
+}
+
+/* --- the head ------------------------------------------------------------ */
+
+.jy-top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+}
+
+.jy-top h1 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.jy-top-sub {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin: 4px 0 0;
+  font-size: 13.5px;
+  color: var(--ink-3);
+}
+
+.jy-verified {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--hold-soft);
+  color: var(--hold);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.jy-verified.is-ok {
+  background: var(--pass-soft);
+  color: var(--pass);
+}
+
+/* Count pills - the same shape as the filters on Applications. */
+.jy-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.jy-counts a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--s-line);
+  background: var(--s-card);
+  color: var(--ink-3);
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.jy-counts a b {
+  min-width: 20px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--s-card-2);
+  border: 1px solid var(--s-line);
+  font-size: 12px;
+  text-align: center;
+}
+
+.jy-counts a:hover {
+  border-color: var(--s-line-2);
+  color: var(--ink);
+}
+
+.jy-counts a.is-on {
+  color: var(--ink);
+}
+
+.jy-counts a.is-on b {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--s-accent) 12%, transparent);
+  color: var(--s-accent);
+}
+
+.jy-counts a.is-hot {
+  border-color: color-mix(in srgb, var(--s-go) 45%, var(--s-line));
+  color: var(--s-go);
+}
+
+.jy-counts a.is-hot b {
+  border-color: transparent;
+  background: var(--s-go);
+  color: #fff;
+}
+
+/* --- the slim track --------------------------------------------------------- */
+
+.jy-road.is-slim {
+  padding: 16px 20px 14px;
+}
+
+.jy-road.is-slim .jy-path {
+  margin: 0;
+}
+
+.jy-road.is-slim .jy-stop {
+  gap: 6px;
+}
+
+.jy-road.is-slim .jy-node {
+  width: 30px;
+  height: 30px;
+  font-size: 12.5px;
+}
+
+.jy-road.is-slim .jy-stop + .jy-stop::before {
+  top: 13px;
+}
+
+.jy-road.is-slim .jy-stop.is-behind + .jy-stop::before,
+.jy-road.is-slim .jy-stop.is-done + .jy-stop.is-done::before,
+.jy-road.is-slim .jy-stop + .jy-stop.is-done::before {
+  top: 13px;
+}
+
+.jy-road.is-slim .jy-stop.is-here .jy-node {
+  width: 36px;
+  height: 36px;
+  margin-top: -3px;
+  border-width: 3px;
+  font-size: 13.5px;
+}
+
+.jy-road.is-slim .jy-label {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 12.5px;
+}
+
+.jy-road.is-slim .jy-here {
+  font-size: 9.5px;
+  padding: 1px 7px;
+}
+
+/* --- two columns ---------------------------------------------------------- */
+
+.jy-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+  gap: 16px;
+  align-items: start;
+}
+
+.jy-cols.is-single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.jy-main,
+.jy-side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* The next step is a card of its own now, not an inset of the road. */
+.jy-main .jy-card {
+  border-radius: var(--s-r-xl);
+  box-shadow: var(--s-shadow-1);
+}
+
+.jy-side-card {
+  padding: 16px 18px;
+  border-radius: var(--s-r-xl);
+  border: 1px solid var(--s-line);
+  background: var(--s-card);
+  box-shadow: var(--s-shadow-1);
+}
+
+.jy-side-card header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.jy-side-card h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.jy-side-card header h3 {
+  margin: 0;
+}
+
+.jy-side-card header a {
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--s-accent);
+  text-decoration: none;
+}
+
+.jy-days {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.jy-days li + li {
+  border-top: 1px solid var(--s-line);
+}
+
+.jy-days a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 -8px;
+  padding: 9px 8px;
+  border-radius: var(--s-r-md);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.jy-days a:hover {
+  background: color-mix(in srgb, var(--s-accent) 6%, transparent);
+}
+
+.jy-day {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 42px;
+  padding: 4px 0;
+  border-radius: 10px;
+  border: 1px solid var(--s-line);
+  background: var(--s-card-2);
+  line-height: 1.1;
+}
+
+.jy-day b {
+  font-size: 16px;
+  font-weight: 750;
+}
+
+.jy-day i {
+  font-style: normal;
+  font-size: 10.5px;
+  font-weight: 650;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.jy-days li.is-interview .jy-day {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--s-accent) 12%, transparent);
+  color: var(--s-accent);
+}
+
+@media (max-width: 1000px) {
+  .jy-cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .jy-road.is-slim .jy-label {
+    flex-direction: row;
+  }
+}

@@ -93,39 +93,36 @@ export default function Team() {
       {freshLink && <OneTimeLink link={freshLink} onDismiss={() => setFreshLink(null)} />}
 
       {loaded && (
-        <section className="card">
+        <section className="ecard-section">
           <h2>Members</h2>
           <p className="muted">
             {members.length} {members.length === 1 ? 'person' : 'people'} &mdash; {admins} who can
             manage the team.
           </p>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Can manage the team</th>
-                <th>What they may do</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {members.map((m) => (
-                <tr key={m.id}>
-                  <td>
-                    {m.user.fullName}
-                    {m.isMe && <span className="row-sub">You</span>}
-                  </td>
-                  <td className="mono">{m.user.email}</td>
-                  <td>
+          <ul className="ecards">
+            {members.map((m) => {
+              const admin = isAdminRole(m.role.permissions);
+              return (
+                <li key={m.id}>
+                  <div className="ecard is-static">
+                    <span className="ecard-top">
+                      <span className="ecard-tag">{m.role.name}</span>
+                      <span className={`pill ${admin ? 'pill-pass' : 'pill-idle'}`}>
+                        {admin ? 'Can manage the team' : 'Member'}
+                      </span>
+                    </span>
+                    <b className="ecard-title">
+                      {m.user.fullName}
+                      {m.isMe && ' (you)'}
+                    </b>
+                    <span className="ecard-sub mono">{m.user.email}</span>
                     {/*
                       Changing the role is how somebody is made an admin, or
                       stops being one: the role is the whole of what they may
                       do, so a separate switch would be a second answer to one
                       question.
                     */}
-                    {canManage && !m.isMe ? (
+                    {canManage && !m.isMe && (
                       <select
                         value={m.role.id}
                         disabled={busy}
@@ -141,18 +138,7 @@ export default function Team() {
                           </option>
                         ))}
                       </select>
-                    ) : (
-                      <span className="pill pill-idle">{m.role.name}</span>
                     )}
-                  </td>
-                  <td>
-                    {isAdminRole(m.role.permissions) ? (
-                      <span className="pill pill-pass">Yes</span>
-                    ) : (
-                      <span className="muted">No</span>
-                    )}
-                  </td>
-                  <td>
                     {/* Read from the catalogue, so it says the same thing
                         here as it does on the invitation form. */}
                     <RolePreview
@@ -164,64 +150,69 @@ export default function Team() {
                       }}
                       catalogue={catalogue}
                     />
-                  </td>
-                  <td className="right">
                     {canManage && !m.isMe && (
-                      <button
-                        type="button"
-                        className="link-btn is-danger"
-                        disabled={busy}
-                        onClick={() => run(() => companyApi.removeMember(m.id))}
-                      >
-                        Remove
-                      </button>
+                      <span className="ecard-foot">
+                        <small />
+                        <span className="ecard-actions">
+                          <button
+                            type="button"
+                            className="link-btn is-danger"
+                            disabled={busy}
+                            aria-label={`Remove ${m.user.fullName} from the team`}
+                            onClick={() => run(() => companyApi.removeMember(m.id))}
+                          >
+                            Remove
+                          </button>
+                        </span>
+                      </span>
                     )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
         </section>
       )}
 
       {invites.length > 0 && (
-        <section className="card">
+        <section className="ecard-section">
           <h2>Invited, not joined yet</h2>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Email</th>
-                <th>Name</th>
-                <th>Role</th>
-                <th>Expires</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {invites.map((inv) => (
-                <tr key={inv.id}>
-                  <td className="mono">{inv.email}</td>
-                  <td>{inv.invitedName ?? '—'}</td>
-                  <td>
-                    <span className="pill pill-idle">{inv.role?.name ?? '—'}</span>
-                  </td>
-                  <td>{new Date(inv.expiresAt).toLocaleDateString()}</td>
-                  <td className="right">
-                    {canManage && (
-                      <button
-                        type="button"
-                        className="link-btn is-danger"
-                        disabled={busy}
-                        onClick={() => run(() => companyApi.cancelInvite(inv.id))}
-                      >
-                        Cancel
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <ul className="ecards">
+            {invites.map((inv) => (
+              <li key={inv.id}>
+                <div className="ecard is-static">
+                  <span className="ecard-top">
+                    <span className="ecard-tag">{inv.role?.name ?? 'No role'}</span>
+                    <span className="pill pill-hold">Invited</span>
+                  </span>
+                  <b className="ecard-title">{inv.invitedName ?? inv.email}</b>
+                  {inv.invitedName && <span className="ecard-sub mono">{inv.email}</span>}
+                  <dl className="ecard-facts">
+                    <div>
+                      <dt>Expires</dt>
+                      <dd>{new Date(inv.expiresAt).toLocaleDateString()}</dd>
+                    </div>
+                  </dl>
+                  {canManage && (
+                    <span className="ecard-foot">
+                      <small>Not joined yet</small>
+                      <span className="ecard-actions">
+                        <button
+                          type="button"
+                          className="link-btn is-danger"
+                          disabled={busy}
+                          aria-label={`Cancel the invitation to ${inv.email}`}
+                          onClick={() => run(() => companyApi.cancelInvite(inv.id))}
+                        >
+                          Cancel
+                        </button>
+                      </span>
+                    </span>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
 

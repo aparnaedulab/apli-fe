@@ -351,10 +351,9 @@ export default function StudentLayout({ children }: { children: ReactNode }) {
    * primary tab into a page that says "not available here". It takes the
    * first one that is on, and guides - which nothing gates - if none are.
    */
-  const prepareTo = useMemo(() => {
-    const ready = groups.find((g) => g.label === 'Get ready');
-    return ready?.items[0]?.to ?? '/student/guides';
-  }, [groups]);
+  // Prepare is now one hub page listing every tool that is switched on,
+  // rather than whichever tool happened to be first.
+  const prepareTo = '/student/get-ready';
 
   const primary = useMemo(
     () => PRIMARY.map((p) => (p.to === '__prepare__' ? { ...p, to: prepareTo } : p)),

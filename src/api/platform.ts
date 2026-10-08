@@ -13,6 +13,7 @@ export type StepKey =
   | 'batches'
   | 'students'
   | 'features'
+  | 'help'
   | 'people'
   | 'review';
 export type ModuleCategory =
@@ -365,6 +366,18 @@ export interface InviteOutcome {
   note?: string;
 }
 
+export interface HelpQuestionInput {
+  question: string;
+  answer: string;
+  isVisible: boolean;
+}
+
+export interface HelpList {
+  questions: (HelpQuestionInput & { id: string })[];
+  /** True until the institution saves a list of its own. */
+  isDefault: boolean;
+}
+
 export const platformApi = {
   tenants: () => api.get<{ tenants: TenantCard[] }>('/platform/tenants'),
   catalogue: () => api.get<Catalogue>('/platform/catalogue'),
@@ -414,6 +427,10 @@ export const platformApi = {
   deleteBatch: (id: string, batchId: string) =>
     api.delete<OnboardingState>(`/platform/tenants/${id}/batches/${batchId}`),
   /** Passes an optional step (batches) without adding anything. */
+  /** The student help questions, or the platform defaults to start from. */
+  help: (id: string) => api.get<HelpList>(`/platform/tenants/${id}/help`),
+  saveHelp: (id: string, questions: HelpQuestionInput[]) =>
+    api.put<HelpList & OnboardingState>(`/platform/tenants/${id}/help`, { questions }),
   completeStep: (id: string, step: StepKey) =>
     api.post<OnboardingState>(`/platform/tenants/${id}/steps/${step}/complete`),
   saveFeatures: (id: string, selected: string[], unverifiedCompanyAccess?: boolean) =>

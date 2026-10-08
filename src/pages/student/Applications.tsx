@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import StudentLayout from './StudentLayout';
 import { studentJobsApi, type MyApplication, type MyRound } from '../../api/candidate';
@@ -10,7 +10,6 @@ import { Stepper, Timeline, WaitingNote } from '../../components/TrackerView';
 import { afterOfferApi, type RatingRow, type StudentOffer } from '../../api/afterOffer';
 import { JoiningCard, RateCard } from './AfterOffer';
 import { proofApi, type EnrolmentStatus, type StudentRoundSimulation } from '../../api/proof';
-import { ApliFace } from './Apli';
 import { notificationApi, type Notification } from '../../api/notifications';
 import GuideStrip, { cueForRound, cueForStatus } from './guides/GuideStrip';
 import { useT, type MessageKey } from '../../i18n';
@@ -198,6 +197,9 @@ export default function Applications() {
   const navigate = useNavigate();
 
   const [tile, setTile] = useState<'all' | Bucket | 'needs'>('all');
+  /** The application open in the side panel. */
+  const [openId, setOpenId] = useState<string | null>(null);
+  const closePanel = useCallback(() => setOpenId(null), []);
 
   const load = useCallback(() => {
     studentJobsApi
@@ -389,18 +391,53 @@ export default function Applications() {
   return (
     <StudentLayout>
       <div className="ap">
+        {/*
+          One compact head: the title and a line saying what this is on the
+          left, the filters on the right. The cards are the page; nothing
+          above them should take more room than it has to.
+        */}
         <header className="ap-head">
           <div className="ap-head-left">
-            <h1>{t('app.title')}</h1>
-            {unreadTotal > 0 && (
-              <span className="ap-head-new">{t('app.newsNew', { n: unreadTotal })}</span>
-            )}
+            <h1>
+              {t('app.title')}
+              {unreadTotal > 0 && (
+                <span className="ap-head-new">{t('app.newsNew', { n: unreadTotal })}</span>
+              )}
+            </h1>
+            <p className="ap-lede">{t('app.lede')}</p>
           </div>
 
-          {unreadTotal > 0 && (
-            <button type="button" className="ap-read-all" onClick={readEverything}>
-              {t('app.markAllRead')}
-            </button>
+          {apps && apps.length > 0 && (
+            <div className="ap-pills" role="tablist" aria-label={t('app.title')}>
+              {counts.needs > 0 && (
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={tile === 'needs'}
+                  className={`ap-pill is-hot ${tile === 'needs' ? 'is-current' : ''}`}
+                  onClick={() => setTile('needs')}
+                >
+                  {t('app.tileNeeds')} <b>{counts.needs}</b>
+                </button>
+              )}
+              {TILES.map(([key, label, , n]) => (
+                <button
+                  key={key}
+                  type="button"
+                  role="tab"
+                  aria-selected={tile === key}
+                  className={`ap-pill ${tile === key ? 'is-current' : ''}`}
+                  onClick={() => setTile(key)}
+                >
+                  {label} <b>{n}</b>
+                </button>
+              ))}
+              {unreadTotal > 0 && (
+                <button type="button" className="ap-read-all" onClick={readEverything}>
+                  {t('app.markAllRead')}
+                </button>
+              )}
+            </div>
           )}
         </header>
 
@@ -410,73 +447,36 @@ export default function Applications() {
 
         {apps && apps.length > 0 && (
           <>
-            {/*
-              What is next, at the top, because it is the question the page is
-              opened with. A student with three interviews next week should
-              never have to read nine cards to find out what Thursday is.
-            */}
-            <section className={`ap-next ${comingUp.length > 0 ? 'has-dates' : ''}`}>
-              <p className="ap-apli">
-                <ApliFace mood={comingUp.length > 0 ? 'cheer' : said.mood} size={34} />
-                <span>{comingUp.length > 0 ? apliAbout(t, comingUp[0]!) : said.says}</span>
-              </p>
+            {/* Only when there is something to act on or a date to keep:
+                an interview coming up, or something waiting on the student.
+                "Nothing needs you" is what the counts already say. */}
+            {(comingUp.length > 0 || counts.needs > 0) && (
+              <section className={`ap-next ${comingUp.length > 0 ? 'has-dates' : ''}`}>
+                <p className="ap-apli">
+                  <span className="ap-apli-dot" aria-hidden="true" />
+                  <span>{comingUp.length > 0 ? apliAbout(t, comingUp[0]!) : said.says}</span>
+                </p>
 
-              {comingUp.length > 0 && (
-                <>
-                  <h2>{t('app.comingUp')}</h2>
-                  <ul>
+                {comingUp.length > 0 && (
+                  <ul className="ap-next-list">
                     {comingUp.slice(0, 3).map(({ a, round, at }) => (
                       <li key={a.id}>
-                        <time dateTime={round.scheduledAt!}>{dayOf(t, at)}</time>
-                        <span className="ap-next-what">
-                          <b>{round.name}</b>
-                          <small>
-                            {a.companyName} · {round.isOnline ? t('app.online') : t('app.inPerson')}
-                            {round.venue ? ` · ${round.venue}` : ''}
-                          </small>
-                        </span>
-                        <span className="ap-next-time">{timeOf(at)}</span>
+                        <button type="button" onClick={() => setOpenId(a.id)}>
+                          <time dateTime={round.scheduledAt!}>{dayOf(t, at)}</time>
+                          <span className="ap-next-what">
+                            <b>{round.name}</b>
+                            <small>
+                              {a.companyName} · {round.isOnline ? t('app.online') : t('app.inPerson')}
+                            </small>
+                          </span>
+                          <span className="ap-next-time">{timeOf(at)}</span>
+                        </button>
                       </li>
                     ))}
                   </ul>
-                </>
-              )}
-            </section>
-
-            {/* The count and the filter are the same control: a student who
-                wants to know how many are still moving is about to click on
-                them anyway. */}
-            <div className="ap-tiles" role="tablist" aria-label={t('app.title')}>
-              {TILES.map(([key, label, hint, n]) => (
-                <button
-                  key={key}
-                  type="button"
-                  role="tab"
-                  aria-selected={tile === key}
-                  className={`ap-tile ${tile === key ? 'is-current' : ''}`}
-                  onClick={() => setTile(key)}
-                >
-                  <b>{n}</b>
-                  <span>{label}</span>
-                  <small>{hint}</small>
-                </button>
-              ))}
-
-              {/* Only ever on the page when it is true. */}
-              {counts.needs > 0 && (
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={tile === 'needs'}
-                  className={`ap-tile is-hot ${tile === 'needs' ? 'is-current' : ''}`}
-                  onClick={() => setTile('needs')}
-                >
-                  <b>{counts.needs}</b>
-                  <span>{t('app.tileNeeds')}</span>
-                  <small>{t('app.tileNeedsHint')}</small>
-                </button>
-              )}
-            </div>
+                )}
+              </section>
+            )}
 
             {shown.length === 0 ? (
               <div className="ap-none">
@@ -484,32 +484,48 @@ export default function Applications() {
                 <p className="muted">{t('app.noneMatchBody')}</p>
               </div>
             ) : (
-              <ul className="ap-list">
+              <ul className="ap-board">
                 {shown.map((a) => (
-                  <Row
+                  <Card
                     key={a.id}
                     a={a}
                     updates={newsFor.get(a.id) ?? []}
                     tracked={tracked.get(a.id)}
-                    sim={roundSims.get(a.id)}
-                    offer={offers.get(a.id)}
-                    rated={ratings.get(a.id)}
-                    busy={busy}
-                    onRead={readOne}
-                    onStartRound={startRound}
-                    onOpenSim={(id) => navigate(`/student/projects?id=${id}`)}
-                    onAct={act}
-                    onChanged={load}
+                    mine={needsMe(a)}
+                    onOpen={() => setOpenId(a.id)}
                   />
                 ))}
               </ul>
             )}
+
+            {openId &&
+              (() => {
+                const a = (apps ?? []).find((x) => x.id === openId);
+                if (!a) return null;
+                return (
+                  <Panel title={a.title} subtitle={`${a.companyName} · ${a.placementName}`} onClose={closePanel}>
+                    <Detail
+                      a={a}
+                      updates={newsFor.get(a.id) ?? []}
+                      tracked={tracked.get(a.id)}
+                      sim={roundSims.get(a.id)}
+                      offer={offers.get(a.id)}
+                      rated={ratings.get(a.id)}
+                      busy={busy}
+                      onRead={readOne}
+                      onStartRound={startRound}
+                      onOpenSim={(id) => navigate(`/student/projects?id=${id}`)}
+                      onAct={act}
+                      onChanged={load}
+                    />
+                  </Panel>
+                );
+              })()}
           </>
         )}
 
         {apps?.length === 0 && (
           <div className="ap-empty">
-            <ApliFace mood="hello" size={54} />
             <h2>{t('app.emptyTitle')}</h2>
             <p>{t('app.emptyBody')}</p>
             <Link className="btn btn-primary" to="/student/jobs">
@@ -596,7 +612,165 @@ function WhenWhere({ round }: { round: MyRound }) {
 }
 
 /**
- * One application, as a row that opens.
+ * One application on the board.
+ *
+ * The card answers what a student scans for: which role, where it stands,
+ * and whether anything new has happened. The track along the middle is the
+ * process drawn - applied, each round, the offer - with the student's place
+ * on it. Everything else is one click away, in the side panel.
+ */
+function Card({
+  a,
+  updates,
+  tracked,
+  mine,
+  onOpen,
+}: {
+  a: MyApplication;
+  updates: Notification[];
+  tracked?: TrackedApplication;
+  mine: boolean;
+  onOpen: () => void;
+}) {
+  const { t } = useT();
+  const bucket = bucketOf(a.status);
+  const rounds = tracked?.rounds ?? a.rounds;
+  const unread = updates.filter((n) => !n.readAt).length;
+  const latest = updates[0];
+  const quiet = daysSince(a.lastEventAt);
+
+  /* The track: applied, each round, the offer. */
+  const stops = [t('app.st.APPLIED'), ...rounds.map((r) => r.name), t('app.tileOffers')];
+  const reached =
+    bucket === 'offer'
+      ? stops.length - 1
+      : a.status === 'IN_ROUND' || a.status === 'SHORTLISTED' || a.status === 'WAITLISTED'
+        ? Math.max(1, a.currentRound?.order ?? 1)
+        : 0;
+
+  return (
+    <li className={`ap-card is-${bucket} ${mine ? 'is-mine' : ''} ${unread > 0 ? 'is-unread' : ''}`}>
+      <button type="button" className="ap-card-hit" onClick={onOpen} aria-label={`${a.title}, ${a.companyName}`}>
+        <span className="ap-card-top">
+          <span className="ap-mark" aria-hidden="true">
+            {a.companyName.slice(0, 2).toUpperCase()}
+          </span>
+          <span className="ap-card-who">
+            <b>{a.title}</b>
+            <small>{a.companyName}</small>
+          </span>
+          <span className={`ap-status is-${a.status.toLowerCase()}`}>
+            {ST[a.status] ? t(ST[a.status]!) : a.status}
+          </span>
+        </span>
+
+        {bucket !== 'closed' && (
+          <span className="ap-track" aria-hidden="true">
+            {stops.map((name, i) => (
+              <span
+                key={i}
+                className={`ap-stop ${i < reached ? 'is-done' : ''} ${i === reached ? 'is-here' : ''}`}
+                title={name}
+              >
+                <i />
+              </span>
+            ))}
+          </span>
+        )}
+        {bucket !== 'closed' && (
+          <span className="ap-track-label">
+            {reached === 0
+              ? t('app.st.APPLIED')
+              : reached >= stops.length - 1
+                ? stops[stops.length - 1]
+                : stops[reached]}
+            <small>
+              {' · '}
+              {Math.min(reached + 1, stops.length)} / {stops.length}
+            </small>
+          </span>
+        )}
+
+        <span className="ap-card-news">
+          {unread > 0 && <span className="ap-dot" aria-hidden="true" />}
+          {latest ? (
+            <>
+              <b>{latest.title}</b>
+              <small>{ago(t, latest.createdAt)}</small>
+            </>
+          ) : SD[a.status] ? (
+            <span>{t(SD[a.status]!)}</span>
+          ) : null}
+        </span>
+
+        <span className="ap-card-foot">
+          <small>
+            {t('app.appliedOn', { date: shortDate(a.appliedAt) })}
+            {' · '}
+            {quiet <= 0 ? t('app.movedToday') : quiet === 1 ? t('app.quietOne') : t('app.quietDays', { n: quiet })}
+          </small>
+          {mine ? (
+            <span className="ap-card-cta">
+              {a.status === 'OFFERED' ? t('app.accept') + ' / ' + t('app.decline') : t('app.needsYouFlag')} →
+            </span>
+          ) : (
+            <span className="ap-card-more">Details →</span>
+          )}
+        </span>
+      </button>
+    </li>
+  );
+}
+
+/** A panel that slides in from the right. Escape or the backdrop closes it. */
+function Panel({
+  title,
+  subtitle,
+  onClose,
+  children,
+}: {
+  title: string;
+  subtitle: string;
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
+  const box = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    window.addEventListener('keydown', onKey);
+    box.current?.focus();
+    const before = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = before;
+    };
+  }, [onClose]);
+
+  return (
+    <div className="ap-panel-back" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="ap-panel" role="dialog" aria-modal="true" aria-labelledby="ap-panel-title" tabIndex={-1} ref={box}>
+        <header className="ap-panel-head">
+          <div>
+            <h2 id="ap-panel-title">{title}</h2>
+            <p>{subtitle}</p>
+          </div>
+          <button type="button" className="ap-panel-x" onClick={onClose} aria-label="Close">
+            ×
+          </button>
+        </header>
+        <div className="ap-panel-body">{children}</div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Everything about one application, in the side panel: its updates, where to
+ * be and when, anything that is the student's to do, and its history.
+ *
+ * (Formerly the body of a row that opened in place.)
  *
  * Closed, it answers the three questions a student scanning the list has:
  * which role, where it stands, and whether anything has happened. Open, it is
@@ -608,7 +782,7 @@ function WhenWhere({ round }: { round: MyRound }) {
  * changed, and a number they can see without opening anything is the fastest
  * way to find it.
  */
-function Row({
+function Detail({
   a,
   updates,
   tracked,
@@ -651,68 +825,20 @@ function Row({
    * button behind a click somebody has to think to make is a missed offer,
    * and no amount of tidiness is worth that.
    */
-  const [open, setOpen] = useState(mine);
-  const [history, setHistory] = useState(false);
+  const [history, setHistory] = useState(true);
 
   return (
-    <li className={`ap-row is-${bucket} ${unread > 0 ? 'is-unread' : ''} ${open ? 'is-open' : ''}`}>
-      <button
-        type="button"
-        className="ap-row-head"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-      >
-        {/* A monogram, not a logo: every company has two letters and none of
-            them has an image here. */}
-        <span className="ap-mark" aria-hidden="true">
-          {a.companyName.slice(0, 2).toUpperCase()}
-        </span>
-
-        <span className="ap-row-who">
-          <b>{a.title}</b>
-          <small>
-            {a.companyName} · {a.placementName}
-          </small>
-        </span>
-
-        {/* How far along, as a shape - dropped once the answer stops
-            mattering, which is the moment the application closes. */}
-        {bucket !== 'closed' && rounds.length > 0 && (
-          <span className="ap-row-far">
-            <span className="ap-bar" aria-hidden="true">
-              {rounds.map((r, i) => (
-                <i key={r.id} className={i + 1 < at ? 'is-done' : i + 1 === at ? 'is-now' : ''} />
-              ))}
-            </span>
-            <small>{t('app.roundOf', { n: at, of: rounds.length })}</small>
-          </span>
-        )}
-
-        <span className={`pill ${STATUS_PILL[a.status] ?? 'pill-idle'}`}>
+    <div className={`ap-detail is-${bucket}`}>
+      <p className="ap-detail-status">
+        <span className={`ap-status is-${a.status.toLowerCase()}`}>
           {ST[a.status] ? t(ST[a.status]!) : a.status}
         </span>
-
-        {/*
-          How much has happened here. Filled while any of it is unread, hollow
-          once it has all been seen - so the list can be scanned for the one
-          that changed without opening a single row.
-        */}
-        {updates.length > 0 && (
-          <span
-            className={`ap-count ${unread > 0 ? 'is-new' : ''}`}
-            title={t('app.updates')}
-            aria-label={t('app.newsNew', { n: unread || updates.length })}
-          >
-            {unread > 0 ? unread : updates.length}
-          </span>
+        {bucket !== 'closed' && rounds.length > 0 && (
+          <span className="ap-detail-far">{t('app.roundOf', { n: at, of: rounds.length })}</span>
         )}
-
-        {mine && <span className="ap-mine">{t('app.needsYouFlag')}</span>}
-
-        <span className={`ap-caret ${open ? 'is-open' : ''}`} aria-hidden="true" />
-      </button>
-
-      {open && (
+        {unread > 0 && <span className="ap-detail-new">{t('app.newsNew', { n: unread })}</span>}
+      </p>
+      {(
         <div className="ap-row-body">
           {/* The status as a sentence, but only where it says more than the
               pill above it already did. */}
@@ -898,6 +1024,6 @@ function Row({
           )}
         </div>
       )}
-    </li>
+    </div>
   );
 }

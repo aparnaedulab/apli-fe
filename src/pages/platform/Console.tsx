@@ -5,9 +5,11 @@ import { platformApi, type TenantCard, type TenantStatus } from '../../api/platf
 import { useAuth } from '../../auth/AuthContext';
 import { lightTokens, monogram } from '../../lib/brand';
 import ConsoleHeader from './ConsoleHeader';
+import { STEPS } from './Onboarding';
 import './Platform.css';
 
-const STEP_TOTAL = 7;
+/** The wizard's own step list, so this count can never drift from it again. */
+const STEP_TOTAL = STEPS.length;
 
 const FILTERS: { key: TenantStatus | 'ALL'; label: string }[] = [
   { key: 'ALL', label: 'All' },

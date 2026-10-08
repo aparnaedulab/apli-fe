@@ -118,56 +118,46 @@ export function Companies() {
       )}
 
       {companies && companies.length > 0 && (
-        <div className="table-wrap">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Company</th>
-                <th>Industry</th>
-                <th>Came from</th>
-                <th className="num">Team</th>
-                <th className="num">Jobs</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {companies.map((c) => (
-                <tr key={c.id}>
-                  <td>
-                    <Link to={`/admin/companies/${c.id}`} className="row-link">
-                      {c.name}
-                    </Link>
-                    {c.website && <span className="row-sub">{c.website}</span>}
-                  </td>
-                  <td>
-                    {c.industry ?? '—'}
-                    {c.city && <span className="row-sub">{c.city}</span>}
-                  </td>
-                  <td>
-                    {/* Worth telling apart: one was vouched for, one was not. */}
-                    {c.appliedAt ? (
-                      <>
-                        Registered
-                        <span className="row-sub">
-                          {new Date(c.appliedAt).toLocaleDateString()}
-                        </span>
-                      </>
-                    ) : (
-                      <span className="muted">Added by operations</span>
-                    )}
-                  </td>
-                  <td className="num">{c.memberCount}</td>
-                  <td className="num">{c.jobCount}</td>
-                  <td>
-                    <span className={`pill ${STATUS_PILL[c.status].cls}`}>
-                      {STATUS_PILL[c.status].label}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ul className="ecards">
+          {companies.map((c) => (
+            <li key={c.id}>
+              <Link
+                to={`/admin/companies/${c.id}`}
+                className={`ecard ${c.status === 'REJECTED' || c.status === 'SUSPENDED' ? 'is-muted' : ''}`}
+              >
+                <span className="ecard-top">
+                  <span className="ecard-tag">{c.industry ?? 'No industry'}</span>
+                  <span className={`pill ${STATUS_PILL[c.status].cls}`}>
+                    {STATUS_PILL[c.status].label}
+                  </span>
+                </span>
+                <b className="ecard-title">{c.name}</b>
+                <span className="ecard-sub">
+                  {[c.website, c.city].filter(Boolean).join(' · ') || 'No website or city given'}
+                </span>
+                <dl className="ecard-facts">
+                  <div>
+                    <dt>Team</dt>
+                    <dd>{c.memberCount}</dd>
+                  </div>
+                  <div>
+                    <dt>Jobs</dt>
+                    <dd>{c.jobCount}</dd>
+                  </div>
+                </dl>
+                <span className="ecard-foot">
+                  {/* Worth telling apart: one was vouched for, one was not. */}
+                  <small>
+                    {c.appliedAt
+                      ? `Registered ${new Date(c.appliedAt).toLocaleDateString()}`
+                      : 'Added by operations'}
+                  </small>
+                  <span className="ecard-go">{c.status === 'PENDING' ? 'Review →' : 'Open →'}</span>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
       )}
     </AdminLayout>
   );

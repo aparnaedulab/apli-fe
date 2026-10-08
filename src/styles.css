@@ -480,3 +480,238 @@ code {
 .admin-brand .brand-logo {
   height: 24px;
 }
+
+/* --- filter tabs ------------------------------------------------------------
+   A row of pill buttons for switching a list's view ("Waiting on you",
+   "Accepted", ...). Used across the portals; the colours come from whichever
+   portal it sits in. These base rules had gone missing, which left the
+   buttons drawn as bare browser defaults. */
+
+.tabs-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 16px;
+}
+
+.tabs-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: 1px solid var(--rule-2);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.tabs-btn:hover {
+  border-color: var(--ink-3);
+  color: var(--ink);
+}
+
+.tabs-btn.is-active {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.tabs-btn:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* --- entity cards -------------------------------------------------------------
+   The card grid that replaces a table wherever the rows are things a person
+   opens - a batch, a season, a job, a college. One set of rules for every
+   portal; colours come from whichever portal it sits in.
+
+     <ul class="ecards">
+       <li><Link class="ecard">
+         <span class="ecard-top"><span class="ecard-tag">B.Tech</span><span class="pill …"/></span>
+         <b class="ecard-title">…</b>
+         <span class="ecard-sub">…</span>
+         <dl class="ecard-facts"><div><dt>…</dt><dd>…</dd></div>…</dl>
+         <span class="ecard-bar"><i style="width:…"/></span>
+         <span class="ecard-foot"><small>…</small><span class="ecard-go">Open →</span></span>
+       </Link></li>
+     </ul>
+*/
+
+.ecards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ecard {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  padding: 16px 18px 14px;
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgb(16 34 63 / 0.04), 0 8px 24px -14px rgb(16 34 63 / 0.16);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+a.ecard:hover,
+button.ecard:hover {
+  border-color: color-mix(in srgb, var(--brand) 40%, var(--rule));
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+.ecard:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.ecard.is-muted {
+  opacity: 0.72;
+}
+
+.ecard-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 22px;
+}
+
+.ecard-tag {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ecard-title {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.ecard-sub {
+  margin-top: -4px;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.ecard-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 8px;
+  margin: 4px 0 0;
+}
+
+.ecard-facts dt {
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.ecard-facts dd {
+  margin: 2px 0 0;
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--ink);
+}
+
+.ecard-facts dd.is-soon {
+  color: var(--stop);
+}
+
+.ecard-bar {
+  display: block;
+  height: 6px;
+  border-radius: 6px;
+  background: var(--paper-2);
+  overflow: hidden;
+}
+
+.ecard-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 6px;
+  background: var(--pass);
+}
+
+.ecard-note {
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+.ecard-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--rule);
+}
+
+.ecard-foot small {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.ecard-go {
+  flex: none;
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--brand);
+}
+
+/* A card that holds its own buttons (rather than being one big link). */
+.ecard.is-static {
+  cursor: default;
+}
+
+.ecard-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* A titled group of cards, without a frame of its own (a card inside a card
+   is a border nobody reads). */
+.ecard-section {
+  margin: 0 0 24px;
+}
+
+.ecard-section > h2 {
+  margin: 0 0 12px;
+  font-size: 17px;
+  font-weight: 700;
+}

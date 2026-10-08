@@ -6,6 +6,7 @@ import CampusConsent from './pages/campus/Consent';
 import CampusAlumni from './pages/campus/Alumni';
 import CampusFlags from './pages/campus/Flags';
 import AdminInstitutionRules from './pages/admin/InstitutionRules';
+import AdminInterviewQuestions from './pages/admin/InterviewQuestions';
 import AdminCompanyAccess from './pages/admin/CompanyAccess';
 import CompanyInstitutions from './pages/company/Institutions';
 import CompanyProfile from './pages/company/Profile';
@@ -69,6 +70,7 @@ import Onboarding from './pages/platform/Onboarding';
 import ConsoleCompanies from './pages/platform/ConsoleCompanies';
 import StudentPrivacy from './pages/student/Privacy';
 import StudentPrepare from './pages/student/Prepare';
+import StudentPrepareHub from './pages/student/PrepareHub';
 import StudentCompanyPage from './pages/student/CompanyPage';
 import CampusReports from './pages/campus/Reports';
 import AdminReports from './pages/admin/Reports';
@@ -129,6 +131,7 @@ export default function App() {
         [
           ['/student/privacy', 'CANDIDATE', <StudentPrivacy key="p" />],
           ['/student/prepare', 'CANDIDATE', <StudentPrepare key="pr" />],
+          ['/student/get-ready', 'CANDIDATE', <StudentPrepareHub key="prh" />],
           ['/student/companies/:id', 'CANDIDATE', <StudentCompanyPage key="c" />],
           ['/company/profile', 'COMPANY', <CompanyProfile key="cpf" />],
           // The page editor was split in two - words here, links on the
@@ -160,6 +163,7 @@ export default function App() {
           ['/campus/alumni', 'CAMPUS', <CampusAlumni key="cal" />],
           ['/campus/flags', 'CAMPUS', <CampusFlags key="cfl" />],
           ['/admin/institution-rules', 'ADMIN', <AdminInstitutionRules key="air" />],
+          ['/admin/interview-questions', 'ADMIN', <AdminInterviewQuestions key="aiq" />],
           ['/admin/company-access', 'ADMIN', <AdminCompanyAccess key="aca" />],
           ['/company/institutions', 'COMPANY', <CompanyInstitutions key="cin" />],
           // Phase 3

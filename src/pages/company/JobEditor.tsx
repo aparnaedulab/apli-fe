@@ -234,6 +234,8 @@ export default function JobEditor() {
   const [job, setJob] = useState<JobDetail | null>(null);
   const [readiness, setReadiness] = useState<Readiness | null>(null);
   const [step, setStep] = useState<Step>('Details');
+  // Closed until asked for: the form gets the whole width, and "Preview"
+  // opens it beside the form (or over the page on a smaller screen).
   const [showPreview, setShowPreview] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -520,9 +522,17 @@ export default function JobEditor() {
           </div>
         </main>
 
-        <aside className="ob-preview job-wizard-preview" aria-label="Preview of the role as students see it">
-          <JobPreview job={job} reach={reach} companyName={companyName} />
-        </aside>
+        {showPreview && (
+          <aside className="ob-preview job-wizard-preview" aria-label="Preview of the role as students see it">
+            <div className="jw-preview-head">
+              <span>Preview · how students see it</span>
+              <button type="button" className="jw-preview-x" onClick={() => setShowPreview(false)} aria-label="Hide preview">
+                ×
+              </button>
+            </div>
+            <JobPreview job={job} reach={reach} companyName={companyName} />
+          </aside>
+        )}
       </div>
     </AdvanceContext.Provider>
   );

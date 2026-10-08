@@ -95,7 +95,7 @@ export default function FeaturesStep({ state, catalogue, onSaved, goto }: StepPr
     setError(null);
     try {
       const next = await platformApi.saveFeatures(t.id, [...selected], openDoor);
-      onSaved(next, 'people');
+      onSaved(next, 'help');
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Could not save. Try again.');
     } finally {

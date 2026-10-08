@@ -176,20 +176,43 @@ export default function StudentDashboard() {
 
       {profile && (
         <div className="jy">
-          <header className="jy-head">
-            <p className="jy-when">{partOfDay()}</p>
-            <h1>
-              {first}
-              <span className="jy-sub">
+          {/* One compact head, like Jobs and Applications: who, on the left;
+              the four numbers that matter, as pills you can open, on the right. */}
+          <header className="jy-top">
+            <div>
+              <h1>
+                {partOfDay()}, {first}
+              </h1>
+              <p className="jy-top-sub">
                 {[profile.batch?.course, profile.batch?.graduationYear].filter(Boolean).join(' · ')}
                 {profile.cgpa ? ` · CGPA ${profile.cgpa}` : ''}
-              </span>
-            </h1>
+                <span className={`jy-verified ${verified ? 'is-ok' : ''}`}>
+                  {verified ? '✓ Verified by your college' : 'Verification pending'}
+                </span>
+              </p>
+            </div>
+            <nav className="jy-counts" aria-label="At a glance">
+              <Link to="/student/jobs" className={open.length ? 'is-on' : ''}>
+                Open to you <b>{open.length}</b>
+              </Link>
+              <Link to="/student/applications" className={live.length ? 'is-on' : ''}>
+                Applied <b>{live.length}</b>
+              </Link>
+              <Link to="/student/interviews" className={due.some((d) => d.kind === 'interview') ? 'is-on' : ''}>
+                Interviews <b>{due.filter((d) => d.kind === 'interview').length}</b>
+              </Link>
+              <Link
+                to="/student/applications"
+                className={all.some((a) => a.status === 'OFFERED') ? 'is-hot' : all.some((a) => ['ACCEPTED', 'HIRED'].includes(a.status)) ? 'is-on' : ''}
+              >
+                Offers <b>{all.filter((a) => ['OFFERED', 'ACCEPTED', 'HIRED'].includes(a.status)).length}</b>
+              </Link>
+            </nav>
           </header>
 
-          {/* --- the path -------------------------------------------------- */}
+          {/* --- the path, as a slim track ----------------------------------- */}
           <section
-            className="jy-road"
+            className="jy-road is-slim"
             aria-label="Your placement journey"
             style={{ '--here': Math.max(0, hereIndex === -1 ? MILESTONES.length - 1 : hereIndex), '--n': MILESTONES.length } as CSSProperties}
           >
@@ -206,82 +229,83 @@ export default function StudentDashboard() {
                     <span className="jy-node" aria-hidden="true">
                       {isDone ? '✓' : i + 1}
                     </span>
-                    <span className="jy-label">{m.label}</span>
-                    {isHere && <span className="jy-here">You are here</span>}
+                    <span className="jy-label">
+                      {m.label}
+                      {isHere && <span className="jy-here">You are here</span>}
+                    </span>
                   </li>
                 );
               })}
             </ol>
-
-            {/* The one thing to do, hanging from "you are here". */}
-            <div className="jy-next">
-              <span className="jy-caret" aria-hidden="true" />
-              <Next
-                stage={stage}
-                profile={profile}
-                sections={sections}
-                percent={percent}
-                verified={verified}
-                roles={best}
-                openCount={open.length}
-                live={live}
-                due={due}
-                apps={all}
-                onSkillAdded={() => {
-                  load();
-                  refreshMe();
-                }}
-              />
-            </div>
           </section>
 
-          {/* --- what is waiting: while the profile or the record is not done -- */}
-          {(stage === 'profile' || stage === 'verified') && (
-            <Waiting roles={best.slice(0, 3)} total={open.length} stage={stage} />
-          )}
+          {/* --- two columns: the next step, and what is going on ---------- */}
+          {(() => {
+            const showMotion = live.length > 0 && stage !== 'applied' && stage !== 'rounds';
+            const hasSide = due.length > 0 || showMotion;
+            return (
+              <div className={`jy-cols ${hasSide ? '' : 'is-single'}`}>
+                <div className="jy-main">
+                  <Next
+                    stage={stage}
+                    profile={profile}
+                    sections={sections}
+                    percent={percent}
+                    verified={verified}
+                    roles={best}
+                    openCount={open.length}
+                    live={live}
+                    due={due}
+                    apps={all}
+                    onSkillAdded={() => {
+                      load();
+                      refreshMe();
+                    }}
+                  />
 
-          {/* --- this week ------------------------------------------------- */}
-          {due.length > 0 && (
-            <section className="jy-week" aria-label="This week">
-              <span className="jy-week-tag">This week</span>
-              <ul>
-                {due.map((d) => (
-                  <li key={d.key} className={`is-${d.kind}`}>
-                    <Link to={d.to}>
-                      <b>{dateOf(d.at)}</b>
-                      <span>{d.title}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
+                  {(stage === 'profile' || stage === 'verified') && (
+                    <Waiting roles={best.slice(0, 3)} total={open.length} stage={stage} />
+                  )}
+                </div>
 
-          {/* --- in motion: once anything has been sent -------------------- */}
-          {live.length > 0 && stage !== 'applied' && stage !== 'rounds' && (
-            <section className="jy-motion" aria-label="Your applications">
-              <header>
-                <h3>In motion</h3>
-                <Link to="/student/applications">All applications →</Link>
-              </header>
-              <ul>
-                {live.slice(0, 4).map((a) => (
-                  <li key={a.id}>
-                    <Link to="/student/applications">
-                      <span className="jy-logo" aria-hidden="true">
-                        {a.companyName.slice(0, 1)}
-                      </span>
-                      <span className="jy-text">
-                        <b>{a.title}</b>
-                        <small>{a.companyName}</small>
-                      </span>
-                      <span className={`jy-pill is-${a.status.toLowerCase()}`}>{STATUS[a.status] ?? a.status}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
+                {hasSide && (
+                  <aside className="jy-side">
+                    {due.length > 0 && (
+                      <section className="jy-side-card" aria-label="This week">
+                        <h3>This week</h3>
+                        <ul className="jy-days">
+                          {due.map((d) => (
+                            <li key={d.key} className={`is-${d.kind}`}>
+                              <Link to={d.to}>
+                                <span className="jy-day">
+                                  <b>{new Date(d.at).getDate()}</b>
+                                  <i>{new Date(d.at).toLocaleDateString('en-IN', { month: 'short' })}</i>
+                                </span>
+                                <span className="jy-text">
+                                  <b>{d.title}</b>
+                                  <small>{d.kind === 'interview' ? 'Interview' : 'Applications close'}</small>
+                                </span>
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </section>
+                    )}
+
+                    {showMotion && (
+                      <section className="jy-side-card" aria-label="Your applications">
+                        <header>
+                          <h3>In motion</h3>
+                          <Link to="/student/applications">All →</Link>
+                        </header>
+                        <Motion live={live} />
+                      </section>
+                    )}
+                  </aside>
+                )}
+              </div>
+            );
+          })()}
         </div>
       )}
     </StudentLayout>

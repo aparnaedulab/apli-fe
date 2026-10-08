@@ -200,7 +200,7 @@ export default function PeopleStep({ state, catalogue, onSaved, goto }: StepProp
 
       <div className="step-foot">
         <div className="step-foot-row">
-          <button type="button" className="btn btn-ghost" onClick={() => goto('features')}>
+          <button type="button" className="btn btn-ghost" onClick={() => goto('help')}>
             ← Back
           </button>
           <span className="step-foot-note">

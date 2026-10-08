@@ -567,7 +567,8 @@ export const en = {
   'projects.finished': 'Finished',
   'projects.finishedHint': 'Leave blank if you are still working on it.',
   // --- my applications ----------------------------------------------------
-  'app.title': 'My applications',
+  'app.title': 'Track your applications',
+  'app.lede': 'Every job you applied for, and where it stands. Click a job to see more.',
   'app.search': 'Search your applications',
   'app.searchPlaceholder': 'Search by role or company',
   'app.loadError': 'Could not load your applications.',

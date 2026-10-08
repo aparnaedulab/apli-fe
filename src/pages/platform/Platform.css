@@ -4078,3 +4078,300 @@ small.xl-new {
   font-size: 13px;
   color: var(--ink-2);
 }
+
+/* ---------------------------------------------------------------------------
+   Student help step: the questions on the left, the panel as a student will
+   see it on the right.
+--------------------------------------------------------------------------- */
+
+.hs-sub {
+  margin: 2px 0 0;
+}
+
+.hs {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+  gap: 18px;
+  align-items: start;
+}
+
+.hs-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hs-item {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+.hs-item.is-hidden {
+  background: var(--paper-2);
+  opacity: 0.7;
+}
+
+.hs-item-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hs-n {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.hs-show {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.hs-show input {
+  accent-color: var(--brand);
+}
+
+.hs-tools {
+  display: inline-flex;
+  gap: 2px;
+  margin-left: auto;
+}
+
+.hs-tools .icon-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.hs-del:hover {
+  color: var(--stop);
+}
+
+.ob .hs-q,
+.ob .hs-a {
+  max-width: none;
+}
+
+.ob .hs-q {
+  font-weight: 650;
+}
+
+.ob .hs-a {
+  resize: vertical;
+  min-height: 64px;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.hs-empty {
+  padding: 20px;
+  border-radius: 12px;
+  border: 1.5px dashed var(--rule-2);
+  text-align: center;
+  font-size: 13.5px;
+  color: var(--ink-3);
+}
+
+/* the preview */
+.hs-preview {
+  position: sticky;
+  top: 12px;
+}
+
+.hs-preview-tag {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.hs-panel {
+  padding: 14px 16px 16px;
+  border-radius: 18px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  box-shadow: var(--ob-shadow-lift);
+}
+
+.hs-panel-tag {
+  margin: 0 0 10px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+
+.hs-panel ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hs-panel li {
+  border-radius: 12px;
+  border: 1px solid var(--rule);
+  background: var(--paper-2);
+  overflow: hidden;
+}
+
+.hs-panel li.is-open {
+  border-color: color-mix(in srgb, var(--brand) 35%, var(--rule));
+  background: var(--surface);
+}
+
+.hs-panel button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+}
+
+.hs-panel button i {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  margin-top: -3px;
+  border-right: 2px solid var(--ink-3);
+  border-bottom: 2px solid var(--ink-3);
+  transform: rotate(45deg);
+}
+
+.hs-panel li.is-open button i {
+  margin-top: 3px;
+  transform: rotate(-135deg);
+}
+
+.hs-panel li p {
+  margin: 0;
+  padding: 0 12px 12px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+.hs-panel-none {
+  padding: 12px;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+@media (max-width: 1000px) {
+  .hs {
+    grid-template-columns: 1fr;
+  }
+
+  .hs-preview {
+    position: static;
+  }
+}
+
+/* ===========================================================================
+   The landing page's palette for the platform team's console and the set-up
+   wizard (which the recruiter's job editor also uses). Neither belongs to one
+   institution, so both take Apli's own sky blue, with blush for actions.
+   ======================================================================== */
+
+.console,
+.ob {
+  --brand: #1f4fa3;
+  --brand-hover: #173f86;
+  --brand-soft: #e3eefe;
+  --on-brand: #ffffff;
+  --paper-2: #f5f9ff;
+  --ink: #10223f;
+  --ink-2: #4c5d78;
+  --ink-3: #8b9ab3;
+  --rule: #dfe7f2;
+  --rule-2: #c9d6ea;
+  --pass: #13a37a;
+  --pass-soft: #d8f4ea;
+  background:
+    radial-gradient(44rem 30rem at 92% -6%, rgb(31 79 163 / 0.07), transparent 60%),
+    #f5f9ff;
+}
+
+@media (prefers-color-scheme: dark) {
+  .console,
+  .ob {
+    --brand: #a8c6ff;
+    --brand-hover: #c4d8ff;
+    --brand-soft: #1a2b4f;
+    --on-brand: #0a1428;
+    --paper-2: #0f1c36;
+    --ink: #eef4ff;
+    --ink-2: #aebcd6;
+    --ink-3: #7586a6;
+    --rule: #1e3054;
+    --rule-2: #2b4170;
+    --pass: #4fd1a1;
+    --pass-soft: #0f3029;
+    background: #0a1428;
+  }
+}
+
+.console .btn,
+.ob .btn {
+  border-radius: 999px;
+}
+
+.console .btn-primary,
+.ob .btn-primary {
+  background: #e8456b;
+  border-color: #e8456b;
+  color: #fff;
+  box-shadow: 0 6px 16px -6px rgb(232 69 107 / 0.55);
+}
+
+.console .btn-primary:hover:not(:disabled),
+.ob .btn-primary:hover:not(:disabled) {
+  background: #d02f56;
+  border-color: #d02f56;
+}
+
+.console-brand .brand-logo {
+  display: block;
+  height: 30px;
+  width: auto;
+  color: var(--brand);
+}
+
+.console-top {
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+.console-nav a.is-on {
+  color: var(--brand);
+}

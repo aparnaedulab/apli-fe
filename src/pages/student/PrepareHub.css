@@ -1,0 +1,170 @@
+/* ---------------------------------------------------------------------------
+   Prepare: a compact head, an "up next" nudge when a round is coming, and a
+   card per practice tool - the same shapes as Home and Applications.
+--------------------------------------------------------------------------- */
+
+.pr {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pr-head h1 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.pr-head p {
+  margin: 4px 0 0;
+  font-size: 13.5px;
+  color: var(--ink-3);
+}
+
+/* --- up next ------------------------------------------------------------- */
+
+.pr-next {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: var(--s-r-xl);
+  background: var(--s-grad);
+  color: #fff;
+  text-decoration: none;
+  box-shadow: 0 14px 34px -16px color-mix(in srgb, var(--s-accent) 70%, transparent);
+  transition: transform 0.18s var(--s-ease);
+}
+
+.pr-next:hover {
+  transform: translateY(-2px);
+}
+
+.pr-next-tag {
+  flex: none;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.18);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pr-next-text {
+  display: grid;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.pr-next-text b {
+  font-size: 15.5px;
+  font-weight: 700;
+}
+
+.pr-next-text small {
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.pr-next-go {
+  flex: none;
+  padding: 9px 18px;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+/* --- the tools ---------------------------------------------------------- */
+
+.pr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pr-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  padding: 18px 20px 16px;
+  border-radius: var(--s-r-lg);
+  border: 1px solid var(--s-line);
+  background: var(--s-card);
+  box-shadow: var(--s-shadow-1);
+  color: var(--ink);
+  text-decoration: none;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s var(--s-ease);
+}
+
+.pr-card:hover {
+  border-color: color-mix(in srgb, var(--s-accent) 35%, var(--s-line));
+  box-shadow: var(--s-shadow-2);
+  transform: translateY(-2px);
+}
+
+.pr-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--s-accent) 11%, var(--s-card));
+  color: var(--s-accent);
+}
+
+.pr-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.pr-card-text {
+  display: grid;
+  gap: 4px;
+  flex: 1;
+}
+
+.pr-card-text b {
+  font-size: 15.5px;
+  font-weight: 700;
+}
+
+.pr-card-text small {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.pr-go {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--s-accent);
+}
+
+@media (max-width: 640px) {
+  .pr-next {
+    flex-wrap: wrap;
+  }
+
+  .pr-next-go {
+    width: 100%;
+    text-align: center;
+  }
+
+  .pr-grid {
+    grid-template-columns: 1fr;
+  }
+}

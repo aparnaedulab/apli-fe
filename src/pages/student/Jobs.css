@@ -1509,3 +1509,46 @@
 .sh .jb-pane .card .sub-heading {
   margin: 18px 0 8px;
 }
+
+/* ---------------------------------------------------------------------------
+   The two columns are one shape: the same height, tops and bottoms in line,
+   each scrolling inside itself.
+
+   They used to size themselves with different rules - the list stopped at
+   the screen height less 220px (without allowing for the portal's scale),
+   the pane went further - so the list ended two thirds of the way down the
+   pane. Now both take one height: the screen below the filters.
+--------------------------------------------------------------------------- */
+.jb-split {
+  --jb-h: max(480px, calc(100vh / var(--s-zoom, 1) - 290px));
+  align-items: stretch;
+}
+
+.jb-list,
+.jb-pane {
+  height: var(--jb-h);
+  max-height: none;
+}
+
+/* The pane no longer needs to stick: it is already the height of the screen. */
+.jb-pane {
+  position: static;
+}
+
+/* The list's rows take whatever the tabs leave, and scroll there. */
+.jb-rows {
+  flex: 1;
+  min-height: 0;
+  scrollbar-width: thin;
+}
+
+@media (max-width: 900px) {
+  .jb-list,
+  .jb-pane {
+    height: auto;
+  }
+
+  .jb-list {
+    max-height: 60vh;
+  }
+}

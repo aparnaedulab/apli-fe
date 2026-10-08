@@ -84,144 +84,141 @@ export default function DriveInvitations() {
         <p className="muted">No college has invited you to a drive yet.</p>
       )}
 
-      <div className="drive-list">
-        {drives?.map((d) => {
-          const r = reports[d.id];
-          return (
-            <section key={d.id} className="card drive-card">
-              <div className="drive-head">
-                <div>
-                  <h2>{d.college.name}</h2>
-                  <p className="drive-sub">{d.title}</p>
-                </div>
-                <span className={`pill pill-${d.status === 'INVITED' ? 'hold' : d.status === 'DECLINED' ? 'stop' : 'pass'}`}>
-                  {LABEL[d.status]}
-                </span>
-              </div>
+      {drives && drives.length > 0 && (
+        <ul className="ecards">
+          {drives.map((d) => {
+            const r = reports[d.id];
+            return (
+              <li key={d.id}>
+                <section className={`ecard is-static ${d.status === 'DECLINED' ? 'is-muted' : ''}`}>
+                  <span className="ecard-top">
+                    <span className="ecard-tag">
+                      {d.placement.name} ({d.placement.year})
+                    </span>
+                    <span className={`pill pill-${d.status === 'INVITED' ? 'hold' : d.status === 'DECLINED' ? 'stop' : 'pass'}`}>
+                      {LABEL[d.status]}
+                    </span>
+                  </span>
+                  <b className="ecard-title">{d.college.name}</b>
+                  <span className="ecard-sub">{d.title}</span>
 
-              {d.pitch && <p className="drive-pitch">{d.pitch}</p>}
+                  {d.pitch && <p className="drive-pitch">{d.pitch}</p>}
 
-              <dl className="drive-facts">
-                <div>
-                  <dt>When</dt>
-                  <dd>
-                    {d.scheduledAt
-                      ? new Date(d.scheduledAt).toLocaleString(undefined, {
-                          weekday: 'short',
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })
-                      : 'The college sets this once you agree'}
-                  </dd>
-                </div>
-                <div>
-                  <dt>Where</dt>
-                  <dd>{d.addressLine || (d.meetingLink ? 'Online' : 'Set once you agree')}</dd>
-                </div>
-                <div>
-                  <dt>Season</dt>
-                  <dd>
-                    {d.placement.name} ({d.placement.year})
-                  </dd>
-                </div>
-                <div>
-                  <dt>Your roles on the day</dt>
-                  <dd>
+                  <dl className="ecard-facts">
+                    <div>
+                      <dt>When</dt>
+                      <dd>
+                        {d.scheduledAt
+                          ? new Date(d.scheduledAt).toLocaleString(undefined, {
+                              weekday: 'short',
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })
+                          : 'The college sets this once you agree'}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Where</dt>
+                      <dd>{d.addressLine || (d.meetingLink ? 'Online' : 'Set once you agree')}</dd>
+                    </div>
+                  </dl>
+                  <p className="ecard-note">
+                    <b>Your roles on the day:</b>{' '}
                     {d.jobs.length === 0
                       ? 'None yet — you can add them after agreeing'
                       : d.jobs.map((j) => j.job.title).join(', ')}
-                  </dd>
-                </div>
-              </dl>
+                  </p>
 
-              <Bar drive={d} />
+                  <Bar drive={d} />
 
-              {r && (
-                <div className="drive-report">
-                  <div className="drive-figures">
-                    <div className="drive-figure">
-                      <b>{r.inSeason}</b>
-                      <span>in the season</span>
+                  {r && (
+                    <div className="drive-report">
+                      <div className="drive-figures">
+                        <div className="drive-figure">
+                          <b>{r.inSeason}</b>
+                          <span>in the season</span>
+                        </div>
+                        <div className="drive-figure">
+                          <b>{r.verified}</b>
+                          <span>verified by the college</span>
+                        </div>
+                        <div className="drive-figure is-strong">
+                          <b>{r.eligible}</b>
+                          <span>
+                            clear your bar{r.eligiblePct === null ? '' : ` · ${r.eligiblePct}%`}
+                          </span>
+                        </div>
+                      </div>
+                      {r.byBranch.length > 0 && (
+                        <p className="drive-split">
+                          {r.byBranch.map((b) => `${b.branch}: ${b.count}`).join(' · ')}
+                        </p>
+                      )}
+                      <p className="muted drive-note">{r.note}</p>
                     </div>
-                    <div className="drive-figure">
-                      <b>{r.verified}</b>
-                      <span>verified by the college</span>
-                    </div>
-                    <div className="drive-figure is-strong">
-                      <b>{r.eligible}</b>
-                      <span>
-                        clear your bar{r.eligiblePct === null ? '' : ` · ${r.eligiblePct}%`}
-                      </span>
-                    </div>
-                  </div>
-                  {r.byBranch.length > 0 && (
-                    <p className="drive-split">
-                      {r.byBranch.map((b) => `${b.branch}: ${b.count}`).join(' · ')}
-                    </p>
                   )}
-                  <p className="muted drive-note">{r.note}</p>
-                </div>
-              )}
 
-              {d.status === 'INVITED' && (
-                <div className="drive-actions">
-                  <button
-                    type="button"
-                    className="btn btn-primary btn-sm"
-                    onClick={() => respond(d.id, true)}
-                  >
-                    Yes, we will come
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-ghost btn-sm"
-                    onClick={() => setDeclining(declining === d.id ? null : d.id)}
-                  >
-                    Decline
-                  </button>
-                </div>
-              )}
+                  {d.status === 'INVITED' && (
+                    <div className="ecard-actions">
+                      <button
+                        type="button"
+                        className="btn btn-primary btn-sm"
+                        onClick={() => respond(d.id, true)}
+                      >
+                        Yes, we will come
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm"
+                        onClick={() => setDeclining(declining === d.id ? null : d.id)}
+                      >
+                        Decline
+                      </button>
+                    </div>
+                  )}
 
-              {declining === d.id && (
-                <form
-                  className="drive-decline"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    respond(d.id, false, reason);
-                  }}
-                >
-                  <label className="field">
-                    <span className="field-label">Why not?</span>
-                    <input
-                      className="input"
-                      value={reason}
-                      onChange={(e) => setReason(e.target.value)}
-                      placeholder="Hiring is paused for this quarter."
-                      required
-                    />
-                    <span className="field-hint">
-                      The cell is planning a season around this, so a reason saves them a fortnight
-                      of guessing.
-                    </span>
-                  </label>
-                  <button type="submit" className="btn btn-secondary btn-sm">
-                    Send
-                  </button>
-                </form>
-              )}
+                  {declining === d.id && (
+                    <form
+                      className="drive-decline"
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        respond(d.id, false, reason);
+                      }}
+                    >
+                      <label className="field">
+                        <span className="field-label">Why not?</span>
+                        <input
+                          className="input"
+                          value={reason}
+                          onChange={(e) => setReason(e.target.value)}
+                          placeholder="Hiring is paused for this quarter."
+                          required
+                        />
+                        <span className="field-hint">
+                          The cell is planning a season around this, so a reason saves them a fortnight
+                          of guessing.
+                        </span>
+                      </label>
+                      <button type="submit" className="btn btn-secondary btn-sm">
+                        Send
+                      </button>
+                    </form>
+                  )}
 
-              {(d.status === 'OPEN' || d.status === 'CLOSED') && <Roster driveId={d.id} />}
+                  {(d.status === 'OPEN' || d.status === 'CLOSED') && <Roster driveId={d.id} />}
 
-              {d.status === 'DECLINED' && d.declineReason && (
-                <p className="muted">You said: {d.declineReason}</p>
-              )}
-            </section>
-          );
-        })}
-      </div>
+                  {d.status === 'DECLINED' && d.declineReason && (
+                    <p className="ecard-note">You said: {d.declineReason}</p>
+                  )}
+                </section>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </CompanyLayout>
   );
 }
@@ -256,32 +253,35 @@ function Roster({ driveId }: { driveId: string }) {
       {data.students.length === 0 ? (
         <p className="muted">{data.note}</p>
       ) : (
-        <table className="league">
-          <thead>
-            <tr>
-              <th>Student</th>
-              <th>Branch</th>
-              <th className="num">CGPA</th>
-              <th className="num">Backlogs</th>
-              <th className="num">Graduating</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.students.map((s) => (
-              <tr key={s.id}>
-                <td>
-                  {s.name}
-                  <br />
-                  <small className="muted">{s.email}</small>
-                </td>
-                <td>{s.branch ?? s.course ?? '—'}</td>
-                <td className="num">{s.cgpa ?? '—'}</td>
-                <td className="num">{s.backlogs ?? '—'}</td>
-                <td className="num">{s.graduationYear ?? '—'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        // One column: this list sits inside an invitation card, narrower than the grid's minimum.
+        <ul className="ecards" style={{ gridTemplateColumns: '1fr' }}>
+          {data.students.map((s) => (
+            <li key={s.id}>
+              <div className="ecard is-static">
+                <b className="ecard-title">{s.name}</b>
+                <span className="ecard-sub">{s.email}</span>
+                <dl className="ecard-facts">
+                  <div>
+                    <dt>Branch</dt>
+                    <dd>{s.branch ?? s.course ?? '—'}</dd>
+                  </div>
+                  <div>
+                    <dt>CGPA</dt>
+                    <dd>{s.cgpa ?? '—'}</dd>
+                  </div>
+                  <div>
+                    <dt>Backlogs</dt>
+                    <dd>{s.backlogs ?? '—'}</dd>
+                  </div>
+                  <div>
+                    <dt>Graduating</dt>
+                    <dd>{s.graduationYear ?? '—'}</dd>
+                  </div>
+                </dl>
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
 
       {data.withheld > 0 && (

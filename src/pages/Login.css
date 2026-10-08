@@ -275,3 +275,115 @@
     transform: none;
   }
 }
+
+/* ===========================================================================
+   The landing page's look on the sign-in screens.
+
+   Sign in, company sign-up, accepting an invite and joining a batch are where
+   somebody crosses from the public site into the product, so they wear its
+   palette: an airy blue canvas, deep blue ink, blush for the one action.
+   An institution's own sign-in page (.tenant-login) keeps its colour; it
+   only shares the softer shapes.
+   ======================================================================== */
+
+.login:not(.tenant-login) {
+  --brand: #1f4fa3;
+  --ink: #10223f;
+  --ink-2: #4c5d78;
+  --ink-3: #8b9ab3;
+  --rule-2: #c9d6ea;
+  background:
+    radial-gradient(40rem 28rem at 6% -8%, rgb(31 79 163 / 0.1), transparent 62%),
+    radial-gradient(30rem 22rem at 60% 110%, rgb(232 69 107 / 0.06), transparent 60%),
+    #f5f9ff;
+}
+
+.login:not(.tenant-login) .btn-primary {
+  background: #e8456b;
+  border-color: #e8456b;
+  color: #fff;
+  box-shadow: 0 8px 20px -8px rgb(232 69 107 / 0.6);
+}
+
+.login:not(.tenant-login) .btn-primary:hover:not(:disabled) {
+  background: #d02f56;
+  border-color: #d02f56;
+}
+
+.login .brand-logo {
+  height: 34px;
+  width: auto;
+  color: var(--brand);
+}
+
+/* Softer shapes for every sign-in page, the institution's included. */
+.login .field input {
+  border-radius: 12px;
+  padding: 13px 15px;
+}
+
+.login .btn-block {
+  border-radius: 999px;
+}
+
+.login-error {
+  border-radius: 10px;
+  border-left-width: 0;
+  box-shadow: inset 3px 0 0 var(--stop);
+}
+
+/* The right-hand panel: the landing page's promise, in deep blue. */
+.login:not(.tenant-login) .login-aside {
+  background:
+    radial-gradient(70% 60% at 100% 0%, rgb(232 69 107 / 0.28), transparent 60%),
+    radial-gradient(60% 50% at 0% 100%, rgb(126 162 238 / 0.25), transparent 60%),
+    linear-gradient(160deg, #1f4fa3, #0b1f45);
+  color: #f0f5ff;
+}
+
+.login-promise {
+  position: relative;
+  max-width: 34ch;
+}
+
+.login-promise-title {
+  margin: 0 0 24px;
+  font-family: var(--display);
+  font-size: clamp(24px, 2.6vw, 34px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+.login-promise-title span {
+  color: #ff9bb0;
+}
+
+.login-promise ul {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.login-promise li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  opacity: 0.92;
+}
+
+.login-promise li::before {
+  content: '✓';
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.16);
+  font-size: 12px;
+  font-weight: 800;
+}

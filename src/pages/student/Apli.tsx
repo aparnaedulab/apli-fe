@@ -1,5 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import ApliLogo from '../../components/ApliLogo';
+import { helpApi } from '../../api/help';
 import './Apli.css';
 
 /**
@@ -126,6 +128,41 @@ export function ApliFace({
 }
 
 /**
+ * The questions students ask most, answered plainly. Kept to what the
+ * portal actually does - nothing here promises more than the product keeps.
+ */
+const FALLBACK_FAQ: { q: string; a: string }[] = [
+  {
+    q: 'Why can’t I apply to a job?',
+    a: 'Two things have to be true: your college has verified your record, and the role is open to your course, branch, passing year and marks. The Jobs page only shows roles you qualify for, and lists the ones you don’t with the reason.',
+  },
+  {
+    q: 'What does the match % mean?',
+    a: 'How many of the skills a role asks for are on your profile. It does not stop you applying - it shows what to add, or learn, to be a stronger fit.',
+  },
+  {
+    q: 'How do I know a company has seen my application?',
+    a: 'Open Applied. Each card shows where your application stands and the company’s latest update. Companies have to reply within the time your college sets.',
+  },
+  {
+    q: 'Do I have to pay anything?',
+    a: 'Never. No company on Apli.ai may charge a student at any stage. If anyone asks you for money, tell your placement cell straight away.',
+  },
+  {
+    q: 'What happens when I accept an offer?',
+    a: 'Under the one-offer rule your other applications in that drive close. After that, your joining date and documents are tracked until your first day.',
+  },
+  {
+    q: 'My marks are wrong. How do I fix them?',
+    a: 'Your marks come from your college’s records, so recruiters can trust them. Ask your placement cell to correct them - they update it for you.',
+  },
+  {
+    q: 'Who can see my profile?',
+    a: 'Your college, and the companies whose roles you apply to. Nobody else - and practice tools like mock interviews are never shown to recruiters.',
+  },
+];
+
+/**
  * Apli in the corner, on every student page.
  *
  * The speech card at the top of the overview only exists on the overview. A
@@ -139,6 +176,22 @@ export function ApliFace({
  */
 export default function ApliBubble({ tips }: { tips: { title: string; body: string; to?: string; cta?: string } }) {
   const [open, setOpen] = useState(false);
+  /** Which question is open; one at a time, so the panel stays short. */
+  const [asked, setAsked] = useState<number | null>(null);
+  /**
+   * The institution's own questions, set in onboarding. Fetched the first
+   * time the panel opens; the built-in list stands in until then, and if
+   * the request fails, so the panel is never empty.
+   */
+  const [faq, setFaq] = useState<{ q: string; a: string }[] | null>(null);
+  useEffect(() => {
+    if (!open || faq) return;
+    helpApi
+      .faq()
+      .then((list) => setFaq(list.map((x) => ({ q: x.question, a: x.answer }))))
+      .catch(() => setFaq(FALLBACK_FAQ));
+  }, [open, faq]);
+  const questions = faq ?? FALLBACK_FAQ;
   const wrap = useRef<HTMLDivElement>(null);
 
   // Close on a click anywhere else, and on Escape, which is what everybody
@@ -162,15 +215,39 @@ export default function ApliBubble({ tips }: { tips: { title: string; body: stri
   return (
     <div className={`apli-bubble ${open ? 'is-open' : ''}`} ref={wrap}>
       {open && (
-        <div className="apli-pop" role="dialog" aria-label="Apli">
-          <p className="apli-pop-tag">Apli</p>
-          <p className="apli-pop-title">{tips.title}</p>
-          <p className="apli-pop-body">{tips.body}</p>
-          {tips.to && tips.cta && (
-            <Link className="apli-pop-do" to={tips.to} onClick={() => setOpen(false)}>
-              {tips.cta}
-            </Link>
-          )}
+        <div className="apli-pop" role="dialog" aria-label="Apli help">
+          <header className="apli-pop-head">
+            <ApliLogo className="apli-pop-logo" />
+            <span>Help</span>
+          </header>
+
+          {/* What this page is for. */}
+          <section className="apli-pop-page">
+            <p className="apli-pop-tag">On this page</p>
+            <p className="apli-pop-title">{tips.title}</p>
+            <p className="apli-pop-body">{tips.body}</p>
+            {tips.to && tips.cta && (
+              <Link className="apli-pop-do" to={tips.to} onClick={() => setOpen(false)}>
+                {tips.cta}
+              </Link>
+            )}
+          </section>
+
+          {/* The questions students ask most. */}
+          <section className="apli-faq">
+            <p className="apli-pop-tag">Questions &amp; answers</p>
+            <ul>
+              {questions.map((f, i) => (
+                <li key={f.q} className={asked === i ? 'is-open' : ''}>
+                  <button type="button" aria-expanded={asked === i} onClick={() => setAsked(asked === i ? null : i)}>
+                    <span>{f.q}</span>
+                    <i aria-hidden="true" />
+                  </button>
+                  {asked === i && <p>{f.a}</p>}
+                </li>
+              ))}
+            </ul>
+          </section>
         </div>
       )}
 
@@ -179,9 +256,9 @@ export default function ApliBubble({ tips }: { tips: { title: string; body: stri
         className="apli-tab"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        aria-label={open ? 'Close Apli' : 'Ask Apli what this page is for'}
+        aria-label={open ? 'Close help' : 'Help and questions'}
       >
-        <ApliFace mood={open ? 'cheer' : 'hello'} size={34} idle={!open} />
+        {open ? <span className="apli-tab-x" aria-hidden="true">×</span> : <ApliLogo className="apli-tab-logo" />}
       </button>
     </div>
   );

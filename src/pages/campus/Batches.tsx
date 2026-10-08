@@ -69,53 +69,57 @@ export default function Batches() {
       )}
 
       {batches && batches.length > 0 && (
-        <div className="table-wrap">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Batch</th>
-                <th>Course</th>
-                <th className="num">Year</th>
-                <th className="num">Students</th>
-                <th className="num">Verified</th>
-                <th>Join link</th>
-              </tr>
-            </thead>
-            <tbody>
-              {batches.map((b) => (
-                <tr key={b.id}>
-                  <td>
-                    <Link to={`/campus/batches/${b.id}`} className="row-link">
-                      {b.name}
-                    </Link>
-                    {b.headOfDept && <span className="row-sub">{b.headOfDept}</span>}
-                  </td>
-                  <td>
-                    {b.course ?? <span className="muted">—</span>}
-                    {b.specialisation && <span className="row-sub">{b.specialisation}</span>}
-                  </td>
-                  <td className="num">
-                    {b.graduationYear ?? (b.studyYear ? `Year ${b.studyYear}` : <span className="muted">—</span>)}
-                  </td>
-                  <td className="num">{b.studentCount}</td>
-                  <td className="num">
-                    {b.frozenCount}
-                    {b.studentCount > 0 && b.frozenCount < b.studentCount && (
-                      <span className="row-sub">{b.studentCount - b.frozenCount} pending</span>
-                    )}
-                  </td>
-                  <td>
+        <ul className="ecards">
+          {batches.map((b) => {
+            const pending = b.studentCount - b.frozenCount;
+            const pct = b.studentCount > 0 ? Math.round((b.frozenCount / b.studentCount) * 100) : 0;
+            return (
+              <li key={b.id}>
+                <Link to={`/campus/batches/${b.id}`} className="ecard">
+                  <span className="ecard-top">
+                    <span className="ecard-tag">{b.course ?? 'No course'}</span>
                     {b.joinCodeEnabled ? (
-                      <span className="pill pill-pass">Open</span>
+                      <span className="pill pill-pass">Join link open</span>
                     ) : (
-                      <span className="pill pill-idle">Off</span>
+                      <span className="pill pill-idle">Join link off</span>
                     )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </span>
+                  <b className="ecard-title">{b.name}</b>
+                  <span className="ecard-sub">
+                    {[b.specialisation, b.headOfDept].filter(Boolean).join(' · ') || '—'}
+                  </span>
+                  <dl className="ecard-facts">
+                    <div>
+                      <dt>Year</dt>
+                      <dd>{b.graduationYear ?? (b.studyYear ? `Year ${b.studyYear}` : '—')}</dd>
+                    </div>
+                    <div>
+                      <dt>Students</dt>
+                      <dd>{b.studentCount}</dd>
+                    </div>
+                    <div>
+                      <dt>Verified</dt>
+                      <dd>{b.frozenCount}</dd>
+                    </div>
+                  </dl>
+                  <span className="ecard-bar" aria-hidden="true">
+                    <i style={{ width: `${pct}%` }} />
+                  </span>
+                  <span className="ecard-foot">
+                    <small>
+                      {b.studentCount === 0
+                        ? 'No students yet'
+                        : pending > 0
+                          ? `${pending} pending verification`
+                          : 'Everyone verified'}
+                    </small>
+                    <span className="ecard-go">Open →</span>
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
       )}
     </CampusLayout>
   );

@@ -121,12 +121,16 @@ export default function Login() {
       </div>
 
       <aside className="login-aside" aria-hidden="true">
-        <blockquote>
-          <p>
-            Colleges keep one verified roster and decide which companies reach their students.
-            Recruiters run their own rounds. Students see only what they qualify for.
+        <div className="login-promise">
+          <p className="login-promise-title">
+            Every student real. Every job real. <span>Every offer kept.</span>
           </p>
-        </blockquote>
+          <ul>
+            <li>Students verified by their own college</li>
+            <li>Every job approved by the placement cell</li>
+            <li>Offers followed all the way to day one</li>
+          </ul>
+        </div>
       </aside>
     </div>
   );

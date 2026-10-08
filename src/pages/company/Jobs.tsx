@@ -1,13 +1,19 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import CompanyLayout from './CompanyLayout';
-import { jobApi, type JobSummary } from '../../api/jobs';
+import { EMPLOYMENT_LABELS, WORK_MODE_LABELS, jobApi, type JobSummary } from '../../api/jobs';
 import { ApiError } from '../../api/client';
 
 const STATUS_PILL: Record<JobSummary['status'], string> = {
   DRAFT: 'pill-idle',
   PUBLISHED: 'pill-pass',
   CLOSED: 'pill-stop',
+};
+
+const STATUS_LABEL: Record<JobSummary['status'], string> = {
+  DRAFT: 'Draft',
+  PUBLISHED: 'Live',
+  CLOSED: 'Closed',
 };
 
 export default function Jobs() {
@@ -74,49 +80,64 @@ export default function Jobs() {
       )}
 
       {jobs && jobs.length > 0 && (
-        <div className="table-wrap">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Role</th>
-                <th>Status</th>
-                <th className="num">Rounds</th>
-                <th>Colleges</th>
-                <th className="num">Applicants</th>
-                <th>Deadline</th>
-              </tr>
-            </thead>
-            <tbody>
-              {jobs.map((j) => (
-                <tr key={j.id}>
-                  <td>
-                    <Link to={`/company/jobs/${j.id}`} className="row-link">
-                      {j.title}
-                    </Link>
-                    {j.location && <span className="row-sub">{j.location}</span>}
-                  </td>
-                  <td>
-                    <span className={`pill ${STATUS_PILL[j.status]}`}>{j.status}</span>
-                  </td>
-                  <td className="num">{j.roundCount}</td>
-                  <td>
-                    {j.accepted + j.pending + j.declined === 0 ? (
-                      <span className="muted">Not targeted</span>
-                    ) : (
-                      <span className="posting-mix">
-                        {j.accepted > 0 && <b className="is-pass">{j.accepted} live</b>}
-                        {j.pending > 0 && <b className="is-hold">{j.pending} pending</b>}
-                        {j.declined > 0 && <b className="is-stop">{j.declined} declined</b>}
-                      </span>
-                    )}
-                  </td>
-                  <td className="num">{j.applicationCount}</td>
-                  <td>{new Date(j.deadline).toLocaleDateString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ul className="ecards">
+          {jobs.map((j) => {
+            const days = Math.ceil((new Date(j.deadline).getTime() - Date.now()) / 86_400_000);
+            const targeted = j.accepted + j.pending + j.declined > 0;
+            const where = [
+              j.location,
+              j.workMode ? WORK_MODE_LABELS[j.workMode] ?? j.workMode : null,
+            ]
+              .filter(Boolean)
+              .join(' · ');
+            return (
+              <li key={j.id}>
+                <Link to={`/company/jobs/${j.id}`} className={`ecard ${j.status === 'CLOSED' ? 'is-muted' : ''}`}>
+                  <span className="ecard-top">
+                    <span className="ecard-tag">{EMPLOYMENT_LABELS[j.jobType] ?? j.jobType}</span>
+                    <span className={`pill ${STATUS_PILL[j.status]}`}>{STATUS_LABEL[j.status]}</span>
+                  </span>
+                  <b className="ecard-title">{j.title || 'Untitled role'}</b>
+                  {where && <span className="ecard-sub">{where}</span>}
+                  <dl className="ecard-facts">
+                    <div>
+                      <dt>Applicants</dt>
+                      <dd>{j.applicationCount}</dd>
+                    </div>
+                    <div>
+                      <dt>Colleges</dt>
+                      <dd>
+                        {targeted ? `${j.accepted} live${j.pending > 0 ? ` · ${j.pending} waiting` : ''}` : '—'}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Deadline</dt>
+                      <dd className={days >= 0 && days <= 3 ? 'is-soon' : ''}>
+                        {new Date(j.deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Rounds</dt>
+                      <dd>{j.roundCount}</dd>
+                    </div>
+                  </dl>
+                  <span className="ecard-foot">
+                    <small>
+                      {!targeted
+                        ? 'Not targeted at any college yet'
+                        : j.declined > 0
+                          ? `${j.declined} ${j.declined === 1 ? 'college' : 'colleges'} declined`
+                          : j.status === 'DRAFT'
+                            ? 'Not published yet'
+                            : ''}
+                    </small>
+                    <span className="ecard-go">Open →</span>
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
       )}
     </CompanyLayout>
   );

@@ -81,54 +81,53 @@ export default function JobRequests() {
       )}
 
       {rows && rows.length > 0 && (
-        <div className="table-wrap">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Role</th>
-                <th>Company</th>
-                <th>Drive</th>
-                <th className="num">Rounds</th>
-                <th>CTC</th>
-                <th>Deadline</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((p) => (
-                <tr key={p.id}>
-                  <td>
-                    <Link to={`/campus/requests/${p.id}`} className="row-link">
-                      {p.title}
-                    </Link>
-                    {p.location && <span className="row-sub">{p.location}</span>}
-                  </td>
-                  <td>
-                    {p.companyName}
-                    {!p.companyVerified && <span className="row-sub">Not verified</span>}
-                  </td>
-                  <td>{p.placementName}</td>
-                  <td className="num">{p.roundCount}</td>
-                  <td>{money(p.ctcMin, p.ctcMax)}</td>
-                  <td>{new Date(p.deadline).toLocaleDateString()}</td>
-                  <td>
+        <ul className="ecards">
+          {rows.map((p) => {
+            const days = Math.ceil((new Date(p.deadline).getTime() - Date.now()) / 86_400_000);
+            return (
+              <li key={p.id}>
+                <Link to={`/campus/requests/${p.id}`} className={`ecard ${p.status === 'DECLINED' ? 'is-muted' : ''}`}>
+                  <span className="ecard-top">
+                    <span className="ecard-tag">{p.placementName}</span>
                     <span
                       className={`pill ${
-                        p.status === 'ACCEPTED'
-                          ? 'pill-pass'
-                          : p.status === 'DECLINED'
-                            ? 'pill-stop'
-                            : 'pill-hold'
+                        p.status === 'ACCEPTED' ? 'pill-pass' : p.status === 'DECLINED' ? 'pill-stop' : 'pill-hold'
                       }`}
                     >
-                      {p.status}
+                      {p.status === 'ACCEPTED' ? 'Accepted' : p.status === 'DECLINED' ? 'Declined' : 'Waiting on you'}
                     </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </span>
+                  <b className="ecard-title">{p.title}</b>
+                  <span className="ecard-sub">
+                    {p.companyName}
+                    {!p.companyVerified && ' · not verified'}
+                    {p.location ? ` · ${p.location}` : ''}
+                  </span>
+                  <dl className="ecard-facts">
+                    <div>
+                      <dt>Package</dt>
+                      <dd>{money(p.ctcMin, p.ctcMax)}</dd>
+                    </div>
+                    <div>
+                      <dt>Rounds</dt>
+                      <dd>{p.roundCount}</dd>
+                    </div>
+                    <div>
+                      <dt>Apply by</dt>
+                      <dd className={days >= 0 && days <= 3 ? 'is-soon' : ''}>
+                        {new Date(p.deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                      </dd>
+                    </div>
+                  </dl>
+                  <span className="ecard-foot">
+                    <small>{p.status === 'PENDING' ? 'Students cannot see it until you accept' : p.declineReason ?? ''}</small>
+                    <span className="ecard-go">{p.status === 'PENDING' ? 'Review →' : 'Open →'}</span>
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
       )}
     </CampusLayout>
   );

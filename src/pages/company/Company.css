@@ -1,0 +1,744 @@
+/* ---------------------------------------------------------------------------
+   The recruiter portal, in the landing page's palette.
+
+   The company screens share the admin shell's structure (a sidebar and a
+   content pane) but not its look: scoped under `.co`, this gives them the
+   airy blue canvas, deep blue ink, blush for actions and soft rounded cards
+   that the landing page and the student portal use - so a recruiter who
+   arrives from the public site lands in the same product.
+--------------------------------------------------------------------------- */
+
+.co {
+  --co-go: #e8456b;
+  --co-go-hover: #d02f56;
+
+  --paper: #ffffff;
+  --paper-2: #f5f9ff;
+  --surface: #ffffff;
+  --ink: #10223f;
+  --ink-2: #4c5d78;
+  --ink-3: #8b9ab3;
+  --rule: #dfe7f2;
+  --rule-2: #c9d6ea;
+  --pass: #13a37a;
+  --pass-soft: #d8f4ea;
+
+  --co-r: 16px;
+  --co-shadow: 0 1px 2px rgb(16 34 63 / 0.04), 0 8px 24px -12px rgb(16 34 63 / 0.14);
+
+  background:
+    radial-gradient(44rem 30rem at 92% -6%, rgb(31 79 163 / 0.08), transparent 60%),
+    radial-gradient(36rem 24rem at 30% 0%, rgb(232 69 107 / 0.05), transparent 62%),
+    #f5f9ff;
+  background-attachment: fixed;
+  color: var(--ink);
+}
+
+@media (prefers-color-scheme: dark) {
+  .co {
+    --co-go: #ff7896;
+    --co-go-hover: #ff95ab;
+    --paper: #142445;
+    --paper-2: #0f1c36;
+    --surface: #142445;
+    --ink: #eef4ff;
+    --ink-2: #aebcd6;
+    --ink-3: #7586a6;
+    --rule: #1e3054;
+    --rule-2: #2b4170;
+    --pass: #4fd1a1;
+    --pass-soft: #0f3029;
+    background: #0a1428;
+  }
+}
+
+/*
+  The accent. A college or a university's admins see their own institution's
+  colour (set on :root by lib/brand.ts) - every tenant wears its own colour.
+  Only the recruiter portal, which serves every institution at once, takes
+  Apli's sky blue.
+*/
+.co.is-company {
+  --brand: #1f4fa3;
+  --brand-hover: #173f86;
+  --brand-soft: #e3eefe;
+  --on-brand: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  .co.is-company {
+    --brand: #a8c6ff;
+    --brand-hover: #c4d8ff;
+    --brand-soft: #1a2b4f;
+    --on-brand: #0a1428;
+  }
+}
+
+/* --- the sidebar ---------------------------------------------------------- */
+
+.co .admin-nav {
+  background: var(--surface);
+  border-right-color: var(--rule);
+  box-shadow: 1px 0 0 var(--rule);
+}
+
+.co .admin-brand {
+  overflow: visible;
+  padding: 2px 0;
+}
+
+/* A fixed height: with none set, the logo drew at the SVG's default size and
+   the brand box cut it in half. */
+.co .admin-brand .brand-logo {
+  display: block;
+  height: 34px;
+  width: auto;
+  color: var(--brand);
+}
+
+.co-portal {
+  margin: 2px 0 14px;
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--ink-3);
+}
+
+.co-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  margin-right: -6px;
+  padding-right: 6px;
+  scrollbar-width: thin;
+}
+
+.co-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.co .admin-nav-label {
+  margin: 0 0 4px 10px;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.co .admin-link {
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 550;
+}
+
+.co .admin-link:hover:not(.is-current) {
+  background: var(--paper-2);
+}
+
+/* Current: a soft blue pill, not a solid block. */
+.co .admin-link.is-current {
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 650;
+}
+
+.co .admin-badge {
+  background: var(--co-go);
+  color: #fff;
+}
+
+/* --- the top bar and content -------------------------------------------- */
+
+.co .admin-topbar {
+  gap: 12px;
+}
+
+/* Primary actions in blush, as on the landing page. */
+.co .btn {
+  border-radius: 999px;
+}
+
+.co .btn-primary {
+  background: var(--co-go);
+  border-color: var(--co-go);
+  color: #fff;
+  box-shadow: 0 6px 16px -6px rgb(232 69 107 / 0.55);
+}
+
+.co .btn-primary:hover:not(:disabled) {
+  background: var(--co-go-hover);
+  border-color: var(--co-go-hover);
+}
+
+.co .btn-secondary {
+  background: var(--surface);
+}
+
+.co .card {
+  border-radius: var(--co-r);
+  border-color: var(--rule);
+  box-shadow: var(--co-shadow);
+}
+
+/* A compact page head, like the student pages. */
+.co .page-head {
+  margin-bottom: 18px;
+}
+
+.co .page-head h1 {
+  font-size: 26px;
+  letter-spacing: -0.02em;
+}
+
+.co .page-head .eyebrow {
+  margin-bottom: 4px;
+}
+
+.co .page-lede {
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+/* --- the overview ---------------------------------------------------------- */
+
+.cd-head {
+  margin-bottom: 18px;
+}
+
+.cd-when {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+
+.cd-head h1 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin: 2px 0 0;
+  font-family: var(--display);
+  font-size: 26px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.cd-badge {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.cd-badge.is-ok {
+  background: var(--pass-soft);
+  color: var(--pass);
+}
+
+.cd-badge.is-wait {
+  background: var(--hold-soft);
+  color: var(--hold);
+}
+
+.cd-badge.is-stop {
+  background: var(--stop-soft);
+  color: var(--stop);
+}
+
+.cd-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.cd-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 16px 18px;
+  border-radius: var(--co-r);
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  box-shadow: var(--co-shadow);
+  color: var(--ink);
+  text-decoration: none;
+  transition:
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.cd-stat:hover {
+  border-color: color-mix(in srgb, var(--brand) 40%, var(--rule));
+  transform: translateY(-1px);
+}
+
+.cd-stat b {
+  font-family: var(--display);
+  font-size: 28px;
+  font-weight: 750;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.cd-stat span {
+  font-size: 13.5px;
+  font-weight: 650;
+}
+
+.cd-stat small {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.cd-stat.is-hot {
+  border-color: color-mix(in srgb, var(--co-go) 45%, var(--rule));
+}
+
+.cd-stat.is-hot b {
+  color: var(--co-go);
+}
+
+.cd-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  gap: 16px;
+  align-items: start;
+}
+
+.cd-main,
+.cd-side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.cd-panel {
+  padding: 18px 20px;
+  border-radius: var(--co-r);
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  box-shadow: var(--co-shadow);
+}
+
+.cd-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.cd-panel-head h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.cd-panel-head a {
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--brand);
+}
+
+.cd-empty {
+  margin: 0;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1.5px dashed var(--rule-2);
+  font-size: 13.5px;
+  color: var(--ink-3);
+}
+
+.cd-note {
+  margin: 0 0 12px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+/* roles */
+.cd-roles {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cd-roles li + li {
+  border-top: 1px solid var(--rule);
+}
+
+.cd-roles a {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0 -10px;
+  padding: 11px 10px;
+  border-radius: 10px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.cd-roles a:hover {
+  background: var(--paper-2);
+}
+
+.cd-role-main {
+  display: grid;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.cd-role-main b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14.5px;
+  font-weight: 650;
+}
+
+.cd-role-main small {
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+.cd-role-apps {
+  display: grid;
+  justify-items: end;
+  flex: none;
+  width: 70px;
+}
+
+.cd-role-apps b {
+  font-size: 16px;
+  font-weight: 750;
+}
+
+.cd-role-apps small {
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+.cd-role-status {
+  flex: none;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  color: var(--ink-2);
+}
+
+.cd-role-status.is-published {
+  border-color: transparent;
+  background: var(--pass-soft);
+  color: var(--pass);
+}
+
+.cd-role-due {
+  flex: none;
+  width: 84px;
+  text-align: right;
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+.cd-role-due.is-soon {
+  color: var(--stop);
+  font-weight: 650;
+}
+
+/* pipeline as bars */
+.cd-funnel {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cd-funnel li {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) 40px;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.cd-funnel-label {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.cd-funnel-bar {
+  height: 10px;
+  border-radius: 10px;
+  background: var(--paper-2);
+  overflow: hidden;
+}
+
+.cd-funnel-bar i {
+  display: block;
+  height: 100%;
+  min-width: 2px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, var(--brand), color-mix(in srgb, var(--brand) 40%, var(--co-go)));
+}
+
+.cd-funnel b {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* set-up steps */
+.cd-left {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--co-go) 12%, transparent);
+  color: var(--co-go);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cd-steps {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cd-steps a {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 8px;
+  margin: 0 -8px;
+  border-radius: 10px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.cd-steps a:hover {
+  background: var(--paper-2);
+}
+
+.cd-step-mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  border-radius: 50%;
+  border: 1.5px solid var(--rule-2);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.cd-steps li.is-done .cd-step-mark {
+  border-color: transparent;
+  background: var(--pass);
+  color: #fff;
+}
+
+.cd-steps b {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 650;
+}
+
+.cd-steps li.is-done b {
+  color: var(--ink-3);
+  font-weight: 500;
+}
+
+.cd-steps small {
+  display: block;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+/* invitations waiting */
+.cd-invite {
+  display: grid;
+  gap: 4px;
+  padding: 16px 18px;
+  border-radius: var(--co-r);
+  background: linear-gradient(120deg, var(--co-go), #f08a6b);
+  color: #fff;
+  text-decoration: none;
+  box-shadow: 0 12px 28px -14px rgb(232 69 107 / 0.7);
+}
+
+.cd-invite b {
+  font-size: 15px;
+}
+
+.cd-invite small {
+  font-size: 13px;
+  opacity: 0.92;
+}
+
+@media (max-width: 1100px) {
+  .cd-cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .cd-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cd-role-due {
+    display: none;
+  }
+}
+
+/* --- the flat nav and "More tools" --------------------------------------- */
+
+.co-groups {
+  gap: 2px;
+}
+
+.co-more {
+  width: 100%;
+  margin-top: 6px;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.co-more-dots {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--ink-3);
+}
+
+.co-more-caret {
+  width: 7px;
+  height: 7px;
+  margin-left: auto;
+  border-right: 2px solid var(--ink-3);
+  border-bottom: 2px solid var(--ink-3);
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform 0.2s ease;
+}
+
+.co-more.is-open .co-more-caret {
+  transform: rotate(-135deg) translateY(-2px);
+}
+
+.co-more-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-left: 12px;
+  padding-left: 8px;
+  border-left: 1px solid var(--rule);
+}
+
+/* --- the placement cell's overview (shares the shapes above) -------------- */
+
+.cc-todo {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cc-todo li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+}
+
+.cc-todo li + li {
+  border-top: 1px solid var(--rule);
+}
+
+.cc-todo-text {
+  display: grid;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.cc-todo-text b {
+  font-size: 14.5px;
+}
+
+.cc-todo-text small {
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+.cc-ring-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.cc-ring-row > span:last-child {
+  display: grid;
+  gap: 2px;
+}
+
+.cc-ring-row small {
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+.cc-ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: conic-gradient(var(--pass) var(--p), var(--pass-soft) 0);
+}
+
+.cc-ring::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background: var(--surface);
+}
+
+.cc-ring b {
+  position: relative;
+  font-size: 14px;
+}
+
+/* The admin rail can collapse to icons: "More tools" folds with it. */
+.is-collapsed .co-more-caret {
+  display: none;
+}
+
+.is-collapsed .co-more-list {
+  margin-left: 0;
+  padding-left: 0;
+  border-left: 0;
+}
+
+.co.is-collapsed .admin-brand .brand-logo {
+  height: 20px;
+}

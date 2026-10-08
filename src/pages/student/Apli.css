@@ -295,3 +295,143 @@
     transform: none;
   }
 }
+
+/* ===========================================================================
+   The help button: the Apli logo instead of a face, and a panel with what
+   this page is for and the questions students ask most.
+   ======================================================================== */
+
+.apli-tab {
+  width: 60px;
+  height: 60px;
+  border-radius: 20px;
+  border-color: transparent;
+  background: var(--s-card, var(--surface));
+}
+
+.apli-tab-logo {
+  width: 40px;
+  height: auto;
+  color: var(--s-accent, var(--brand));
+}
+
+.apli-tab-x {
+  font-size: 26px;
+  line-height: 1;
+  color: var(--ink-2);
+}
+
+.apli-pop {
+  width: min(360px, calc(100vw - 44px));
+  max-height: min(560px, calc(100vh - 140px));
+  overflow-y: auto;
+  padding: 0;
+  scrollbar-width: thin;
+}
+
+.apli-pop-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px 12px;
+  border-bottom: 1px solid var(--s-line, var(--rule));
+  background: var(--s-card, var(--surface));
+}
+
+.apli-pop-logo {
+  width: 46px;
+  height: auto;
+  color: var(--s-accent, var(--brand));
+}
+
+.apli-pop-head span {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-3);
+}
+
+.apli-pop-page {
+  padding: 14px 18px 16px;
+  border-bottom: 1px solid var(--s-line, var(--rule));
+}
+
+.apli-faq {
+  padding: 14px 18px 16px;
+}
+
+.apli-faq ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.apli-faq li {
+  border-radius: 12px;
+  border: 1px solid var(--s-line, var(--rule));
+  background: var(--s-card-2, var(--paper-2));
+  overflow: hidden;
+}
+
+.apli-faq li.is-open {
+  border-color: color-mix(in srgb, var(--s-accent, var(--brand)) 35%, var(--s-line, var(--rule)));
+  background: var(--s-card, var(--surface));
+}
+
+.apli-faq button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* A chevron that turns when the answer is open. */
+.apli-faq button i {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-top: -3px;
+  border-right: 2px solid var(--ink-3);
+  border-bottom: 2px solid var(--ink-3);
+  transform: rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+.apli-faq li.is-open button i {
+  margin-top: 3px;
+  transform: rotate(-135deg);
+}
+
+.apli-faq li p {
+  margin: 0;
+  padding: 0 12px 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  animation: apli-pop-in 0.18s ease both;
+}
+
+@media (max-width: 860px) {
+  .apli-tab {
+    width: 52px;
+    height: 52px;
+  }
+
+  .apli-tab-logo {
+    width: 34px;
+  }
+}

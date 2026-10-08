@@ -167,7 +167,8 @@
  * A refetch dims the rows rather than replacing them with a spinner: the
  * shape of the page stays put while a filter is applied, so nothing jumps.
  */
-.table-wrap.is-loading {
+.table-wrap.is-loading,
+.ecards.is-loading {
   opacity: 0.55;
   transition: opacity 120ms ease-out;
   pointer-events: none;

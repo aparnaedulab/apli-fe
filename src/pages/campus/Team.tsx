@@ -102,27 +102,32 @@ export default function Team() {
       {freshLink && <OneTimeLink link={freshLink} onDismiss={() => setFreshLink(null)} />}
 
       {loaded && (
-        <section className="card">
+        <section className="ecard-section">
           <h2>Members</h2>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {members.map((m) => (
-                <tr key={m.id}>
-                  <td>
-                    {m.user.fullName}
-                    {m.isMe && <span className="row-sub">You</span>}
-                  </td>
-                  <td className="mono">{m.user.email}</td>
-                  <td>
-                    {canManage && !m.isMe ? (
+          <ul className="ecards">
+            {members.map((m) => (
+              <li key={m.id}>
+                <div className="ecard is-static">
+                  <span className="ecard-top">
+                    <span className="ecard-tag">{m.role.name}</span>
+                    {m.isMe ? (
+                      <span className="pill pill-pass">You</span>
+                    ) : m.user.isActive ? (
+                      <span className="pill pill-pass">Active</span>
+                    ) : (
+                      <span className="pill pill-idle">Inactive</span>
+                    )}
+                  </span>
+                  <b className="ecard-title">{m.user.fullName}</b>
+                  <span className="ecard-sub mono">{m.user.email}</span>
+                  <dl className="ecard-facts">
+                    <div>
+                      <dt>Joined</dt>
+                      <dd>{new Date(m.joinedAt).toLocaleDateString()}</dd>
+                    </div>
+                  </dl>
+                  {canManage && !m.isMe && (
+                    <span className="ecard-foot">
                       <select
                         value={m.role.id}
                         disabled={busy}
@@ -137,12 +142,6 @@ export default function Team() {
                           </option>
                         ))}
                       </select>
-                    ) : (
-                      <span className="pill pill-idle">{m.role.name}</span>
-                    )}
-                  </td>
-                  <td className="right">
-                    {canManage && !m.isMe && (
                       <button
                         type="button"
                         className="link-btn is-danger"
@@ -151,53 +150,56 @@ export default function Team() {
                       >
                         Remove
                       </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    </span>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
 
       {invites.length > 0 && (
-        <section className="card">
+        <section className="ecard-section">
           <h2>Invited, not joined yet</h2>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Email</th>
-                <th>Name</th>
-                <th>Role</th>
-                <th>Expires</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {invites.map((inv) => (
-                <tr key={inv.id}>
-                  <td className="mono">{inv.email}</td>
-                  <td>{inv.invitedName ?? '—'}</td>
-                  <td>
-                    <span className="pill pill-idle">{inv.role?.name ?? '—'}</span>
-                  </td>
-                  <td>{new Date(inv.expiresAt).toLocaleDateString()}</td>
-                  <td className="right">
+          <ul className="ecards">
+            {invites.map((inv) => {
+              const days = Math.ceil((new Date(inv.expiresAt).getTime() - Date.now()) / 86_400_000);
+              return (
+                <li key={inv.id}>
+                  <div className="ecard is-static">
+                    <span className="ecard-top">
+                      <span className="ecard-tag">{inv.role?.name ?? '—'}</span>
+                      <span className="pill pill-hold">Invited</span>
+                    </span>
+                    <b className="ecard-title">{inv.invitedName ?? inv.email}</b>
+                    <span className="ecard-sub mono">{inv.email}</span>
+                    <dl className="ecard-facts">
+                      <div>
+                        <dt>Expires</dt>
+                        <dd className={days <= 2 ? 'is-soon' : ''}>
+                          {new Date(inv.expiresAt).toLocaleDateString()}
+                        </dd>
+                      </div>
+                    </dl>
                     {canManage && (
-                      <button
-                        type="button"
-                        className="link-btn is-danger"
-                        disabled={busy}
-                        onClick={() => run(() => api.delete(`/campus/team/invites/${inv.id}`))}
-                      >
-                        Cancel
-                      </button>
+                      <span className="ecard-foot">
+                        <small>Not joined yet</small>
+                        <button
+                          type="button"
+                          className="link-btn is-danger"
+                          disabled={busy}
+                          onClick={() => run(() => api.delete(`/campus/team/invites/${inv.id}`))}
+                        >
+                          Cancel
+                        </button>
+                      </span>
                     )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
         </section>
       )}
 

@@ -791,3 +791,578 @@
     transform: none;
   }
 }
+
+/* ===========================================================================
+   Applications as a board of cards, each opening in a side panel.
+   ======================================================================== */
+
+/* --- the line at the top -------------------------------------------------- */
+
+.ap-apli {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ap-apli-dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--s-accent);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--s-accent) 15%, transparent);
+}
+
+.ap-next-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ap-next-list button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--s-line);
+  background: var(--s-card);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ap-next-list button:hover {
+  border-color: color-mix(in srgb, var(--s-accent) 40%, var(--s-line));
+}
+
+/* --- filters as pills ----------------------------------------------------- */
+
+.ap-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0 16px;
+}
+
+.ap-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--s-line);
+  background: var(--s-card);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 650;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.ap-pill b {
+  min-width: 20px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--s-card-2);
+  border: 1px solid var(--s-line);
+  font-size: 12px;
+  text-align: center;
+}
+
+.ap-pill:hover {
+  border-color: var(--s-line-2);
+  color: var(--ink);
+}
+
+.ap-pill.is-current {
+  border-color: var(--s-accent);
+  background: color-mix(in srgb, var(--s-accent) 10%, var(--s-card));
+  color: var(--s-accent);
+}
+
+.ap-pill.is-current b {
+  border-color: transparent;
+  background: var(--s-accent);
+  color: #fff;
+}
+
+.ap-pill.is-hot {
+  border-color: color-mix(in srgb, var(--s-go) 45%, var(--s-line));
+  color: var(--s-go);
+}
+
+.ap-pill.is-hot b {
+  border-color: transparent;
+  background: var(--s-go);
+  color: #fff;
+}
+
+/* --- the board ---------------------------------------------------------- */
+
+.ap-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ap-card {
+  position: relative;
+  border-radius: var(--s-r-lg);
+  border: 1px solid var(--s-line);
+  background: var(--s-card);
+  box-shadow: var(--s-shadow-1);
+  overflow: hidden;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s var(--s-ease);
+}
+
+.ap-card:hover {
+  border-color: color-mix(in srgb, var(--s-accent) 35%, var(--s-line));
+  box-shadow: var(--s-shadow-2);
+  transform: translateY(-2px);
+}
+
+/* A thin colour edge says the state before any word does. */
+.ap-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--s-line-2);
+}
+
+.ap-card.is-live::before {
+  background: var(--s-accent);
+}
+
+.ap-card.is-offer::before {
+  background: var(--pass);
+}
+
+.ap-card.is-mine::before {
+  background: var(--s-go);
+}
+
+.ap-card.is-closed {
+  opacity: 0.78;
+}
+
+.ap-card-hit {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  height: 100%;
+  padding: 16px 18px 14px 20px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ap-card-hit:focus-visible {
+  outline: 2px solid var(--s-accent);
+  outline-offset: -2px;
+}
+
+.ap-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.ap-card-who {
+  display: grid;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.ap-card-who b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.ap-card-who small {
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+/* status chips, one colour per kind of state */
+.ap-status {
+  flex: none;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--s-card-2);
+  border: 1px solid var(--s-line);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.ap-status.is-shortlisted,
+.ap-status.is-in_round {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--s-accent) 12%, transparent);
+  color: var(--s-accent);
+}
+
+.ap-status.is-offered {
+  border-color: transparent;
+  background: var(--s-go);
+  color: #fff;
+}
+
+.ap-status.is-accepted,
+.ap-status.is-hired {
+  border-color: transparent;
+  background: var(--pass-soft);
+  color: var(--pass);
+}
+
+.ap-status.is-waitlisted {
+  border-color: transparent;
+  background: var(--hold-soft);
+  color: var(--hold);
+}
+
+.ap-status.is-rejected,
+.ap-status.is-declined,
+.ap-status.is-withdrawn {
+  border-color: transparent;
+  background: var(--stop-soft);
+  color: var(--stop);
+}
+
+/* the track: applied, rounds, offer */
+.ap-track {
+  display: flex;
+  align-items: center;
+}
+
+.ap-stop {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.ap-stop:first-child {
+  flex: none;
+}
+
+/* the line into each stop */
+.ap-stop:not(:first-child)::before {
+  content: '';
+  flex: 1;
+  height: 3px;
+  margin: 0 3px;
+  border-radius: 3px;
+  background: var(--s-line);
+}
+
+.ap-stop.is-done:not(:first-child)::before,
+.ap-stop.is-here:not(:first-child)::before {
+  background: var(--s-grad);
+}
+
+.ap-stop i {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--s-line-2);
+  background: var(--s-card);
+}
+
+.ap-stop.is-done i {
+  border-color: transparent;
+  background: var(--s-accent);
+}
+
+.ap-stop.is-here i {
+  width: 16px;
+  height: 16px;
+  border: 3px solid var(--s-accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--s-accent) 15%, transparent);
+}
+
+.ap-card.is-offer .ap-stop.is-here i {
+  border-color: var(--pass);
+  box-shadow: 0 0 0 4px var(--pass-soft);
+}
+
+.ap-track-label {
+  margin-top: -6px;
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--ink-2);
+}
+
+.ap-track-label small {
+  font-weight: 500;
+  color: var(--ink-3);
+}
+
+/* the latest update */
+.ap-card-news {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-height: 38px;
+  padding: 9px 11px;
+  border-radius: 10px;
+  background: var(--s-card-2);
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.ap-card-news b {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 650;
+  color: var(--ink);
+}
+
+.ap-card-news small {
+  flex: none;
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+.ap-dot {
+  flex: none;
+  align-self: center;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--s-go);
+}
+
+.ap-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ap-card-foot small {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.ap-card-more {
+  flex: none;
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--s-accent);
+}
+
+.ap-card-cta {
+  flex: none;
+  padding: 6px 13px;
+  border-radius: 999px;
+  background: var(--s-go);
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+/* --- the side panel ---------------------------------------------------------- */
+
+.ap-panel-back {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  justify-content: flex-end;
+  background: rgb(10 20 40 / 0.38);
+  animation: ap-fade 0.15s ease both;
+}
+
+.ap-panel {
+  display: flex;
+  flex-direction: column;
+  width: min(720px, 100%);
+  height: 100%;
+  background: var(--s-canvas);
+  box-shadow: -18px 0 50px rgb(0 0 0 / 0.2);
+  outline: none;
+  animation: ap-slide 0.25s var(--s-ease) both;
+}
+
+.ap-panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid var(--s-line);
+  background: var(--s-card);
+}
+
+.ap-panel-head h2 {
+  margin: 0 0 2px;
+  font-family: var(--display);
+  font-size: 19px;
+}
+
+.ap-panel-head p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.ap-panel-x {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--s-line);
+  background: var(--s-card);
+  color: var(--ink-2);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.ap-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 22px 28px;
+  scrollbar-width: thin;
+}
+
+.ap-detail-status {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 14px;
+}
+
+.ap-detail-far {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.ap-detail-new {
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--s-go) 12%, transparent);
+  color: var(--s-go);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Inside the panel the body is not an inset of a row any more. */
+.ap-panel .ap-row-body {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+@keyframes ap-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes ap-slide {
+  from {
+    transform: translateX(40px);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .ap-board {
+    grid-template-columns: 1fr;
+  }
+
+  .ap-panel-body {
+    padding: 16px;
+  }
+}
+
+/* --- what this page is ----------------------------------------------------- */
+
+.ap-lede {
+  max-width: 78ch;
+  margin: 6px 0 14px;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+
+/* --- the compact head ------------------------------------------------------- */
+
+.ap-head {
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin-bottom: 18px;
+}
+
+.ap-head-left {
+  display: block;
+  min-width: 0;
+}
+
+.ap-head h1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 24px;
+}
+
+.ap-head .ap-lede {
+  margin: 4px 0 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+
+/* The filters sit on the title's row, not on a row of their own. */
+.ap-head .ap-pills {
+  align-items: center;
+  margin: 0;
+}
+
+.ap-head .ap-pill {
+  padding: 7px 13px;
+  font-size: 13px;
+}
+
+.ap-head .ap-read-all {
+  margin-left: 4px;
+}

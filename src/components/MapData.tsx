@@ -26,6 +26,7 @@ export default function MapData({
   onChanged,
   only,
   layout = 'cards',
+  initialProgramId,
 }: {
   scope: MappingScope;
   offered: Offered;
@@ -36,6 +37,8 @@ export default function MapData({
   onChanged?: () => void;
   /** Show one half without tabs - how Set up walks through it step by step. */
   only?: 'programs' | 'students';
+  /** Open the students half on this programme rather than the first. */
+  initialProgramId?: string;
 }) {
   const [tab, setTab] = useState<'programs' | 'students'>(only ?? 'programs');
   const [programs, setPrograms] = useState<CollegeProgram[] | null>(null);
@@ -122,6 +125,7 @@ export default function MapData({
         <StudentsMapper
           scope={scope}
           programs={programs}
+          initialProgramId={initialProgramId}
           onChanged={() => {
             void load();
             onChanged?.();
@@ -626,12 +630,16 @@ function StudentsMapper({
   scope,
   programs,
   onChanged,
+  initialProgramId,
 }: {
   scope: MappingScope;
   programs: CollegeProgram[];
   onChanged: () => void;
+  initialProgramId?: string;
 }) {
-  const [programId, setProgramId] = useState(programs[0]!.id);
+  const [programId, setProgramId] = useState(
+    initialProgramId && programs.some((p) => p.id === initialProgramId) ? initialProgramId : programs[0]!.id,
+  );
   const program = programs.find((p) => p.id === programId) ?? programs[0]!;
 
   const [inside, setInside] = useState<StudentPage | null>(null);

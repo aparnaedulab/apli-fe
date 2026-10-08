@@ -1,0 +1,212 @@
+/* Interview questions: pick a round, edit its list. */
+
+.iq-rounds,
+.iq-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.iq-round,
+.iq-role {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--rule-2);
+  background: var(--surface);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.iq-role {
+  padding: 6px 13px;
+  font-size: 13px;
+}
+
+.iq-round.is-on,
+.iq-role.is-on {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: var(--on-brand);
+}
+
+.iq-role.is-on {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.iq-card {
+  margin-top: 6px;
+}
+
+.iq-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.iq-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 13.5px;
+}
+
+.iq-badge {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.iq-badge.is-own {
+  border-color: transparent;
+  background: var(--pass-soft);
+  color: var(--pass);
+}
+
+.iq-actions {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.iq-note {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--brand-soft);
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.iq-empty {
+  padding: 20px;
+  border: 1.5px dashed var(--rule-2);
+  border-radius: 8px;
+  text-align: center;
+  color: var(--ink-3);
+}
+
+.iq-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.iq-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+.iq-item.is-hidden {
+  background: var(--paper-2);
+  opacity: 0.65;
+}
+
+.iq-n {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  margin-top: 4px;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.iq-main {
+  display: grid;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.iq-text {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--rule-2);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.iq-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.iq-meta select {
+  padding: 5px 8px;
+  border: 1px solid var(--rule-2);
+  border-radius: 8px;
+  background: var(--surface);
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.iq-show {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.iq-tools {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.iq-tools button {
+  width: 30px;
+  height: 30px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: none;
+  color: var(--ink-3);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.iq-tools button:hover:not(:disabled) {
+  border-color: var(--rule);
+  background: var(--paper-2);
+  color: var(--ink);
+}
+
+.iq-tools button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.iq-tools .iq-del:hover:not(:disabled) {
+  color: var(--stop);
+}

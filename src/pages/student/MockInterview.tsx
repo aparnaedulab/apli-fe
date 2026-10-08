@@ -72,55 +72,118 @@ export default function MockInterview() {
     );
   }
 
+  const roleLabel = (key: string) => options?.roles.find((r) => r.key === key)?.label ?? key;
+
   return (
     <StudentLayout>
-      <header className="page-head">
-        <div>
-          <p className="eyebrow">Practice</p>
-          <h1>Mock interview</h1>
-          <p className="page-lede">
-            Five questions, one at a time. Answer as you would in the room - then see what worked and one or two things to
-            try next time.
-          </p>
-        </div>
-        {session && (
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={() => {
-              setSession(null);
-              loadHistory();
-            }}
-          >
-            End session
-          </button>
+      <div className="mi">
+        <header className="mi-head">
+          <div>
+            <h1>Mock interview</h1>
+            <p>Five questions, one at a time. Answer as you would in the room, then see what worked.</p>
+          </div>
+          {session && (
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => {
+                setSession(null);
+                loadHistory();
+              }}
+            >
+              End session
+            </button>
+          )}
+        </header>
+
+        {error && <p className="alert alert-error">{error}</p>}
+
+        {!options && !error && <p className="muted">Loading…</p>}
+
+        {options && !session && (
+          <div className="mi-cols">
+            <Setup options={options} onStarted={setSession} onError={setError} />
+            <aside className="mi-side">
+              {history && history.length > 0 ? <History sessions={history} onOpen={open} /> : <HowItWorks />}
+            </aside>
+          </div>
         )}
-      </header>
 
-      {error && <p className="alert alert-error">{error}</p>}
-
-      {!options && !error && <p className="muted">Loading…</p>}
-
-      {options && !session && (
-        <>
-          <Setup options={options} onStarted={setSession} onError={setError} />
-          <History sessions={history} onOpen={open} />
-        </>
-      )}
-
-      {options && session && (
-        <Practice
-          session={session}
-          aiEnabled={options.aiEnabled}
-          roleLabel={options.roles.find((r) => r.key === session.role)?.label ?? session.role}
-          onUpdate={setSession}
-          onAgain={() => {
-            setSession(null);
-            loadHistory();
-          }}
-        />
-      )}
+        {options && session && (
+          <div className="mi-cols">
+            <Practice
+              session={session}
+              aiEnabled={options.aiEnabled}
+              roleLabel={roleLabel(session.role)}
+              onUpdate={setSession}
+              onAgain={() => {
+                setSession(null);
+                loadHistory();
+              }}
+            />
+            <aside className="mi-side">
+              <SessionRail session={session} roleLabel={roleLabel(session.role)} />
+            </aside>
+          </div>
+        )}
+      </div>
     </StudentLayout>
+  );
+}
+
+/** What a session is, for somebody who has not tried one yet. */
+function HowItWorks() {
+  return (
+    <section className="mi-panel">
+      <h2>How it works</h2>
+      <ol className="mi-how">
+        <li>
+          <b>Choose a round</b>
+          <small>HR, technical or managerial - like the real thing.</small>
+        </li>
+        <li>
+          <b>Answer five questions</b>
+          <small>Type, or press the microphone and speak.</small>
+        </li>
+        <li>
+          <b>Get feedback after each</b>
+          <small>What worked, and one or two things to try next time.</small>
+        </li>
+      </ol>
+      <p className="mi-how-note">Nothing here is marked or shown to recruiters.</p>
+    </section>
+  );
+}
+
+/** Where you are in the session: each question, answered or not, and the average so far. */
+function SessionRail({ session, roleLabel }: { session: MockSession; roleLabel: string }) {
+  const answered = new Map(session.answers.map((a) => [a.question, a.feedback.score]));
+  const current = session.questions.findIndex((q) => !answered.has(q.text));
+  return (
+    <section className="mi-panel">
+      <p className="mi-rail-kind">
+        {KIND_LABEL[session.kind]}
+        {session.kind === 'TECHNICAL' ? ` · ${roleLabel}` : ''}
+      </p>
+      <ol className="mi-rail">
+        {session.questions.map((q, i) => {
+          const score = answered.get(q.text);
+          const state = score !== undefined ? 'done' : i === current ? 'now' : 'todo';
+          return (
+            <li key={q.id} className={`is-${state}`}>
+              <span className="mi-rail-n">{state === 'done' ? '✓' : i + 1}</span>
+              <span className="mi-rail-text">{state === 'todo' ? `Question ${i + 1}` : q.text}</span>
+              {score !== undefined && <span className="mi-rail-score">{score}</span>}
+            </li>
+          );
+        })}
+      </ol>
+      {session.averageScore !== null && (
+        <p className="mi-rail-avg">
+          Average so far <b>{session.averageScore}</b>
+        </p>
+      )}
+    </section>
   );
 }
 
@@ -154,7 +217,7 @@ function Setup({
   }
 
   return (
-    <section className="card mi-setup">
+    <section className="mi-panel mi-setup">
       <h2>What do you want to practise?</h2>
       <div className="mi-kinds" role="radiogroup" aria-label="Interview round">
         {options.kinds.map((k) => (
@@ -166,33 +229,42 @@ function Setup({
             className={`mi-kind ${kind === k.key ? 'is-on' : ''}`}
             onClick={() => setKind(k.key)}
           >
+            <span className="mi-kind-check" aria-hidden="true" />
             <strong>{k.label}</strong>
             <span>{k.blurb}</span>
           </button>
         ))}
       </div>
 
-      <label className="mi-role">
-        <span>The kind of role you are preparing for</span>
-        <select className="input" value={role} onChange={(e) => setRole(e.target.value)}>
-          {options.roles.map((r) => (
-            <option key={r.key} value={r.key}>
-              {r.label}
-            </option>
-          ))}
-        </select>
-        {kind !== 'TECHNICAL' && <small>HR and managerial questions are the same for every role.</small>}
-      </label>
+      {/* Only a technical round differs by role; the others ask the same. */}
+      {kind === 'TECHNICAL' && (
+        <div className="mi-roles">
+          <p>The kind of role you are preparing for</p>
+          <div className="mi-role-pills" role="radiogroup" aria-label="Role">
+            {options.roles.map((r) => (
+              <button
+                key={r.key}
+                type="button"
+                role="radio"
+                aria-checked={role === r.key}
+                className={role === r.key ? 'is-on' : ''}
+                onClick={() => setRole(r.key)}
+              >
+                {r.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="mi-start">
-        <p className="mi-privacy">
-          {options.aiEnabled ? 'Feedback is written by AI, checked against a fixed guide.' : 'Feedback comes from built-in guidelines.'} Only
-          the text of your answers is saved. If you speak, your browser turns it into text - no recording is stored or
-          uploaded.
-        </p>
-        <button type="button" className="btn btn-primary" onClick={start} disabled={busy}>
-          {busy ? 'Starting…' : 'Start practising'}
+        <button type="button" className="btn btn-primary mi-go" onClick={start} disabled={busy}>
+          {busy ? 'Starting…' : 'Start practising →'}
         </button>
+        <p className="mi-privacy">
+          {options.aiEnabled ? 'Feedback is written by AI, checked against a fixed guide.' : 'Feedback comes from built-in guidelines.'}{' '}
+          Only the text of your answers is saved - if you speak, your browser turns it into text and no recording is kept.
+        </p>
       </div>
     </section>
   );
@@ -376,7 +448,7 @@ function QuestionView({
   }
 
   return (
-    <section className="card mi-question">
+    <section className="mi-panel mi-question">
       <div className="mi-q-top">
         <span className="mi-step">
           Question {index + 1} of {session.questions.length}
@@ -476,7 +548,7 @@ function FeedbackCard({
 }) {
   const m = feedback.metrics;
   return (
-    <section className="card mi-feedback">
+    <section className="mi-panel mi-feedback">
       <div className="mi-fb-head">
         <ScoreRing score={feedback.score} />
         <div>
@@ -558,7 +630,7 @@ function FeedbackCard({
 
 function Summary({ session, roleLabel, onAgain }: { session: MockSession; roleLabel: string; onAgain: () => void }) {
   return (
-    <section className="card mi-summary">
+    <section className="mi-panel mi-summary">
       <p className="mi-step">
         {KIND_LABEL[session.kind]} · {roleLabel}
       </p>
@@ -601,7 +673,7 @@ function History({ sessions, onOpen }: { sessions: MockSessionSummary[] | null; 
   if (!sessions || sessions.length === 0) return null;
 
   return (
-    <section className="card mi-history">
+    <section className="mi-panel mi-history">
       <div className="mi-history-head">
         <h2>Your practice so far</h2>
         {points && (
