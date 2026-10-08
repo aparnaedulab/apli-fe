@@ -36,6 +36,32 @@ export const STUDENT_ICONS: Record<string, (p: IconProps) => JSX.Element> = {
     </svg>
   ),
 
+  // Virtual internships: a laptop with a task ticked on its screen.
+  'Virtual internships': (p) => (
+    <svg {...base} {...p}>
+      <rect x="4" y="5" width="16" height="11" rx="1.8" />
+      <path d="M2.5 19h19" />
+      <path d="m9 10.5 2 2 4-4" />
+    </svg>
+  ),
+
+  // Micro-internships: a clock with a rupee, for short paid work.
+  'Micro-internships': (p) => (
+    <svg {...base} {...p}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M9.5 8.5h5M9.5 11h5M12.5 8.5c1.6 0 1.6 2.5 0 2.5H9.5l4 4.5" />
+    </svg>
+  ),
+
+  // Skills passport: a passport book with a seal.
+  'Skills passport': (p) => (
+    <svg {...base} {...p}>
+      <rect x="5" y="3" width="14" height="18" rx="2" />
+      <circle cx="12" cy="10.5" r="3" />
+      <path d="M9 16.5h6" />
+    </svg>
+  ),
+
   // Jobs: a briefcase.
   Jobs: (p) => (
     <svg {...base} {...p}>

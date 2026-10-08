@@ -45,18 +45,18 @@ export default function Simulations() {
     <CompanyLayout>
       <header className="page-head">
         <div>
-          <p className="eyebrow">Work simulations</p>
-          <h1>Let students show you real work.</h1>
+          <p className="eyebrow">Virtual internships</p>
+          <h1>See how students work before you hire them.</h1>
           <p className="page-lede">
-            A short project in your own words. Students who finish it and explain it on a call earn a certificate you can
-            trust - it appears on their skills passport.
+            A few hours of real tasks, in your own words. Students who finish and explain their work on a short call earn
+            a certificate you can trust. You see who did it well, and you can use it as a round in your own hiring.
           </p>
         </div>
       </header>
 
-      <div className="seg sims-tabs" role="tablist" aria-label="Simulations">
+      <div className="seg sims-tabs" role="tablist" aria-label="Virtual internships">
         <button type="button" role="tab" aria-selected={tab === 'build'} className={`seg-opt ${tab === 'build' ? 'is-on' : ''}`} onClick={() => go({})}>
-          Your simulations
+          Your internships
         </button>
         <button
           type="button"

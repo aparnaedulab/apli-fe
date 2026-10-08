@@ -89,6 +89,15 @@ export const NAV_ICONS: Record<string, (p: IconProps) => JSX.Element> = {
     </svg>
   ),
 
+  // Virtual internships: a laptop with a task ticked on its screen.
+  internships: (p) => (
+    <svg {...base} {...p}>
+      <rect x="4" y="5" width="16" height="11" rx="1.8" />
+      <path d="M2.5 19h19" />
+      <path d="m9 10.5 2 2 4-4" />
+    </svg>
+  ),
+
   // Roles: a tag.
   jobs: (p) => (
     <svg {...base} {...p}>

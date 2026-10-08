@@ -10,6 +10,8 @@ import {
   type Profile,
 } from '../../api/candidate';
 import { ApiError } from '../../api/client';
+import { proofApi, type EnrolmentStatus, type StudentSimulationRow } from '../../api/proof';
+import { useAuth } from '../../auth/AuthContext';
 import { useT } from '../../i18n';
 import NoticeBoard from '../../components/NoticeBoard';
 import StudentDrives from '../../components/StudentDrives';
@@ -88,8 +90,20 @@ const MILESTONES = [
 
 type Stage = (typeof MILESTONES)[number]['key'] | 'done';
 
+/** How a student's own virtual internship reads in one word. */
+const INTERN_STATUS: Record<EnrolmentStatus, string> = {
+  IN_PROGRESS: 'In progress',
+  SUBMITTED: 'With the company',
+  EXPLAIN_BOOKED: 'Call booked',
+  NEEDS_WORK: 'Needs work',
+  COMPLETED: 'Certificate earned',
+};
+
 export default function StudentDashboard() {
   const { t } = useT();
+  const { hasModule } = useAuth();
+  const internshipsOn = hasModule('proof.simulations');
+  const [internships, setInternships] = useState<StudentSimulationRow[] | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [jobs, setJobs] = useState<JobCard[] | null>(null);
   const [apps, setApps] = useState<MyApplication[] | null>(null);
@@ -109,7 +123,13 @@ export default function StudentDashboard() {
       .applications()
       .then(setApps)
       .catch(() => setApps([]));
-  }, []);
+    if (internshipsOn) {
+      proofApi
+        .list()
+        .then(setInternships)
+        .catch(() => setInternships([]));
+    }
+  }, [internshipsOn]);
 
   useEffect(load, [load]);
 
@@ -156,6 +176,10 @@ export default function StudentDashboard() {
     return out.sort((a, b) => a.at - b.at).slice(0, 6);
   }, [all, open]);
 
+  /** Virtual internships: the student's own first, otherwise two to try. */
+  const myInternships = (internships ?? []).filter((r) => r.mine);
+  const internshipCard = myInternships.length > 0 ? myInternships.slice(0, 3) : (internships ?? []).slice(0, 2);
+
   const loading = !profile && error === null;
   const first = profile?.fullName.split(' ')[0] ?? '';
 
@@ -192,6 +216,11 @@ export default function StudentDashboard() {
               </p>
             </div>
             <nav className="jy-counts" aria-label="At a glance">
+              {internshipsOn && (
+                <Link to="/student/projects" className={myInternships.length ? 'is-on' : ''}>
+                  Internships <b>{myInternships.length}</b>
+                </Link>
+              )}
               <Link to="/student/jobs" className={open.length ? 'is-on' : ''}>
                 Open to you <b>{open.length}</b>
               </Link>
@@ -242,7 +271,7 @@ export default function StudentDashboard() {
           {/* --- two columns: the next step, and what is going on ---------- */}
           {(() => {
             const showMotion = live.length > 0 && stage !== 'applied' && stage !== 'rounds';
-            const hasSide = due.length > 0 || showMotion;
+            const hasSide = due.length > 0 || showMotion || internshipCard.length > 0;
             return (
               <div className={`jy-cols ${hasSide ? '' : 'is-single'}`}>
                 <div className="jy-main">
@@ -270,6 +299,30 @@ export default function StudentDashboard() {
 
                 {hasSide && (
                   <aside className="jy-side">
+                    {internshipCard.length > 0 && (
+                      <section className="jy-side-card" aria-label="Virtual internships">
+                        <header>
+                          <h3>{myInternships.length > 0 ? 'Your virtual internships' : 'Try a virtual internship'}</h3>
+                          <Link to="/student/projects">All →</Link>
+                        </header>
+                        <ul className="jy-days">
+                          {internshipCard.map((r) => (
+                            <li key={r.id}>
+                              <Link to={`/student/projects?id=${r.id}`}>
+                                <span className="jy-text">
+                                  <b>{r.title}</b>
+                                  <small>
+                                    {r.company.name} ·{' '}
+                                    {r.mine ? INTERN_STATUS[r.mine.status] : `about ${r.estimatedHours} hrs`}
+                                  </small>
+                                </span>
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </section>
+                    )}
+
                     {due.length > 0 && (
                       <section className="jy-side-card" aria-label="This week">
                         <h3>This week</h3>

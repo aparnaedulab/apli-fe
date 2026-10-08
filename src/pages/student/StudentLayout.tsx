@@ -56,6 +56,15 @@ type Item = { to: string; label: string; end?: boolean; module?: string };
  */
 const GROUPS: { label: string; lede: string; items: Item[] }[] = [
   {
+    label: 'Show your work',
+    lede: 'Real tasks from real companies, and the proof they leave',
+    items: [
+      { to: '/student/projects', label: 'Virtual internships', module: 'proof.simulations' },
+      { to: '/student/micro-projects', label: 'Micro-internships', module: 'proof.microInternships' },
+      { to: '/student/passport', label: 'Skills passport', module: 'proof.passport' },
+    ],
+  },
+  {
     label: 'Placements',
     lede: 'Roles, the ones you sent, and what happens next',
     items: [
@@ -94,15 +103,18 @@ const GROUPS: { label: string; lede: string; items: Item[] }[] = [
 ];
 
 /**
- * The four that are always on the bar, plus Prepare, which is whichever
- * rehearsal section the institution has actually switched on.
+ * The five on the bar.
  *
  * Chosen by what somebody opens between lectures, not by what the portal
- * contains: is anything new, what can I apply to, where are the ones I sent,
- * how do I get better at this, and is my own record in order.
+ * contains: is anything new, what real work can I do, what can I apply to,
+ * where are the ones I sent, and how do I get better at this. Virtual
+ * internships sit second because they are the heart of the product: the
+ * experience comes first, the job follows. The profile lives in the account
+ * menu under the avatar, which is where people look for it.
  */
 const PRIMARY: { to: string; label: string; icon: string; text: MessageKey; end?: boolean }[] = [
   { to: '/student', label: 'Overview', icon: 'Overview', text: 'layout.home', end: true },
+  { to: '/student/projects', label: 'Virtual internships', icon: 'Virtual internships', text: 'layout.internships' },
   { to: '/student/jobs', label: 'Jobs', icon: 'Jobs', text: 'nav.Jobs' },
   {
     to: '/student/applications',
@@ -111,7 +123,6 @@ const PRIMARY: { to: string; label: string; icon: string; text: MessageKey; end?
     text: 'layout.applied',
   },
   { to: '__prepare__', label: 'Prepare', icon: 'Aptitude practice', text: 'layout.prepare' },
-  { to: '/student/profile', label: 'My profile', icon: 'My profile', text: 'layout.profile' },
 ];
 
 /**
@@ -126,6 +137,13 @@ const PRIMARY: { to: string; label: string; icon: string; text: MessageKey; end?
  * than falling through to the default.
  */
 const PAGE_HELP: { path: string; title: string; body: string; to?: string; cta?: string }[] = [
+  {
+    path: '/student/projects',
+    title: 'Experience first, the job follows',
+    body: 'Each virtual internship is a few hours of real tasks set by a company. Finish it, explain your work on a short call, and the certificate goes on your skills passport, where recruiters see it when you apply.',
+    to: '/student/passport',
+    cta: 'See my skills passport',
+  },
   {
     path: '/student/jobs',
     title: 'Everything here is open to you',

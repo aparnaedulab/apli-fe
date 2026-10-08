@@ -8,13 +8,16 @@ import './landing/home.css';
  * The landing page.
  *
  * One job: somebody who arrives here knows within a few seconds what Apli.ai
- * is for. Campus hiring between three parties - students, the college's
- * placement cell and companies - where the college verifies every student and
- * approves every job, and every offer is followed until the student joins.
+ * is for. A virtual internship portal that leads to jobs: students do short,
+ * real tasks set by companies, explain their work, earn a certificate anyone
+ * can check, and get invited to interview. The college verifies who they are,
+ * so recruiters trust what they did, and every offer is followed to joining.
  *
- * Six sections and no more: the hero says it, the problem says why, the
- * thread says how, the doors say who it is for, the waiting says who else
- * is counting on the offer, the close says what we refuse.
+ * The hero says it, the problem names the experience trap, the internships
+ * show what is on offer, the thread says how it works, the trust section says
+ * why a recruiter believes the certificate, the doors say who it is for, the
+ * waiting says who else is counting on the offer, the close says what we
+ * refuse.
  *
  * Colour
  * ------
@@ -50,7 +53,9 @@ export default function Landing() {
       <main id="main">
         <Hero entered={entered} />
         <Problem />
+        <Internships />
         <Thread />
+        <Trust />
         <Doors />
         <Waiting />
         <Close />
@@ -109,7 +114,7 @@ function Intro({ onDone }: { onDone: () => void }) {
         <ApliLogo className="h-intro-logo" />
       </div>
       <p className="h-intro-line">
-        Every student real. Every job real. <span>Every offer kept.</span>
+        Real work. Real proof. <span>A real job.</span>
       </p>
       <p className="h-intro-skip">Click or press any key to skip</p>
     </div>
@@ -166,23 +171,23 @@ function Hero({ entered }: { entered: boolean }) {
         <div className="h-hero-copy">
           <p className="h-kicker h-arrive" style={{ '--i': 0 } as CSSProperties}>
             <span className="h-kicker-dot" aria-hidden="true" />
-            Campus hiring, built on trust
+            Virtual internships that lead to jobs
           </p>
           <h1 className="h-title h-arrive" style={{ '--i': 1 } as CSSProperties}>
-            Every student real.
+            Real work.
             <br />
-            Every job real.
+            Real proof.
             <br />
-            <span className="h-title-warm">Every offer kept.</span>
+            <span className="h-title-warm">A real job.</span>
           </h1>
           <p className="h-lede h-arrive" style={{ '--i': 2 } as CSSProperties}>
-            Apli.ai brings students, placement cells and companies onto one honest platform. Your
-            college verifies every student and approves every job, and we follow every offer until
-            the day you join.
+            Virtual internships set by companies, free for students. Do the tasks, explain your work on a
+            short call, and earn a certificate anyone can check. Your college vouches for who you are, so
+            recruiters trust what you did, and the interviews follow.
           </p>
           <div className="h-actions h-arrive" style={{ '--i': 3 } as CSSProperties}>
             <Link to="/register/student" className="h-btn h-btn-go h-btn-lg">
-              I’m a student
+              Start an internship
               <span className="h-arrow" aria-hidden="true">
                 →
               </span>
@@ -196,8 +201,8 @@ function Hero({ entered }: { entered: boolean }) {
           </div>
           <ul className="h-assure h-arrive" style={{ '--i': 4 } as CSSProperties}>
             <li>Free for students</li>
-            <li>Verified by your college</li>
-            <li>Offers tracked to day one</li>
+            <li>A few hours each</li>
+            <li>Certificates anyone can check</li>
           </ul>
         </div>
 
@@ -215,18 +220,18 @@ function Hero({ entered }: { entered: boolean }) {
 
 /**
  * The idea, as it happens to one student: a phone receiving the updates of a
- * single application, from the college verifying the profile to the joining
- * day. Every step is something Apli.ai makes true, so the reader sees the
- * purpose rather than being told it. Loops; frozen on the finished story for
- * anybody who asked for reduced motion.
+ * single virtual internship, from starting it to the offer it led to. Every
+ * step is something Apli.ai makes true, so the reader sees the purpose rather
+ * than being told it. Loops; frozen on the finished story for anybody who
+ * asked for reduced motion.
  */
 const STORY = [
-  { tone: 'sage', icon: '✓', title: 'Profile verified by your college', sub: 'Marks and record confirmed once' },
-  { tone: 'indigo', icon: '★', title: 'New job approved for you', sub: 'Software Engineer · Sample Tech' },
-  { tone: 'coral', icon: '⏱', title: 'Sample Tech saw your application', sub: 'They must reply within 4 days' },
-  { tone: 'indigo', icon: '✎', title: 'Interview on Friday, 11:00', sub: 'Round 2 of 3 · Technical' },
-  { tone: 'coral', icon: '₹', title: 'Offer received', sub: '₹6.2 LPA fixed · no bond · shown in full' },
-  { tone: 'sage', icon: '✓', title: 'Joining confirmed', sub: 'We followed it all the way to day one' },
+  { tone: 'indigo', icon: '▶', title: 'Started: Software Engineering', sub: 'Sample Tech · virtual internship · 5 hrs' },
+  { tone: 'coral', icon: '✎', title: 'Task 3 of 4 submitted', sub: 'Build and test an API endpoint' },
+  { tone: 'indigo', icon: '☎', title: 'Explain-your-work call booked', sub: '10 minutes · Friday, 11:00' },
+  { tone: 'sage', icon: '✓', title: 'Certificate earned', sub: 'On your skills passport · anyone can check it' },
+  { tone: 'coral', icon: '★', title: 'Sample Tech invited you to apply', sub: 'They saw your work first' },
+  { tone: 'sage', icon: '₹', title: 'Offer received', sub: '₹6.2 LPA fixed · no bond · shown in full' },
 ] as const;
 
 const STORY_STEP_MS = 2200;
@@ -257,24 +262,24 @@ function ApplicationStory({ started }: { started: boolean }) {
     <div
       className="h-story"
       role="img"
-      aria-label="A student's phone receiving updates: profile verified by the college, a job approved, a reply deadline, an interview, an offer shown in full, and joining confirmed."
+      aria-label="A student's phone receiving updates: a virtual internship started, a task submitted, an explain-your-work call booked, a certificate earned, an invitation to apply, and an offer shown in full."
     >
       <span className="h-story-glow" aria-hidden="true" />
 
       {/* Two facts pinned to the phone's edges: they overlap it, which is
           what ties the phone to the copy instead of leaving it on an island. */}
       <span className="h-float is-offer" aria-hidden="true">
-        <span className="h-float-icon">₹</span>
+        <span className="h-float-icon">✓</span>
         <span>
-          <b>₹6.2 LPA</b>
-          <i>shown in full, before you apply</i>
+          <b>Certificate earned</b>
+          <i>anyone can check it</i>
         </span>
       </span>
       <span className="h-float is-clock" aria-hidden="true">
         <span className="h-float-icon">⏱</span>
         <span>
-          <b>Reply due in 4 days</b>
-          <i>no more ghosting</i>
+          <b>5 hours of real work</b>
+          <i>set by the company itself</i>
         </span>
       </span>
 
@@ -286,7 +291,7 @@ function ApplicationStory({ started }: { started: boolean }) {
             <i /> Live
           </span>
         </div>
-        <p className="h-phone-hello">Your application</p>
+        <p className="h-phone-hello">Your internship</p>
         <div className="h-phone-bar">
           <span style={{ width: `${(step / STORY.length) * 100}%` }} />
         </div>
@@ -314,7 +319,7 @@ function ApplicationStory({ started }: { started: boolean }) {
 /* -------------------------------------------------------------------------- */
 
 const PROBLEM =
-  'Forty applications. Weeks of silence. A job that turned out not to exist. An offer that changed after you said yes.';
+  'Every job asks for experience. Every internship asks for experience. Nobody tells you where you are supposed to get it.';
 
 /**
  * The problem, read into focus. Each word goes from faint to full ink as the
@@ -368,8 +373,82 @@ function Problem() {
           ))}
         </p>
         <p className={`h-answer ${lit >= words.length ? 'is-in' : ''}`}>
-          That is campus hiring today. <strong>Apli.ai is built to end it.</strong>
+          So start here. <strong>Apli.ai gives you the experience first.</strong>
         </p>
+      </div>
+    </section>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* The internships                                                             */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * What a virtual internship actually is, shown rather than described: a row
+ * of them, the way a student meets them inside the portal. Sample companies
+ * only, and labelled as such - the page never invents an employer.
+ */
+const INTERNSHIPS = [
+  { company: 'Indus Systems', title: 'Software Engineering', hours: 5, tasks: 3, skills: ['Java', 'REST APIs', 'SQL'], tone: 'indigo' },
+  { company: 'Northwind Analytics', title: 'Data Analytics', hours: 4, tasks: 3, skills: ['Excel', 'SQL', 'Visualisation'], tone: 'sage' },
+  { company: 'Harbour Fintech', title: 'Fintech Product Analyst', hours: 5, tasks: 3, skills: ['Product thinking', 'UPI', 'Writing specs'], tone: 'coral' },
+  { company: 'Vertex Motors', title: 'EV Battery Engineering', hours: 6, tasks: 4, skills: ['Battery systems', 'Thermal analysis', 'MATLAB'], tone: 'indigo' },
+  { company: 'Zenith Labs', title: 'Product Design', hours: 4, tasks: 3, skills: ['UX research', 'Figma', 'Prototyping'], tone: 'coral' },
+  { company: 'Solace Health', title: 'Healthcare Operations', hours: 3, tasks: 3, skills: ['Process mapping', 'Operations', 'Patient experience'], tone: 'sage' },
+] as const;
+
+function Internships() {
+  const { ref, revealed } = useReveal<HTMLUListElement>();
+
+  return (
+    <section className="h-interns" id="internships">
+      <div className="h-wrap">
+        <div className="h-head h-head-row">
+          <div>
+            <p className="h-label">Virtual internships</p>
+            <h2 className="h-h2">Show what you can do, not just what you studied.</h2>
+          </div>
+          <p className="h-interns-lede">
+            Each one is a few hours of real tasks, written by the company that hires for the role, and checked by a
+            person before it counts.
+          </p>
+        </div>
+
+        <ul className={`h-intern-grid ${revealed ? 'is-in' : ''}`} ref={ref}>
+          {INTERNSHIPS.map((x, i) => (
+            <li key={x.title} className={`h-intern is-${x.tone}`} style={{ '--i': i } as CSSProperties}>
+              <span className="h-intern-co">
+                <span className="h-intern-logo" aria-hidden="true">
+                  {x.company
+                    .split(' ')
+                    .map((w) => w[0])
+                    .join('')}
+                </span>
+                {x.company}
+              </span>
+              <b className="h-intern-title">{x.title}</b>
+              <span className="h-intern-meta">
+                {x.hours} hrs · {x.tasks} tasks · certificate
+              </span>
+              <span className="h-intern-skills">
+                {x.skills.map((k) => (
+                  <i key={k}>{k}</i>
+                ))}
+              </span>
+            </li>
+          ))}
+        </ul>
+
+        <div className="h-interns-foot">
+          <Link to="/register/student" className="h-btn h-btn-go">
+            Start one free
+            <span className="h-arrow" aria-hidden="true">
+              →
+            </span>
+          </Link>
+          <p>Sample internships from our demo companies.</p>
+        </div>
       </div>
     </section>
   );
@@ -380,8 +459,9 @@ function Problem() {
 /* -------------------------------------------------------------------------- */
 
 /**
- * Three promises on one thread. The thread draws itself as the reader scrolls,
- * and each promise lights up when the thread reaches it.
+ * Four steps on one thread, from picking an internship to the interview it
+ * leads to. The thread draws itself as the reader scrolls, and each step
+ * lights up when the thread reaches it.
  */
 function Thread() {
   const ref = useRef<HTMLOListElement>(null);
@@ -413,18 +493,23 @@ function Thread() {
 
   const steps = [
     {
-      title: 'Your college verifies you, once.',
-      body: 'The placement cell confirms your marks and record. Companies see facts, not claims, and you never prove the same thing twice.',
-      art: <StampArt />,
+      title: 'Pick a virtual internship.',
+      body: 'Choose a role you are curious about. Each one is built by a company and shows what the job is really like, in a few hours rather than a few months.',
+      art: <PickArt />,
     },
     {
-      title: 'Only real jobs reach you, with a clock on every reply.',
-      body: 'Every posting is approved by your college before you see it. Every company has a deadline to answer, and both sides can see it.',
+      title: 'Do the real tasks.',
+      body: 'Work through the same kind of problems the team solves every week, with the briefs and resources they wrote. Save as you go and submit when you are ready.',
+      art: <TasksArt />,
+    },
+    {
+      title: 'Explain your work.',
+      body: 'A short call with the company: walk them through what you did and why. It is how a certificate here stays worth something when anyone can copy an answer.',
       art: <ClockArt />,
     },
     {
-      title: 'Your offer is followed to your first day.',
-      body: 'Salary split honestly before you apply. After you accept, we keep tracking until you have joined, and companies are measured on keeping their word.',
+      title: 'Get certified. Get hired.',
+      body: 'The certificate goes on your skills passport, and anyone can check it. Recruiters see it when you apply, and every offer you get is tracked to your first day.',
       art: <JourneyArt />,
     },
   ];
@@ -434,7 +519,7 @@ function Thread() {
       <div className="h-wrap">
         <div className="h-head">
           <p className="h-label">How it works</p>
-          <h2 className="h-h2">Three promises, kept in order.</h2>
+          <h2 className="h-h2">From your first task to your first job.</h2>
         </div>
 
         <ol className="h-thread" ref={ref} style={{ '--p': progress } as CSSProperties}>
@@ -456,6 +541,34 @@ function Thread() {
         </ol>
       </div>
     </section>
+  );
+}
+
+function PickArt() {
+  return (
+    <div className="a-card">
+      <div className="a-row">
+        <span className="a-avatar">ST</span>
+        <span className="a-lines">
+          <b>Software Engineering</b>
+          <i>Sample Tech · 5 hrs · 4 tasks</i>
+        </span>
+      </div>
+      <span className="a-start">Start internship →</span>
+    </div>
+  );
+}
+
+function TasksArt() {
+  return (
+    <div className="a-card a-tasks">
+      {['Read the brief', 'Design the endpoint', 'Write the tests', 'Submit your work'].map((t, i) => (
+        <span key={t} className={`a-task ${i < 3 ? 'is-done' : ''}`} style={{ '--i': i } as CSSProperties}>
+          <i aria-hidden="true">{i < 3 ? '✓' : ''}</i>
+          {t}
+        </span>
+      ))}
+    </div>
   );
 }
 
@@ -482,8 +595,8 @@ function ClockArt() {
         <circle cx="32" cy="32" r="26" className="a-ring-fill" pathLength={1} />
       </svg>
       <span className="a-lines">
-        <b>Reply due in 4 days</b>
-        <i>Approved by placement cell</i>
+        <b>Explain-your-work call</b>
+        <i>10 minutes · Friday, 11:00</i>
       </span>
     </div>
   );
@@ -492,7 +605,7 @@ function ClockArt() {
 function JourneyArt() {
   return (
     <div className="a-card a-journey">
-      {['Offer', 'Accepted', 'Documents', 'Joined'].map((s) => (
+      {['Certificate', 'Applied', 'Interview', 'Offer'].map((s) => (
         <span key={s} className="a-stop">
           <i />
           {s}
@@ -504,6 +617,64 @@ function JourneyArt() {
 }
 
 /* -------------------------------------------------------------------------- */
+/* Why recruiters trust it                                                     */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The answer to the recruiter's first question - "anyone can fake a project" -
+ * in three mechanisms, each one something the product actually does.
+ */
+const TRUST = [
+  {
+    title: 'Copied work does not pass.',
+    body: 'Nothing is certified on the written answer alone. The company talks to the student about the work first, and AI-made answers rarely survive five minutes of "why did you do it this way?".',
+  },
+  {
+    title: 'The student is who they say they are.',
+    body: 'Their college verifies and locks their academic record, and approves every company that hires its students. No fake profiles, no fake jobs.',
+  },
+  {
+    title: 'Anyone can check the certificate.',
+    body: 'Every certificate carries a code, and a public page confirms who earned it, for which internship and when. A screenshot is not proof. This is.',
+  },
+] as const;
+
+function Trust() {
+  const { ref, revealed } = useReveal<HTMLDivElement>();
+
+  return (
+    <section className="h-trust" id="trust">
+      <div className={`h-wrap h-trust-inner ${revealed ? 'is-in' : ''}`} ref={ref}>
+        <div className="h-head">
+          <p className="h-label">Why recruiters trust it</p>
+          <h2 className="h-h2">A certificate that means something.</h2>
+        </div>
+        <ul className="h-trust-list">
+          {TRUST.map((t, i) => (
+            <li key={t.title} style={{ '--i': i } as CSSProperties}>
+              <TrustTick />
+              <h3>{t.title}</h3>
+              <p>{t.body}</p>
+            </li>
+          ))}
+        </ul>
+        <div className="h-trust-card" aria-hidden="true">
+          <StampArt />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TrustTick() {
+  return (
+    <span className="h-trust-tick" aria-hidden="true">
+      ✓
+    </span>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
 /* Who it is for                                                               */
 /* -------------------------------------------------------------------------- */
 
@@ -511,24 +682,24 @@ const DOORS = [
   {
     key: 'student',
     who: 'Students',
-    line: 'Find a job you can trust.',
-    body: 'See only roles you qualify for, know why when you do not, and always know where your application stands.',
+    line: 'Get the experience every job asks for.',
+    body: 'Free virtual internships from real companies, a certificate anyone can check, and jobs you qualify for, with every application tracked.',
     to: '/register/student',
-    cta: 'Join your college',
+    cta: 'Start an internship',
   },
   {
     key: 'college',
     who: 'Placement cells',
-    line: 'Run the season without spreadsheets.',
-    body: 'Verify your students, approve every company, and watch placement numbers build themselves for NAAC and NIRF.',
+    line: 'Give every student experience, not just the toppers.',
+    body: 'Virtual internships for the whole batch, a verified roster, every company approved by you, and NAAC and NIRF numbers that build themselves.',
     to: '/login',
     cta: 'Sign in to your portal',
   },
   {
     key: 'company',
     who: 'Companies',
-    line: 'Hire students who are who they say.',
-    body: 'Records frozen by the college, your own rounds in your own order, and a reputation for keeping offers.',
+    line: 'See real work before you interview.',
+    body: 'Build a virtual internship once, reach students across colleges, and invite the ones whose work stood out. Use it as a round in your own hiring.',
     to: '/register/company',
     cta: 'Register your company',
   },
@@ -547,7 +718,7 @@ function Doors() {
       <div className="h-wrap">
         <div className="h-head">
           <p className="h-label">Who it is for</p>
-          <h2 className="h-h2">One platform. Three sides of the same table.</h2>
+          <h2 className="h-h2">One platform. Three sides of the same first job.</h2>
         </div>
 
         <div className={`h-doors ${revealed ? 'is-in' : ''}`} ref={ref}>
@@ -589,7 +760,7 @@ function Doors() {
 const MOMENTS = [
   {
     moment: 'You are the first in your family to sit a campus interview.',
-    answer: 'Every round is named before it starts, so nobody has to guess what “technical round” means.',
+    answer: 'A virtual internship shows you what the job is really like before the interview, so you walk in having done it once.',
   },
   {
     moment: 'Every evening, someone at home asks if there is any news.',
@@ -645,7 +816,7 @@ function Waiting() {
 /* Close                                                                       */
 /* -------------------------------------------------------------------------- */
 
-const REFUSALS = ['No fees, ever.', 'No fake jobs.', 'No silence without a deadline.'];
+const REFUSALS = ['No fees, ever.', 'No fake jobs.', 'No experience? Start here.'];
 
 function Close() {
   const { ref, revealed } = useReveal<HTMLDivElement>();
@@ -663,7 +834,7 @@ function Close() {
         <p className="h-close-sub">The first job should be a beginning, not a gamble.</p>
         <div className="h-actions is-center">
           <Link to="/register/student" className="h-btn h-btn-go h-btn-lg">
-            Get started
+            Start an internship
             <span className="h-arrow" aria-hidden="true">
               →
             </span>
@@ -683,9 +854,10 @@ function Footer() {
       <div className="h-wrap h-footer-inner">
         <div>
           <ApliLogo className="h-foot-logo" title="Apli.ai" />
-          <p className="h-foot-line">Campus hiring where every student, job and offer is real.</p>
+          <p className="h-foot-line">Virtual internships that lead to real jobs.</p>
         </div>
         <nav className="h-foot-links" aria-label="Footer">
+          <a href="#internships">Virtual internships</a>
           <a href="#how">How it works</a>
           <a href="#for">Who it is for</a>
           <Link to="/status">System status</Link>

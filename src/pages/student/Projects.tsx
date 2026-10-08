@@ -24,7 +24,7 @@ const when = (iso: string) =>
   new Date(iso).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
 
 /**
- * /student/projects - work simulations: short projects built by companies.
+ * /student/projects - virtual internships: short work simulations built by companies.
  *
  * One page, two views: the list, and a simulation open for work (?id=). The
  * student works task by task, submits when every task is answered, and then
@@ -51,7 +51,7 @@ export default function Projects() {
       ) : !enabled ? (
         <>
           <Head />
-          <p className="alert">Work simulations are not switched on for your institution.</p>
+          <p className="alert">Virtual internships are not switched on for your institution.</p>
         </>
       ) : (
         <List onOpen={(id) => setParams({ id })} />
@@ -64,11 +64,12 @@ function Head() {
   return (
     <header className="page-head">
       <div>
-        <p className="eyebrow">Projects</p>
-        <h1>Real work, from real companies.</h1>
+        <p className="eyebrow">Virtual internships</p>
+        <h1>Real work, checked by a person, seen by recruiters.</h1>
         <p className="page-lede">
-          Short projects companies built to show what a role is actually like. Finish one and the company reviews your
-          work - it becomes a certificate on your skills passport.
+          Internships set by companies, a few hours each. Do the tasks, explain your work on a short
+          call, and earn a certificate anyone can check. It goes on your skills passport, and recruiters see it when you
+          apply.
         </p>
       </div>
     </header>
@@ -83,7 +84,7 @@ function List({ onOpen }: { onOpen: (id: string) => void }) {
     proofApi
       .list()
       .then(setRows)
-      .catch((e) => setError(e instanceof ApiError ? e.message : 'Could not load projects.'));
+      .catch((e) => setError(e instanceof ApiError ? e.message : 'Could not load virtual internships.'));
   }, []);
 
   const mine = (rows ?? []).filter((r) => r.mine);
@@ -96,8 +97,8 @@ function List({ onOpen }: { onOpen: (id: string) => void }) {
       {!rows && !error && <p className="muted">Loading…</p>}
       {rows && rows.length === 0 && (
         <div className="empty">
-          <h2>No projects yet.</h2>
-          <p>When companies publish work simulations, they appear here.</p>
+          <h2>No virtual internships yet.</h2>
+          <p>When companies publish one, it appears here.</p>
         </div>
       )}
       {mine.length > 0 && (
@@ -164,7 +165,7 @@ function Workspace({ id, onBack }: { id: string; onBack: () => void }) {
     proofApi
       .get(id)
       .then(setSim)
-      .catch((e) => setError(e instanceof ApiError ? e.message : 'Could not open this project.'));
+      .catch((e) => setError(e instanceof ApiError ? e.message : 'Could not open this internship.'));
   }, [id]);
 
   useEffect(load, [load]);
@@ -186,7 +187,7 @@ function Workspace({ id, onBack }: { id: string; onBack: () => void }) {
       <>
         <p className="sim-back">
           <button type="button" className="linkish" onClick={onBack}>
-            ← All projects
+            ← All internships
           </button>
         </p>
         {error ? <p className="alert alert-error">{error}</p> : <p className="muted">Loading…</p>}
@@ -203,7 +204,7 @@ function Workspace({ id, onBack }: { id: string; onBack: () => void }) {
     <>
       <p className="sim-back">
         <button type="button" className="linkish" onClick={onBack}>
-          ← All projects
+          ← All internships
         </button>
       </p>
       <header className="page-head">
@@ -216,7 +217,7 @@ function Workspace({ id, onBack }: { id: string; onBack: () => void }) {
         </div>
         {!e && (
           <button type="button" className="btn btn-primary" disabled={busy} onClick={() => run(() => proofApi.enrol(sim.id))}>
-            Start this project
+            Start this internship
           </button>
         )}
       </header>

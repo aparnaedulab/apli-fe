@@ -27,6 +27,7 @@ interface Section {
 const MAIN: Section[] = [
   { to: '/company', label: 'Overview', end: true, icon: 'overview' },
   { to: '/company/jobs', label: 'Jobs', end: false, icon: 'jobs', needs: 'job:read' },
+  { to: '/company/simulations', label: 'Virtual internships', end: false, icon: 'internships', needs: 'job:read' },
   { to: '/company/applicants', label: 'Applicants', end: false, icon: 'applications', needs: 'application:read' },
   { to: '/company/invitations', label: 'Invitations', end: false, icon: 'invites', badge: 'invitations' },
   { to: '/company/institutions', label: 'Colleges', end: false, icon: 'colleges', needs: 'posting:target' },
