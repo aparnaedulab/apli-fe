@@ -13,8 +13,8 @@ import {
   type ReliabilityRow,
 } from '../../api/afterOffer';
 import { useAuth } from '../../auth/AuthContext';
-import { JoiningHistory } from '../student/AfterOffer';
-import '../student/AfterOffer.css';
+import { JoiningHistory } from '../shared/AfterOffer';
+import '../shared/AfterOffer.css';
 import './Offers.css';
 
 type Tab = 'offers' | 'companies' | 'reliability';

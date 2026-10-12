@@ -1,0 +1,1592 @@
+/*
+  The company app. It sits inside the student app's frame (`.sa`) and uses
+  its colours, type and pieces; only what a company does that a student does
+  not - writing simulations, deciding on work - is styled here.
+*/
+
+.ca-who {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.ca-banner {
+  margin-bottom: 20px !important;
+  padding: 12px 16px;
+  border: 1px solid #ffd7c2;
+  border-radius: 12px;
+  background: var(--sa-orange-soft);
+  font-size: 13.5px;
+}
+
+/* Where a simulation stands. */
+.ca-chip {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--sa-soft);
+  color: var(--sa-ink-2);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ca-chip.is-submitted {
+  background: var(--sa-blue-soft);
+  color: var(--sa-blue);
+}
+
+.ca-chip.is-changes_asked {
+  background: var(--sa-orange-soft);
+  color: var(--sa-orange);
+}
+
+.ca-chip.is-live {
+  background: var(--sa-green-soft);
+  color: var(--sa-green);
+}
+
+.ca-chip.is-retired {
+  color: var(--sa-ink-3);
+}
+
+.ca-start {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+
+.ca-start b {
+  font-family: var(--sa-display);
+  font-size: 16px;
+  color: var(--sa-ink);
+}
+
+/* Overview: the first few simulations. */
+.ca-simlist {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--sa-line);
+  border-radius: var(--sa-radius);
+  background: var(--sa-card);
+}
+
+.ca-simlist li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 12px;
+  padding: 12px 16px;
+}
+
+.ca-simlist li + li {
+  border-top: 1px solid var(--sa-line);
+}
+
+.ca-simlist-title {
+  overflow: hidden;
+  font-family: var(--sa-display);
+  font-weight: 700;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ca-simlist-title:hover {
+  color: var(--sa-blue);
+}
+
+.ca-simlist-meta {
+  color: var(--sa-ink-3);
+  font-size: 12px;
+}
+
+.ca-waiting {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ca-waiting a {
+  display: grid;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--sa-soft);
+  text-decoration: none;
+}
+
+.ca-waiting a:hover {
+  background: var(--sa-blue-soft);
+}
+
+.ca-waiting span {
+  color: var(--sa-ink-3);
+  font-size: 12px;
+}
+
+/* The list of simulations. */
+.ca-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--sa-line);
+  border-radius: var(--sa-radius);
+  background: var(--sa-card);
+}
+
+.ca-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.ca-table th {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--sa-line);
+  color: var(--sa-ink-3);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.ca-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--sa-line);
+  vertical-align: top;
+  font-variant-numeric: tabular-nums;
+}
+
+.ca-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.ca-table-title {
+  display: block;
+  font-family: var(--sa-display);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.ca-table-title:hover {
+  color: var(--sa-blue);
+}
+
+.ca-table-sub {
+  color: var(--sa-ink-3);
+  font-size: 12px;
+}
+
+/* The editor. */
+.ca-editor fieldset {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.ca-editor .sa-block {
+  display: grid;
+  gap: 12px;
+}
+
+.ca-editor textarea,
+.ca-editor select {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1.5px solid var(--sa-line);
+  border-radius: 10px;
+  background: var(--sa-card);
+  color: var(--sa-ink);
+  font: inherit;
+  font-size: 13.5px;
+  resize: vertical;
+}
+
+.ca-editor textarea:focus,
+.ca-editor select:focus {
+  outline: none;
+  border-color: var(--sa-blue);
+  box-shadow: 0 0 0 4px var(--sa-blue-soft);
+}
+
+.ca-editor fieldset:disabled input,
+.ca-editor fieldset:disabled textarea,
+.ca-editor fieldset:disabled select {
+  background: var(--sa-soft);
+  color: var(--sa-ink-2);
+}
+
+.sa-fields-grid.is-three {
+  grid-template-columns: 2fr 1.2fr 1fr;
+}
+
+.ca-tasks {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ca-tasks > li {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--sa-line);
+  border-radius: 12px;
+  background: var(--sa-card);
+}
+
+.ca-task-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ca-task-title {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  background: var(--sa-soft);
+  color: var(--sa-ink);
+  font: 700 14.5px var(--sa-display);
+}
+
+.ca-task-title:focus {
+  outline: none;
+  border-color: var(--sa-blue);
+  background: var(--sa-card);
+}
+
+.ca-task-tools {
+  display: flex;
+  gap: 2px;
+}
+
+.ca-task-tools button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--sa-ink-3);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.ca-task-tools button:hover:not(:disabled) {
+  background: var(--sa-soft);
+  color: var(--sa-ink);
+}
+
+.ca-task-tools button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.ca-task-foot {
+  grid-template-columns: minmax(0, 1fr) 140px;
+}
+
+.ca-err {
+  color: var(--sa-red);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.ca-add {
+  justify-self: start;
+}
+
+.ca-delete {
+  justify-self: start;
+  color: var(--sa-red);
+}
+
+/* Reviews and shared work. */
+.ca-reviews,
+.ca-shared {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ca-review,
+.ca-shared > li {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid var(--sa-line);
+  border-radius: var(--sa-radius);
+  background: var(--sa-card);
+}
+
+.ca-review header,
+.ca-shared-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.ca-review h2,
+.ca-shared h2 {
+  font-size: 17px;
+}
+
+.ca-shared-head p {
+  color: var(--sa-ink-3);
+  font-size: 13px;
+}
+
+.ca-review-who {
+  display: grid;
+  text-align: right;
+  font-size: 13px;
+}
+
+.ca-review-who span {
+  color: var(--sa-ink-3);
+}
+
+.ca-review-tasks {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ca-review-tasks li,
+.ca-shared-work > div:not(.ca-review-explain) {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--sa-soft);
+}
+
+.ca-review h3,
+.ca-shared h3 {
+  margin-bottom: 4px;
+  font-size: 13.5px;
+}
+
+.ca-review-ask {
+  color: var(--sa-ink-3);
+  font-size: 12px;
+}
+
+.ca-review-answer,
+.ca-shared-work p {
+  white-space: pre-wrap;
+  font-size: 13.5px;
+}
+
+.ca-review-explain {
+  padding: 12px 14px;
+  border-left: 3px solid var(--sa-blue);
+  border-radius: 4px 10px 10px 4px;
+  background: var(--sa-blue-soft);
+}
+
+.ca-review-explain p {
+  margin-bottom: 8px !important;
+  white-space: pre-wrap;
+  font-size: 13.5px;
+}
+
+.ca-review-ask-box {
+  display: grid;
+  gap: 10px;
+}
+
+.ca-review-ask-box textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--sa-line);
+  border-radius: 10px;
+  font: inherit;
+  font-size: 13.5px;
+}
+
+.ca-review-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.ca-contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 13px;
+}
+
+.ca-contact a {
+  color: var(--sa-blue);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.ca-shared .sa-quiet {
+  justify-self: start;
+}
+
+.ca-shared-work {
+  display: grid;
+  gap: 10px;
+}
+
+@media (max-width: 640px) {
+  .sa-fields-grid.is-three,
+  .ca-task-foot {
+    grid-template-columns: 1fr;
+  }
+
+  .ca-review header,
+  .ca-shared-head {
+    flex-direction: column;
+  }
+
+  .ca-review-who {
+    text-align: left;
+  }
+
+  .ca-review-actions {
+    flex-direction: column-reverse;
+  }
+}
+
+/* --- the simulation editor: outline, one part, and what students see ------ */
+
+.ce-top {
+  position: sticky;
+  top: 60px;
+  z-index: 25;
+  border-bottom: 1px solid var(--sa-line);
+  background: color-mix(in srgb, var(--sa-bg) 94%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+.ce-top-in {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding-block: 14px;
+}
+
+.ce-top-title {
+  min-width: 0;
+}
+
+.ce-top-title .sa-back {
+  margin-bottom: 4px;
+}
+
+.ce-top-title h1 {
+  overflow: hidden;
+  font-size: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ce-top-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.ce-saved {
+  color: var(--sa-green);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ce-saved.is-dirty {
+  color: var(--sa-orange);
+}
+
+.ce-total {
+  color: var(--sa-ink-3);
+  font-size: 12px;
+}
+
+.ce-top-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+}
+
+.ce-body {
+  padding-block: 22px 64px;
+}
+
+.ce-locked {
+  margin-bottom: 16px !important;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--sa-soft);
+  color: var(--sa-ink-2);
+  font-size: 13.5px;
+}
+
+.ce-grid {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) 320px;
+  gap: 24px;
+  align-items: start;
+}
+
+/* The outline. */
+.ce-rail {
+  position: sticky;
+  top: 160px;
+  display: grid;
+  gap: 2px;
+}
+
+.ce-rail-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--sa-ink-2);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ce-rail-item:hover {
+  background: var(--sa-soft);
+  color: var(--sa-ink);
+}
+
+.ce-rail-item.is-on {
+  background: var(--sa-blue-soft);
+  color: var(--sa-blue);
+}
+
+.ce-rail-item.is-check {
+  margin-top: 8px;
+  border-top: 1px solid var(--sa-line);
+  border-radius: 0 0 8px 8px;
+  padding-top: 12px;
+}
+
+.ce-rail-label {
+  margin: 12px 10px 4px !important;
+  color: var(--sa-ink-3);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ce-rail-tasks {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ce-rail-n {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--sa-soft);
+  font-size: 11px;
+}
+
+.ce-rail-item.is-on .ce-rail-n {
+  background: var(--sa-blue);
+  color: #fff;
+}
+
+.ce-rail-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A small dot: orange while something is missing, green when done. */
+.ce-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sa-orange);
+}
+
+.ce-dot.is-ok {
+  background: var(--sa-green);
+}
+
+.ce-rail-item:not(.is-check) > .ce-dot:first-child {
+  order: 0;
+}
+
+.ce-count {
+  margin-left: auto;
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--sa-orange);
+  color: #fff;
+  font-size: 10.5px;
+  text-align: center;
+}
+
+.ce-rail-add {
+  margin: 4px 0 0;
+  padding: 8px 10px;
+  border: 1.5px dashed var(--sa-line);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--sa-blue);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ce-rail-add:hover {
+  border-color: var(--sa-blue);
+}
+
+/* The part being written. */
+.ce-main {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.ce-part {
+  border: 1px solid var(--sa-line);
+  border-radius: var(--sa-radius);
+  background: var(--sa-card);
+}
+
+.ce-part > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--sa-line);
+}
+
+.ce-part > header h2 {
+  font-size: 16px;
+}
+
+.ce-part > header p {
+  margin-top: 2px !important;
+  color: var(--sa-ink-3);
+  font-size: 12.5px;
+}
+
+.ce-part-body {
+  display: grid;
+  gap: 14px;
+  padding: 16px 18px 18px;
+}
+
+.ce-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.ce-row.is-three {
+  grid-template-columns: 2fr 1.2fr 1fr;
+}
+
+.ce-field {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.ce-label {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 650;
+}
+
+.ce-label i {
+  color: var(--sa-ink-3);
+  font-style: normal;
+  font-weight: 500;
+}
+
+.ce-label small {
+  margin-left: auto;
+  color: var(--sa-ink-3);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.ce-field input,
+.ce-field textarea,
+.ce-field select,
+.ce-chips,
+.ce-list-row input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1.5px solid var(--sa-line);
+  border-radius: 10px;
+  background: var(--sa-card);
+  color: var(--sa-ink);
+  font: inherit;
+  font-size: 13.5px;
+  resize: vertical;
+}
+
+.ce-field input:focus,
+.ce-field textarea:focus,
+.ce-field select:focus,
+.ce-chips:focus-within,
+.ce-list-row input:focus {
+  outline: none;
+  border-color: var(--sa-blue);
+  box-shadow: 0 0 0 4px var(--sa-blue-soft);
+}
+
+.ce-field.has-error input,
+.ce-field.has-error textarea,
+.ce-field.has-error select {
+  border-color: var(--sa-red);
+}
+
+.ce-main:disabled input,
+.ce-main:disabled textarea,
+.ce-main:disabled select,
+.ce-main:disabled .ce-chips {
+  background: var(--sa-soft);
+  color: var(--sa-ink-2);
+}
+
+.ce-hint {
+  color: var(--sa-ink-3);
+  font-size: 12px;
+}
+
+.ce-error {
+  color: var(--sa-red);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.ce-tools {
+  display: flex;
+  gap: 4px;
+}
+
+.ce-tools button {
+  padding: 4px 9px;
+  border: 1px solid var(--sa-line);
+  border-radius: 8px;
+  background: var(--sa-card);
+  color: var(--sa-ink-2);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.ce-tools button:hover:not(:disabled) {
+  border-color: var(--sa-ink-3);
+  color: var(--sa-ink);
+}
+
+.ce-tools button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.ce-tools button.is-danger:hover:not(:disabled) {
+  border-color: var(--sa-red);
+  color: var(--sa-red);
+}
+
+/* Skills as chips in one box. */
+.ce-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  cursor: text;
+}
+
+.ce-chips input {
+  flex: 1;
+  min-width: 120px;
+  padding: 4px;
+  border: 0;
+  box-shadow: none !important;
+}
+
+.ce-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 4px 3px 10px;
+  border-radius: 999px;
+  background: var(--sa-blue-soft);
+  color: var(--sa-blue);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.ce-chip button {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.ce-chip button:hover {
+  background: rgb(36 83 255 / 0.15);
+}
+
+/* A short list of points, one per line. */
+.ce-list {
+  display: grid;
+  gap: 6px;
+}
+
+.ce-list-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ce-list-mark {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--sa-blue);
+  transform: rotate(45deg);
+}
+
+.ce-list-row button {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--sa-ink-3);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.ce-list-row button:hover {
+  background: var(--sa-soft);
+  color: var(--sa-ink);
+}
+
+.ce-list-add {
+  justify-self: start;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: var(--sa-blue);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.ce-next {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ce-next .sa-quiet {
+}
+
+/* Check & send. */
+.ce-checks,
+.ce-hints {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ce-checks li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: var(--sa-orange-soft);
+}
+
+.ce-checks li.is-ok {
+  background: var(--sa-soft);
+}
+
+.ce-checks li > span {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--sa-orange);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ce-checks li.is-ok > span {
+  background: var(--sa-green);
+}
+
+.ce-checks li > div {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.ce-checks b {
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.ce-checks em {
+  color: var(--sa-orange);
+  font-size: 12px;
+  font-style: normal;
+}
+
+.ce-sub {
+  margin-top: 6px;
+  font-size: 13.5px;
+}
+
+.ce-hints li {
+  position: relative;
+  padding-left: 16px;
+  color: var(--sa-ink-2);
+  font-size: 13px;
+}
+
+.ce-hints li::before {
+  content: '·';
+  position: absolute;
+  left: 4px;
+  font-weight: 700;
+}
+
+.ce-hints .sa-link,
+.ce-checks .sa-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.ce-send {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--sa-blue-soft);
+}
+
+.ce-send p {
+  color: var(--sa-ink-2);
+  font-size: 13.5px;
+}
+
+/* What students see. */
+.ce-preview {
+  position: sticky;
+  top: 160px;
+  display: grid;
+  gap: 8px;
+}
+
+.ce-preview-label {
+  color: var(--sa-ink-3);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ce-card {
+  pointer-events: none;
+}
+
+.ce-card .sa-sim-body {
+  padding-bottom: 18px;
+}
+
+.ce-task-preview > li {
+  box-shadow: none;
+}
+
+.ce-task-preview .sa-pt-head {
+  cursor: default;
+}
+
+@media (max-width: 1200px) {
+  .ce-grid {
+    grid-template-columns: 200px minmax(0, 1fr);
+  }
+
+  .ce-preview {
+    display: none;
+  }
+}
+
+@media (max-width: 800px) {
+  .ce-top {
+    position: static;
+  }
+
+  .ce-top-in {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ce-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ce-rail {
+    position: static;
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    overflow-x: auto;
+  }
+
+  .ce-rail-tasks {
+    grid-auto-flow: column;
+  }
+
+  .ce-rail-label {
+    display: none;
+  }
+
+  .ce-rail-item.is-check {
+    margin-top: 0;
+    border-top: 0;
+    padding-top: 8px;
+  }
+
+  .ce-row,
+  .ce-row.is-three {
+    grid-template-columns: 1fr;
+  }
+
+  .ce-send {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.ce-list-n {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--sa-violet-soft);
+  color: var(--sa-violet);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* --- the pages inside a task, as the company writes them ------------------- */
+
+.pe {
+  display: grid;
+  gap: 10px;
+}
+
+.pe-empty {
+  padding: 12px 14px;
+  border: 1.5px dashed var(--sa-line);
+  border-radius: 10px;
+  color: var(--sa-ink-3);
+  font-size: 13px;
+}
+
+.pe-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pe-page {
+  border: 1px solid var(--sa-line);
+  border-left: 3px solid var(--sa-blue);
+  border-radius: 12px;
+  background: var(--sa-card);
+}
+
+.pe-page.is-check {
+  border-left-color: var(--sa-violet);
+}
+
+.pe-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px 6px 4px;
+}
+
+.pe-toggle {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 6px 8px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pe-toggle b {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 13.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pe-kind {
+  flex: none;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--sa-blue-soft);
+  color: var(--sa-blue);
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.pe-page.is-check .pe-kind {
+  background: var(--sa-violet-soft);
+  color: var(--sa-violet);
+}
+
+.pe-meta {
+  color: var(--sa-ink-3);
+  font-size: 12px;
+}
+
+.pe-body {
+  display: grid;
+  gap: 12px;
+  padding: 4px 14px 14px;
+  border-top: 1px solid var(--sa-line);
+  padding-top: 12px;
+}
+
+.pe-gaps {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--sa-orange-soft);
+  color: var(--sa-ink-2);
+  font-size: 12.5px;
+}
+
+.pe-questions {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pe-q {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--sa-soft);
+}
+
+.pe-q-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pe-q-n {
+  padding: 1px 7px;
+  border-radius: 6px;
+  background: var(--sa-violet);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.pe-q-kind {
+  flex: 1;
+  color: var(--sa-ink-2);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.pe-options,
+.pe-groups,
+.pe-items {
+  display: grid;
+  gap: 6px;
+}
+
+.pe-sort {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 14px;
+}
+
+.pe-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pe-option input:not([type='checkbox']),
+.pe-option select {
+  flex: 1;
+  min-width: 0;
+  padding: 7px 10px;
+  border: 1.5px solid var(--sa-line);
+  border-radius: 8px;
+  background: var(--sa-card);
+  color: var(--sa-ink);
+  font: inherit;
+  font-size: 13px;
+}
+
+.pe-option select {
+  flex: 0 0 auto;
+  max-width: 45%;
+}
+
+.pe-option input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--sa-green);
+}
+
+.pe-option.is-right input:not([type='checkbox']) {
+  border-color: var(--sa-green);
+  background: var(--sa-green-soft);
+}
+
+.pe-option > button {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--sa-ink-3);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.pe-option > button:hover {
+  background: var(--sa-card);
+  color: var(--sa-ink);
+}
+
+.pe-group-n {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: var(--sa-violet-soft);
+  color: var(--sa-violet);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.pe-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pe-add button {
+  padding: 7px 12px;
+  border: 1.5px dashed var(--sa-line);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--sa-blue);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.pe-add button:hover {
+  border-color: var(--sa-blue);
+}
+
+.pe-add.is-main button {
+  flex: 1;
+  padding: 10px 12px;
+}
+
+.ce-preview-pages {
+  color: var(--sa-ink-3);
+  font-size: 12.5px;
+  font-style: italic;
+}
+
+@media (max-width: 800px) {
+  .pe-sort {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Choosing the kind of question. */
+.pe-addq {
+  justify-self: start;
+  padding: 8px 14px;
+  border: 1.5px dashed var(--sa-line);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--sa-blue);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.pe-addq:hover {
+  border-color: var(--sa-blue);
+}
+
+.pe-picker {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1.5px solid var(--sa-blue);
+  border-radius: 12px;
+  background: var(--sa-blue-soft);
+}
+
+.pe-picker-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pe-kinds {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+.pe-kind-card {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+  padding: 12px;
+  border: 1.5px solid var(--sa-line);
+  border-radius: 12px;
+  background: var(--sa-card);
+  color: var(--sa-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.pe-kind-card:hover {
+  border-color: var(--sa-blue);
+  transform: translateY(-2px);
+}
+
+.pe-kind-card b {
+  font-size: 13.5px;
+}
+
+.pe-kind-card span {
+  color: var(--sa-ink-2);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.pe-kind-card i {
+  color: var(--sa-ink-3);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.pe-kind-icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-bottom: 4px;
+  border-radius: 9px;
+  background: var(--sa-violet-soft);
+  color: var(--sa-violet) !important;
+  font-size: 15px !important;
+}
+
+.pe-kind-card.is-text .pe-kind-icon {
+  background: var(--sa-green-soft);
+  color: var(--sa-green) !important;
+}
+
+.pe-q-kind i {
+  color: var(--sa-ink-3);
+  font-style: normal;
+  font-weight: 500;
+}
+
+.pe-option input[type='radio'] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--sa-green);
+}
+
+/* How a task is handed in: three toggles. */
+.ce-handin-kinds {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.ce-handin-kinds button {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--sa-line);
+  border-radius: 12px;
+  background: var(--sa-card);
+  color: var(--sa-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ce-handin-kinds button.is-on {
+  border-color: var(--sa-blue);
+  background: var(--sa-blue-soft);
+}
+
+.ce-handin-kinds span:last-child {
+  display: grid;
+}
+
+.ce-handin-kinds b {
+  font-size: 13px;
+}
+
+.ce-handin-kinds i {
+  color: var(--sa-ink-3);
+  font-size: 11.5px;
+  font-style: normal;
+}
+
+.ce-check {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  border: 1.5px solid var(--sa-line);
+  border-radius: 5px;
+  background: var(--sa-card);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.ce-handin-kinds button.is-on .ce-check {
+  border-color: var(--sa-blue);
+  background: var(--sa-blue);
+}
+
+.ca-written {
+  margin-top: 6px;
+  padding: 8px 10px;
+  border-left: 3px solid var(--sa-green);
+  border-radius: 4px 8px 8px 4px;
+  background: var(--sa-card);
+  font-size: 13px;
+}
+
+.ca-written p {
+  white-space: pre-wrap;
+}
+
+@media (max-width: 700px) {
+  .ce-handin-kinds {
+    grid-template-columns: 1fr;
+  }
+}

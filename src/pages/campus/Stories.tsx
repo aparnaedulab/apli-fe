@@ -3,8 +3,8 @@ import CampusLayout from './CampusLayout';
 import { communityApi, type Story, type StoryStatus } from '../../api/community';
 import { ApiError } from '../../api/client';
 import { useAuth } from '../../auth/AuthContext';
-import { StoryCard } from '../student/Stories';
-import '../student/Stories.css';
+import { StoryCard } from '../shared/StoryCard';
+import '../shared/Stories.css';
 import './Stories.css';
 
 const TABS: { key: StoryStatus; label: string }[] = [

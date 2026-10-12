@@ -119,7 +119,7 @@ export default function AcademicsStep({ state, catalogue, onSaved, goto, updateC
         unverifiedCompanyAccess: unverifiedAccess,
         programs: [...picked].map(([courseId, set]) => ({ courseId, specialisationIds: [...set] })),
       });
-      onSaved(next, 'colleges');
+      onSaved(next, 'features');
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Could not save. Try again.');
     } finally {
@@ -381,8 +381,8 @@ export default function AcademicsStep({ state, catalogue, onSaved, goto, updateC
       <StepFooter
         busy={busy}
         error={error}
-        onBack={() => goto('identity')}
-        submitLabel="Save & continue"
+        onBack={() => goto('colleges')}
+        submitLabel="Save & continue to features"
         note={picked.size > 0 ? `${picked.size} course${picked.size === 1 ? '' : 's'}${branchCount ? ` · ${branchCount} branches` : ''}` : null}
       />
     </form>

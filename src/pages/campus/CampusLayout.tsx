@@ -3,7 +3,7 @@ import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 import NotificationBell from '../../components/NotificationBell';
 import '../admin/AdminLayout.css';
-import '../company/Company.css';
+import '../shared/Company.css';
 import ApliLogo from '../../components/ApliLogo';
 import { NAV_ICONS } from '../admin/navIcons';
 

@@ -10,7 +10,7 @@ import {
   type Queue,
 } from '../../api/internships';
 import { useAuth } from '../../auth/AuthContext';
-import '../student/Internships.css';
+import '../shared/Internships.css';
 
 const QUEUES: { key: Queue; label: string; empty: string }[] = [
   { key: 'to_approve', label: 'To approve', empty: 'Nothing waiting. New proposals from students land here.' },

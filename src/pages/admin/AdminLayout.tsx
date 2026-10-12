@@ -5,7 +5,7 @@ import NotificationBell from '../../components/NotificationBell';
 import TenantSwitcher, { PickTenantFirst } from '../../components/TenantSwitcher';
 import { CollapseIcon, NAV_ICONS } from './navIcons';
 import './AdminLayout.css';
-import '../company/Company.css';
+import '../shared/Company.css';
 import ApliLogo from '../../components/ApliLogo';
 
 interface NavItem {

@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { ApiError } from '../../../api/client';
-import { platformApi, type IdentityInput, type TenantKind } from '../../../api/platform';
+import { platformApi, type IdentityInput } from '../../../api/platform';
 import { monogram } from '../../../lib/brand';
 import type { StepProps } from '../Onboarding';
-import { ColourPicker, Field, ImageUpload, StepFooter, fieldErrors } from '../ui';
+import { Field, ImageUpload, StepFooter, fieldErrors } from '../ui';
 
 /**
  * Only universities are onboarded for now. Single colleges and groups are
@@ -11,44 +11,6 @@ import { ColourPicker, Field, ImageUpload, StepFooter, fieldErrors } from '../ui
  * them - but are held back from new onboardings until they have been tried
  * with a real customer. An institution already saved as one keeps its type.
  */
-const OPEN_KINDS: TenantKind[] = ['UNIVERSITY'];
-
-const KINDS: { value: TenantKind; title: string; body: string; icon: JSX.Element }[] = [
-  {
-    value: 'UNIVERSITY',
-    title: 'University',
-    body: 'Affiliated colleges under one university, like SPPU or Mumbai University.',
-    icon: (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 3 3 7.5h18L12 3Z" />
-        <path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 21h18" />
-      </svg>
-    ),
-  },
-  {
-    value: 'COLLEGE',
-    title: 'Single college',
-    body: 'One autonomous college with its own placement cell.',
-    icon: (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M4 21V8l8-5 8 5v13" />
-        <path d="M9 21v-6h6v6M3 21h18" />
-      </svg>
-    ),
-  },
-  {
-    value: 'GROUP',
-    title: 'Group of colleges',
-    body: 'A trust or society that runs several colleges, like Sinhgad or DY Patil.',
-    icon: (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M2 21V11l5-3 5 3v10M12 21V8l5-3 5 3v13" />
-        <path d="M1 21h22" />
-      </svg>
-    ),
-  },
-];
-
 const blank: IdentityInput = {
   name: '',
   shortName: '',
@@ -130,7 +92,6 @@ export default function IdentityStep({ state, catalogue, onSaved }: StepProps) {
   // Derived fields follow the name until somebody types in them - then they
   // are theirs, and the name stops overwriting them.
   const touched = useRef({ shortName: Boolean(t?.shortName), slug: Boolean(t) });
-  const [more, setMore] = useState(Boolean(t?.legalName || t?.website || t?.address));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -177,11 +138,11 @@ export default function IdentityStep({ state, catalogue, onSaved }: StepProps) {
     try {
       if (t) {
         const next = await platformApi.saveIdentity(t.id, form);
-        onSaved(next, 'academics');
+        onSaved(next, 'colleges');
       } else {
         const { tenant } = await platformApi.create(form);
         const next = await platformApi.state(tenant.id);
-        onSaved(next, 'academics');
+        onSaved(next, 'colleges');
       }
     } catch (err) {
       setErrors(fieldErrors(err));
@@ -194,36 +155,7 @@ export default function IdentityStep({ state, catalogue, onSaved }: StepProps) {
   return (
     <form onSubmit={submit} noValidate>
       <section className="blk">
-        <h2 className="blk-title">What kind of institution is it?</h2>
-        <div className="kinds" role="radiogroup" aria-label="Kind of institution">
-          {KINDS.map((k) => {
-            const open = OPEN_KINDS.includes(k.value) || t?.kind === k.value;
-            return (
-              <button
-                key={k.value}
-                type="button"
-                role="radio"
-                aria-checked={form.kind === k.value}
-                aria-disabled={!open}
-                disabled={!open}
-                className={`kind ${form.kind === k.value ? 'is-on' : ''} ${open ? '' : 'is-locked'}`}
-                onClick={() => set('kind', k.value)}
-                title={open ? undefined : 'Coming soon'}
-              >
-                <span className="kind-icon">{k.icon}</span>
-                <strong>
-                  {k.title}
-                  {!open && <span className="pill pill-idle kind-soon">Coming soon</span>}
-                </strong>
-                <span>{k.body}</span>
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="blk">
-        <h2 className="blk-title">Name and address</h2>
+        <h2 className="blk-title">Name and place</h2>
         <div className="grid">
           <Field label="Full name" error={errors.name} wide>
             {(id) => (
@@ -306,32 +238,18 @@ export default function IdentityStep({ state, catalogue, onSaved }: StepProps) {
               </>
             )}
           </Field>
+          <Field label="Website" error={errors.website} optional>
+            {(id) => (
+              <input id={id} className="input" value={form.website} onChange={(e) => set('website', e.target.value)} placeholder="https://" />
+            )}
+          </Field>
         </div>
-
-        <button type="button" className="more" onClick={() => setMore((v) => !v)} aria-expanded={more}>
-          {more ? '− Fewer details' : '+ Legal name and website'}
-        </button>
-        {more && (
-          <div className="grid ob-in">
-            <Field label="Legal name" error={errors.legalName} optional>
-              {(id) => <input id={id} className="input" value={form.legalName} onChange={(e) => set('legalName', e.target.value)} />}
-            </Field>
-            <Field label="Website" error={errors.website} optional>
-              {(id) => (
-                <input id={id} className="input" value={form.website} onChange={(e) => set('website', e.target.value)} placeholder="https://" />
-              )}
-            </Field>
-          </div>
-        )}
       </section>
 
       <section className="blk">
         <h2 className="blk-title">How their portal looks</h2>
-        <p className="blk-sub">Every screen their students and staff see is painted in this. Watch the preview.</p>
+        <p className="blk-sub">Optional. Their logo, shown on their portal.</p>
         <div className="grid">
-          <Field label="Brand colour" error={errors.brandColor}>
-            {() => <ColourPicker value={form.brandColor} onChange={(v) => set('brandColor', v)} />}
-          </Field>
           <Field label="Logo" error={errors.logoUrl} optional>
             {() => (
               <ImageUpload
@@ -348,39 +266,13 @@ export default function IdentityStep({ state, catalogue, onSaved }: StepProps) {
               />
             )}
           </Field>
-          <Field label="Favicon" error={errors.faviconUrl} optional>
-            {() => (
-              <ImageUpload
-                square
-                value={form.faviconUrl}
-                onChange={(v) => set('faviconUrl', v)}
-                upload={(file) => platformApi.uploadImage('favicon', file).then((r) => r.url)}
-                accept="image/png,image/x-icon,image/vnd.microsoft.icon,image/svg+xml,.ico"
-                hint="The icon in the browser tab. Square PNG, ICO or SVG, 32–512 px, up to 512 KB."
-                fallback={<span aria-hidden="true">·</span>}
-              />
-            )}
-          </Field>
-          <Field label="Tagline" hint="One line on their students’ home screen." error={errors.tagline} optional wide>
-            {(id) => (
-              <input
-                id={id}
-                className="input"
-                value={form.tagline}
-                onChange={(e) => set('tagline', e.target.value)}
-                placeholder="Where Pune’s talent meets its future"
-                maxLength={160}
-              />
-            )}
-          </Field>
         </div>
       </section>
 
       <section className="blk">
         <h2 className="blk-title">Who we talk to there</h2>
         <p className="blk-sub">
-          Our contact for this account - private, never shown on their portal. Not a login: you invite the people who
-          sign in later.
+          Our contact at the university. Private, and not a login.
         </p>
         <div className="grid">
           <Field label="Name" error={errors.contactName}>
@@ -403,128 +295,6 @@ export default function IdentityStep({ state, catalogue, onSaved }: StepProps) {
           <Field label="Phone" error={errors.contactPhone} optional>
             {(id) => (
               <input id={id} type="tel" className="input" value={form.contactPhone} onChange={(e) => set('contactPhone', e.target.value)} />
-            )}
-          </Field>
-        </div>
-      </section>
-
-      <section className="blk">
-        <div className="blk-head">
-          <div>
-            <h2 className="blk-title">Contact us</h2>
-            <p className="blk-sub">
-              Shown to their students and recruiters on the portal’s “Contact us”. Use the placement office’s desk, not a
-              personal number.
-            </p>
-          </div>
-          {form.contactEmail && !form.supportEmail && (
-            <button
-              type="button"
-              className="btn btn-secondary btn-sm"
-              onClick={() => {
-                set('supportEmail', form.contactEmail);
-                if (form.contactPhone && !form.supportPhone) set('supportPhone', form.contactPhone);
-              }}
-            >
-              Copy from the contact above
-            </button>
-          )}
-        </div>
-        <div className="grid">
-          <Field label="Email" error={errors.supportEmail} optional>
-            {(id) => (
-              <input
-                id={id}
-                type="email"
-                className="input"
-                value={form.supportEmail}
-                onChange={(e) => set('supportEmail', e.target.value)}
-                placeholder="placements@demo-university.example"
-              />
-            )}
-          </Field>
-          <Field label="Mobile number" error={errors.supportPhone} optional>
-            {(id) => (
-              <input
-                id={id}
-                type="tel"
-                inputMode="tel"
-                className="input"
-                value={form.supportPhone}
-                onChange={(e) => set('supportPhone', e.target.value)}
-                placeholder="+91 90000 00000"
-              />
-            )}
-          </Field>
-          <Field label="Alternate number" hint="A landline or second mobile." error={errors.supportAltPhone} optional>
-            {(id) => (
-              <input
-                id={id}
-                type="tel"
-                inputMode="tel"
-                className="input"
-                value={form.supportAltPhone}
-                onChange={(e) => set('supportAltPhone', e.target.value)}
-                placeholder="020 0000 0000"
-              />
-            )}
-          </Field>
-          <Field label="WhatsApp number" error={errors.supportWhatsapp} optional>
-            {(id) => (
-              <div className="affix">
-                <input
-                  id={id}
-                  type="tel"
-                  inputMode="tel"
-                  className="input affix-input"
-                  value={form.supportWhatsapp}
-                  onChange={(e) => set('supportWhatsapp', e.target.value)}
-                  placeholder="+91 90000 00000"
-                />
-                <button
-                  type="button"
-                  className="btn btn-secondary btn-sm affix-btn"
-                  disabled={!form.supportPhone}
-                  onClick={() => set('supportWhatsapp', form.supportPhone)}
-                  title="Use the mobile number"
-                >
-                  Same as mobile
-                </button>
-              </div>
-            )}
-          </Field>
-          <Field label="Office hours" error={errors.officeHours} optional>
-            {(id) => (
-              <input
-                id={id}
-                className="input"
-                value={form.officeHours}
-                onChange={(e) => set('officeHours', e.target.value)}
-                placeholder="Mon–Fri, 10:00–17:30"
-              />
-            )}
-          </Field>
-          <Field label="PIN code" error={errors.pincode} optional>
-            {(id) => (
-              <input
-                id={id}
-                className="input input-mono"
-                inputMode="numeric"
-                value={form.pincode}
-                onChange={(e) => set('pincode', e.target.value)}
-                placeholder="000000"
-              />
-            )}
-          </Field>
-          <Field label="Office address" error={errors.address} optional wide>
-            {(id) => (
-              <input
-                id={id}
-                className="input"
-                value={form.address}
-                onChange={(e) => set('address', e.target.value)}
-                placeholder="Placement Cell, Demo Road, Demo City"
-              />
             )}
           </Field>
         </div>

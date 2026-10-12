@@ -10,15 +10,10 @@ import {
 } from '../../api/platform';
 import { SavedAgo } from './ui';
 import IdentityStep from './steps/IdentityStep';
-import AcademicsStep from './steps/AcademicsStep';
-import CollegesStep from './steps/CollegesStep';
-import BatchesStep from './steps/BatchesStep';
-import StudentsStep from './steps/StudentsStep';
-import MappingStep from './steps/MappingStep';
-import FeaturesStep from './steps/FeaturesStep';
-import HelpStep from './steps/HelpStep';
-import PeopleStep from './steps/PeopleStep';
-import ReviewStep from './steps/ReviewStep';
+import SimpleCoursesStep from './steps/SimpleCoursesStep';
+import SimpleCollegesStep from './steps/SimpleCollegesStep';
+import FeaturesPending from './steps/FeaturesPending';
+import InterestsStep from './steps/InterestsStep';
 import './Platform.css';
 import '../../components/MapData.css';
 
@@ -53,106 +48,43 @@ interface StepMeta {
 export const STEPS: StepMeta[] = [
   {
     key: 'identity',
-    title: 'Who they are',
+    title: 'University details',
     lede: 'The university’s name, its address on the platform, and how its portal looks.',
     todo: [
       'Name it as students and recruiters should see it.',
       'Pick its web address. It ends up in bookmarks and on printed posters, so it is not meant to change later.',
-      'Add the person we deal with at the institution.',
+      'Add the person we deal with at the university.',
     ],
-    note: 'That contact is not a login. The people who sign in are invited at “Who runs it”.',
-  },
-  {
-    key: 'academics',
-    title: 'What they teach',
-    lede: 'The courses and branches they run.',
-    todo: [
-      'Tick every course this university runs - search to find one, or tick all from the header. A ticked course runs all its branches.',
-      'If it runs only some branches of a course, click “Choose branches” in its row.',
-      'A course missing from the list? Use “New course”, or upload a list from Excel.',
-    ],
-    note: 'Colleges pick only from this list, so every college spells B.E. — Computer Engineering the same way.',
+    note: 'That contact is not a login.',
   },
   {
     key: 'colleges',
-    title: 'Where they teach',
-    lede: 'Every college in the university, with its details and who runs its placement cell.',
+    title: 'Colleges',
+    lede: 'Every college under the university.',
     todo: [
-      'Add each college with a short code — PICT, COEP. The code is unique across the whole platform.',
-      'Give each one a placement officer’s email address.',
-      'Set the passing years. One batch per year is created in each college.',
+      'Type the college’s name - a short code is suggested from it - and its city, then Add.',
+      'Many colleges? Use “Paste many”: one per line, name, code, city.',
     ],
-    note: 'Each officer is sent an invitation the moment you save. Saving the same list again sends nothing twice.',
   },
   {
-    key: 'mapping',
-    title: 'Map courses to colleges',
-    lede: 'Which college runs which of the courses and branches above.',
-    todo: [
-      'Click a college in the table - “Not mapped” shows the ones still to do.',
-      'In the panel, tick the course-and-branch pairs it runs, add seats if known, and save.',
-    ],
-    note: 'Optional — a college can do its own once it signs in. But a roster uploaded before this is done lands unmapped, and an unmapped student is invisible to every role that filters on a course.',
+    key: 'academics',
+    title: 'Courses',
+    lede: 'The courses the university runs.',
+    todo: ['Type a course and pick it from the list, or type a new one and press Add.', 'Save when the list is complete.'],
+    note: 'Students choose their course from this list when they sign up.',
   },
   {
-    key: 'batches',
-    title: 'Their batches',
-    lede: 'Group students the way this university does.',
-    todo: [
-      'Click “Create from mapping”, pick the passing years, and create - one batch per college, course, branch and year.',
-      'For any other group, use “Make one by hand”. Filter the table by college or year to check what exists.',
-    ],
-    note: 'Optional — placement cells can create their own later.',
-  },
-  {
-    key: 'students',
-    title: 'Student details',
-    lede: 'What this university records about a student, and who may put one on the roster.',
-    todo: [
-      'Mark each detail Not collected, Optional or Required.',
-      'Say who adds students: the university, its colleges, or the students themselves.',
-      'If students may register, tick what the registration form asks them.',
-    ],
-    note: 'Optional. Left alone, this university gets what every institution got before there was a choice: name, email and mobile required, and both the university and its colleges able to add.',
+    key: 'interests',
+    title: 'Skills & interests',
+    lede: 'The fields of work students say they want to try.',
+    todo: ['Type a field, for example Marketing or Data, and press Add.', 'Remove any that do not fit with ×.'],
+    note: 'One list for every university. Students pick up to three at sign-up.',
   },
   {
     key: 'features',
-    title: 'What they get',
-    lede: 'Start from a plan, then switch individual modules on or off.',
-    todo: [
-      'Pick the plan closest to what they bought.',
-      'Switch individual modules on or off from there.',
-    ],
-    note: 'Some modules need others to work. Anything pulled in is listed when you save.',
-  },
-  {
-    key: 'help',
-    title: 'Student help',
-    lede: 'The questions and answers students see in the help panel on every page.',
-    todo: [
-      'Start from the standard questions - keep, reword or hide each one.',
-      'Add the questions your students actually ask, such as when the season starts.',
-    ],
-    note: 'Optional. Until this is saved, students see the standard questions.',
-  },
-  {
-    key: 'people',
-    title: 'Who runs it',
-    lede: 'Invite the people who will run this university’s portal day to day.',
-    todo: [
-      'Invite at least one institution admin — usually the placement head or a registrar.',
-      'Choose whether we email the invitation or you copy the link and send it yourself.',
-    ],
-    note: 'Placement officers for each college were already invited at “Where they teach”. These are the people who run the university’s own console.',
-  },
-  {
-    key: 'review',
-    title: 'Go live',
-    lede: 'Check everything is in place, then open the portal to its people.',
-    todo: [
-      'Work down the list. Anything marked required has to be done before you can launch.',
-      'Launch. The portal becomes reachable straight away, and the invitations you sent start working.',
-    ],
+    title: 'Features',
+    lede: 'What the university switches on, one tab per group of people.',
+    todo: ['Students: choose whether a new student gets a welcome email.', 'More tabs arrive as the rest is decided.'],
   },
 ];
 
@@ -204,7 +136,8 @@ export default function Onboarding() {
         setState(s);
         // No step in the URL: resume at the first one not yet done.
         if (!stepParam) {
-          const next = STEPS.find((m) => !s.tenant.completedSteps.includes(m.key))?.key ?? 'review';
+          const finished = new Set([...s.tenant.completedSteps, ...s.checklist.filter((c) => c.done).map((c) => c.step)]);
+          const next = STEPS.find((m) => !finished.has(m.key))?.key ?? 'features';
           navigate(`/platform/tenants/${id}/${next}`, { replace: true });
         }
       })
@@ -262,7 +195,13 @@ export default function Onboarding() {
 
   const meta = STEPS.find((s) => s.key === step)!;
   const index = STEPS.indexOf(meta);
-  const done = new Set(state?.tenant.completedSteps ?? []);
+  // What the server recorded, plus what the checklist can see is done - a
+  // college added on its own does not mark its step.
+  const done = new Set<StepKey>([
+    ...(state?.tenant.completedSteps ?? []),
+    ...(state?.checklist.filter((c) => c.done).map((c) => c.step) ?? []),
+  ]);
+  for (const k of [...done]) if (!STEPS.some((s) => s.key === k)) done.delete(k);
   const summaries = useMemo(() => {
     const map = new Map<StepKey, string>();
     state?.checklist.forEach((c) => c.done && map.set(c.step, c.detail));
@@ -294,7 +233,7 @@ export default function Onboarding() {
           <span className="brand-mark" aria-hidden="true" />
           <span>
             <strong>Launchpad</strong>
-            <small>Institution onboarding</small>
+            <small>University onboarding</small>
           </span>
         </Link>
 
@@ -399,15 +338,10 @@ export default function Onboarding() {
         ) : (
           <div className="ob-body" key={step}>
             {step === 'identity' && <IdentityStep {...stepProps} />}
-            {step === 'academics' && <AcademicsStep {...stepProps} />}
-            {step === 'colleges' && <CollegesStep {...stepProps} />}
-            {step === 'mapping' && <MappingStep {...stepProps} />}
-            {step === 'batches' && <BatchesStep {...stepProps} />}
-            {step === 'students' && <StudentsStep {...stepProps} />}
-            {step === 'features' && <FeaturesStep {...stepProps} />}
-            {step === 'help' && <HelpStep {...stepProps} />}
-            {step === 'people' && <PeopleStep {...stepProps} />}
-            {step === 'review' && <ReviewStep {...stepProps} />}
+            {step === 'academics' && <SimpleCoursesStep {...stepProps} />}
+            {step === 'colleges' && <SimpleCollegesStep {...stepProps} />}
+            {step === 'interests' && <InterestsStep {...stepProps} />}
+            {step === 'features' && <FeaturesPending {...stepProps} />}
           </div>
         )}
       </main>

@@ -47,7 +47,7 @@ export default function CollegesStep({ state, catalogue, onSaved, goto, updateCa
       setError(single ? 'Add the college first.' : 'Add at least one college.');
       return;
     }
-    goto('mapping');
+    goto('academics');
   }
 
   return (
@@ -185,8 +185,8 @@ export default function CollegesStep({ state, catalogue, onSaved, goto, updateCa
       <StepFooter
         busy={false}
         error={error}
-        onBack={() => goto('academics')}
-        submitLabel="Continue to batches"
+        onBack={() => goto('identity')}
+        submitLabel="Continue to courses"
         note={colleges.length ? `${colleges.length} college${colleges.length === 1 ? '' : 's'}` : null}
       />
     </form>

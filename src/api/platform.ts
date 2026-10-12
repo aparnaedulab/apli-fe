@@ -5,9 +5,13 @@ import { api } from './client';
 export type TenantKind = 'UNIVERSITY' | 'COLLEGE' | 'GROUP';
 export type TenantStatus = 'DRAFT' | 'ACTIVE' | 'SUSPENDED';
 export type GradingScale = 'CGPA_10' | 'CGPA_4' | 'PERCENTAGE' | 'BOTH';
+/** Diploma, undergraduate, postgraduate or PhD. */
+export type StudyLevel = 'DIPLOMA' | 'UG' | 'PG' | 'PHD';
+
 export type StepKey =
   | 'identity'
   | 'academics'
+  | 'interests'
   | 'colleges'
   | 'mapping'
   | 'batches'
@@ -80,6 +84,8 @@ export interface Catalogue {
   courses: {
     id: string;
     name: string;
+    level: StudyLevel | null;
+    years: number | null;
     specialisations: { id: string; name: string; branchId: string }[];
   }[];
   collegeTypes: { id: string; name: string }[];
@@ -122,6 +128,8 @@ export interface TenantRecord {
   responseDays: number;
   companyApprovalRequired: boolean;
   unverifiedCompanyAccess: boolean;
+  /** Whether a student signing up at its colleges gets a welcome email. */
+  studentWelcomeEmail: boolean;
   plan: string;
   completedSteps: StepKey[];
   launchedAt: string | null;
@@ -433,6 +441,8 @@ export const platformApi = {
     api.put<HelpList & OnboardingState>(`/platform/tenants/${id}/help`, { questions }),
   completeStep: (id: string, step: StepKey) =>
     api.post<OnboardingState>(`/platform/tenants/${id}/steps/${step}/complete`),
+  saveStudentSettings: (id: string, body: { welcomeEmail: boolean }) =>
+    api.put<OnboardingState>(`/platform/tenants/${id}/students`, body),
   saveFeatures: (id: string, selected: string[], unverifiedCompanyAccess?: boolean) =>
     api.put<OnboardingState & { result: { enabled: string[]; added: string[]; plan: string } }>(
       `/platform/tenants/${id}/features`,
@@ -451,10 +461,12 @@ export const platformApi = {
     api.delete<OnboardingState>(`/platform/tenants/${id}/admins/invites/${inviteId}`),
   launch: (id: string) => api.post<OnboardingState>(`/platform/tenants/${id}/launch`),
   /** Adds a course (and its branches) to the shared list; returns it as the catalogue lists it. */
-  addCourse: (name: string, branchIds: string[]) =>
+  addCourse: (name: string, branchIds: string[], level?: StudyLevel, years?: number) =>
     api.post<{ course: Catalogue['courses'][number]; existed: boolean }>('/platform/courses', {
       name,
       branchIds,
+      level,
+      years,
     }),
   /** Adds a branch to the master list. A look-alike answers 409 with `details.similar`. */
   addBranch: (name: string, confirm = false) =>

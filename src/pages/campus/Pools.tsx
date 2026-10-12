@@ -3,7 +3,7 @@ import CampusLayout from './CampusLayout';
 import { networkApi, type CampusPools, type Pool } from '../../api/network';
 import { ApiError } from '../../api/client';
 import { useAuth } from '../../auth/AuthContext';
-import '../student/Alumni.css';
+import '../shared/Alumni.css';
 import './Pools.css';
 
 const TYPE_LABEL = { FINAL: 'Final placements', INTERNSHIP: 'Internships' } as const;

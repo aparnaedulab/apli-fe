@@ -34,11 +34,20 @@ export default function ConsoleHeader() {
 
       <nav className="console-nav" aria-label="Console sections">
         <NavLink to="/platform" end className={({ isActive }) => (isActive ? 'is-on' : '')}>
-          Universities
+          Institutions
         </NavLink>
         <NavLink to="/platform/companies" className={({ isActive }) => (isActive ? 'is-on' : '')}>
           Companies
           {pending ? <span className="console-badge">{pending}</span> : null}
+        </NavLink>
+        <NavLink to="/platform/requests" className={({ isActive }) => (isActive ? 'is-on' : '')}>
+          Partner requests
+        </NavLink>
+        <NavLink to="/platform/reviews" className={({ isActive }) => (isActive ? 'is-on' : '')}>
+          Reviews
+        </NavLink>
+        <NavLink to="/platform/data" className={({ isActive }) => (isActive ? 'is-on' : '')}>
+          Onboard data
         </NavLink>
       </nav>
 

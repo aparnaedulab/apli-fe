@@ -15,7 +15,7 @@ import {
 } from '../../api/opportunities';
 import { campusApi, postingApi, type BatchSummary, type PostingRow } from '../../api/campus';
 import { useAuth } from '../../auth/AuthContext';
-import '../student/Opportunities.css';
+import '../shared/Opportunities.css';
 import './Events.css';
 
 type Event = CollegeWeek['events'][number];

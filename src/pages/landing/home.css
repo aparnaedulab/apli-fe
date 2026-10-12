@@ -413,6 +413,33 @@
   gap: 6px;
 }
 
+.h-header-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  margin-right: 12px;
+}
+
+.h-header-links a {
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--h-ink-2);
+  text-decoration: none;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.h-header-links a:hover,
+.h-header-links a:focus-visible {
+  color: var(--h-ink);
+  background: color-mix(in srgb, var(--h-indigo) 8%, transparent);
+  outline: none;
+}
+
 /* --- hero ----------------------------------------------------------------- */
 
 .h-hero {
@@ -1257,7 +1284,7 @@
   }
 }
 
-/* --- virtual internships: the strip ---------------------------------------- */
+/* --- work simulations: the strip ---------------------------------------- */
 
 .h-interns {
   padding: 85px 0;
@@ -1398,7 +1425,97 @@
   color: var(--h-ink-3);
 }
 
-/* --- step art for the internship steps ------------------------------------- */
+.h-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: -18px 0 22px;
+}
+
+.h-field {
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--h-rule);
+  background: var(--h-surface);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--h-ink-2);
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.h-field:hover {
+  border-color: var(--h-indigo);
+  color: var(--h-ink);
+}
+
+.h-field.is-on {
+  background: var(--h-ink);
+  border-color: var(--h-ink);
+  color: var(--h-bg);
+}
+
+.h-field:focus-visible {
+  outline: 2px solid var(--h-indigo);
+  outline-offset: 2px;
+}
+
+/* --- the certificate, as the trust section's picture ------------------------ */
+
+.a-cert {
+  display: grid;
+  gap: 4px;
+  padding: 22px 20px 20px;
+  text-align: left;
+  border-top: 4px solid var(--h-sage);
+}
+
+.a-cert-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--h-sage);
+}
+
+.a-cert b {
+  margin-top: 6px;
+  font-family: var(--h-display);
+  font-size: 19px;
+  letter-spacing: -0.02em;
+  color: var(--h-ink);
+}
+
+.a-cert i {
+  font-style: normal;
+  font-size: 11.5px;
+  color: var(--h-ink-3);
+}
+
+.a-cert-name {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--h-rule);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--h-ink);
+}
+
+.a-cert-code {
+  font-size: 11px;
+  color: var(--h-ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.a-cert .a-stamp {
+  justify-self: start;
+}
+
+/* --- step art for the simulation steps ------------------------------------- */
 
 .a-start {
   display: inline-block;
@@ -1883,6 +2000,10 @@
 /* --- small screens -------------------------------------------------------- */
 
 @media (max-width: 920px) {
+  .h-header-links {
+    display: none;
+  }
+
   .h-hero-art {
     justify-self: center;
   }

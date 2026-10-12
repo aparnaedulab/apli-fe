@@ -95,7 +95,7 @@ export default function FeaturesStep({ state, catalogue, onSaved, goto }: StepPr
     setError(null);
     try {
       const next = await platformApi.saveFeatures(t.id, [...selected], openDoor);
-      onSaved(next, 'help');
+      onSaved(next);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Could not save. Try again.');
     } finally {
@@ -249,8 +249,8 @@ export default function FeaturesStep({ state, catalogue, onSaved, goto }: StepPr
       <StepFooter
         busy={busy}
         error={error}
-        onBack={() => goto('batches')}
-        submitLabel="Save & continue"
+        onBack={() => goto('academics')}
+        submitLabel="Save"
         note={`${selected.size} modules · ${liveCount} live today`}
       />
     </form>

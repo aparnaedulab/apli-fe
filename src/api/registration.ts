@@ -17,6 +17,8 @@ export interface CompanyRegistration {
     name: string;
     legalName?: string;
     industryId?: string;
+    /** Only when the industry list has nothing that fits. */
+    industryOther?: string;
     sizeBand?: CompanySize | '';
     foundedYear?: number;
     gstin?: string;
