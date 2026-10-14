@@ -41,7 +41,10 @@ import StudentTaskPlayer from './pages/student-app/TaskPlayer';
 import CompanyOverview from './pages/company-app/Overview';
 import { CompanySimulationList } from './pages/company-app/Simulations';
 import CompanySimulationEditor from './pages/company-app/Editor';
+import CompanyAnalytics from './pages/company-app/Analytics';
+import { CompanyOffers } from './pages/company-app/Offers';
 import { CompanyReviews, CompanyShared } from './pages/company-app/Work';
+import { CompanyInterviewList, CompanyInterviewEditor } from './pages/company-app/Interviews';
 import CompanySignup from './pages/signup/CompanySignup';
 import InstitutionSignup from './pages/signup/InstitutionSignup';
 import Join from './pages/signup/Join';
@@ -525,6 +528,14 @@ export default function App() {
         }
       />
       <Route
+        path="/company/simulations/:id/analytics"
+        element={
+          <RequireAuth roles={['COMPANY']}>
+            <CompanyAnalytics />
+          </RequireAuth>
+        }
+      />
+      <Route
         path="/company/reviews"
         element={
           <RequireAuth roles={['COMPANY']}>
@@ -537,6 +548,38 @@ export default function App() {
         element={
           <RequireAuth roles={['COMPANY']}>
             <CompanyShared />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/company/offers"
+        element={
+          <RequireAuth roles={['COMPANY']}>
+            <CompanyOffers />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/company/interviews"
+        element={
+          <RequireAuth roles={['COMPANY']}>
+            <CompanyInterviewList />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/company/interviews/new"
+        element={
+          <RequireAuth roles={['COMPANY']}>
+            <CompanyInterviewEditor />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/company/interviews/:id"
+        element={
+          <RequireAuth roles={['COMPANY']}>
+            <CompanyInterviewEditor />
           </RequireAuth>
         }
       />

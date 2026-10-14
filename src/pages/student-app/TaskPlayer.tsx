@@ -180,9 +180,13 @@ export default function TaskPlayer() {
                 key={step.page.id}
                 page={step.page}
                 marked={task.checks[step.page.id]}
-                canAnswer={canWork}
+                company={data?.company.name ?? 'the company'}
+                // A test can be taken again any time, except while the work is with a reviewer.
+                canAnswer={Boolean(run) && status !== 'IN_REVIEW'}
                 busy={busy === step.page.id}
                 onSubmit={(answers) => act(step.page!.id, () => studentAppApi.answerCheck(slug, task.id, step.page!.id, answers))}
+                onReveal={() => act(step.page!.id, () => studentAppApi.revealCheck(slug, task.id, step.page!.id))}
+                onSend={(attempt) => act(step.page!.id, () => studentAppApi.sendCheck(slug, task.id, step.page!.id, attempt))}
               />
               {task.checks[step.page.id] && steps[at + 1] && (
                 <div className="tp-test-next">

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { ApiError } from '../../api/client';
+import { dateText, offersApi, type StudentOffer } from '../../api/offers';
 import {
   studentAppApi,
   type ActivityEvent,
@@ -34,6 +35,15 @@ export default function Home() {
 
   useEffect(load, [load]);
 
+  // Offers waiting for an answer go at the top, before anything else.
+  const [offers, setOffers] = useState<StudentOffer[]>([]);
+  useEffect(() => {
+    offersApi
+      .mine()
+      .then((o) => setOffers(o.filter((x) => x.status === 'SENT')))
+      .catch(() => undefined);
+  }, []);
+
   // Gone at once; the server is told in the background.
   function hide(kind: 'suggestion' | 'run', id: string) {
     setData(
@@ -64,6 +74,22 @@ export default function Home() {
 
       <div className="sa-wrap sa-body">
         {error && <p className="sa-alert">{error}</p>}
+        {offers.length > 0 && (
+          <Link to="/student/jobs" className="of-banner">
+            <span className="of-banner-icon" aria-hidden="true">
+              ★
+            </span>
+            <span>
+              <b>
+                {offers.length === 1
+                  ? `${offers[0]!.company.name} offered you an internship: ${offers[0]!.role}`
+                  : `You have ${offers.length} internship offers`}
+              </b>
+              <small>Reply by {dateText(offers[0]!.respondBy)}. See the details and answer.</small>
+            </span>
+            <span aria-hidden="true">→</span>
+          </Link>
+        )}
         {!data && !error && <Skeleton />}
         {data && (
           <>

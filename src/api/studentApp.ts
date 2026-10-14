@@ -174,7 +174,7 @@ export interface ReviewItem {
   runId: string;
   companyId: string;
   submittedAt: string | null;
-  student: { name: string; email: string; college: string | null };
+  student: { id: string; name: string; email: string; college: string | null };
   simulation: { title: string; slug: string; company: string };
   tasks: {
     id: string;
@@ -225,6 +225,12 @@ export const studentAppApi = {
     api.put<SimulationDetail>(`${sim(slug)}/tasks/${taskId}`, body),
   answerCheck: (slug: string, taskId: string, pageId: string, answers: Answers) =>
     api.post<SimulationDetail>(`${sim(slug)}/tasks/${taskId}/checks/${pageId}`, { answers }),
+  /** Shows the right answers to a test; it cannot be taken again after. */
+  revealCheck: (slug: string, taskId: string, pageId: string) =>
+    api.post<SimulationDetail>(`${sim(slug)}/tasks/${taskId}/checks/${pageId}/reveal`),
+  /** Sends one try at a test to the simulation's company. */
+  sendCheck: (slug: string, taskId: string, pageId: string, attempt: number) =>
+    api.post<SimulationDetail>(`${sim(slug)}/tasks/${taskId}/checks/${pageId}/send`, { attempt }),
   explain: (slug: string, body: { how: string; change: string }) => api.post<SimulationDetail>(`${sim(slug)}/explain`, body),
   shareOptions: (runId: string) => api.get<{ companies: ShareOption[] }>(`/student-app/runs/${runId}/shares`),
   setShares: (runId: string, companyIds: string[]) =>

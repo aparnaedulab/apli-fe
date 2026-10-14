@@ -73,6 +73,7 @@ export function CompanySimulationList() {
                   <th>Working</th>
                   <th>To review</th>
                   <th>Approved</th>
+                  <th aria-label="Analytics" />
                 </tr>
               </thead>
               <tbody>
@@ -94,6 +95,13 @@ export function CompanySimulationList() {
                     <td>{s.students.working}</td>
                     <td>{s.students.toReview ? <Link to="/company/reviews">{s.students.toReview}</Link> : 0}</td>
                     <td>{s.students.verified}</td>
+                    <td>
+                      {s.status === 'LIVE' || s.status === 'RETIRED' ? (
+                        <Link to={`/company/simulations/${s.id}/analytics`} className="sa-link is-small">
+                          Analytics →
+                        </Link>
+                      ) : null}
+                    </td>
                   </tr>
                 ))}
               </tbody>

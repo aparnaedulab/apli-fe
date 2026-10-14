@@ -24,8 +24,10 @@ export default function Frame({ children }: { children: ReactNode }) {
       nav={[
         { to: '/company', label: 'Overview', end: true },
         { to: '/company/simulations', label: 'Simulations' },
+        { to: '/company/interviews', label: 'Interviews' },
         { to: '/company/reviews', label: "Students' work", badge: waiting },
         { to: '/company/shared', label: 'Shared with you' },
+        { to: '/company/offers', label: 'Offers' },
       ]}
     >
       {children}

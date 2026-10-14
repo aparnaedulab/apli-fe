@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { ApiError } from '../../api/client';
-import { companyAppApi, type SharedWork } from '../../api/companyApp';
+import { companyAppApi, type SentTest, type SharedWork } from '../../api/companyApp';
 import type { ReviewItem } from '../../api/studentApp';
 import Frame from './Frame';
+import { OfferButton } from './Offers';
 
 const message = (e: unknown, fallback: string) => (e instanceof ApiError ? e.message : fallback);
 
@@ -146,6 +147,7 @@ function ReviewCard({ item: r, onDone }: { item: ReviewItem; onDone: (next: Revi
         </div>
       ) : (
         <div className="ca-review-actions">
+          <OfferButton candidateId={r.student.id} runId={r.runId} name={r.student.name} />
           <button type="button" className="sa-btn is-ghost" onClick={() => setAsking(true)} disabled={busy}>
             Ask for changes
           </button>
@@ -167,11 +169,17 @@ export function CompanyShared() {
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState<string | null>(null);
 
+  const [tests, setTests] = useState<SentTest[] | null>(null);
+
   useEffect(() => {
     companyAppApi
       .shared()
       .then(setItems)
       .catch((e) => setError(message(e, 'Could not load the shared work.')));
+    companyAppApi
+      .tests()
+      .then(setTests)
+      .catch((e) => setError(message(e, 'Could not load the tests sent to you.')));
   }, []);
 
   return (
@@ -190,8 +198,10 @@ export function CompanyShared() {
       </section>
       <div className="sa-wrap sa-body">
         {error && <p className="sa-alert">{error}</p>}
+        {tests && tests.length > 0 && <SentTests tests={tests} />}
         {!items && !error && <p className="sa-loading">Loading…</p>}
-        {items && items.length === 0 && (
+        {items && items.length > 0 && tests && tests.length > 0 && <h2 className="ca-section-title">Finished simulations</h2>}
+        {items && items.length === 0 && (tests?.length ?? 0) === 0 && (
           <p className="sa-empty">
             No one has shared work with you yet. Students choose to, company by company, once a simulation is approved.
           </p>
@@ -234,9 +244,12 @@ export function CompanyShared() {
                       </a>
                     )}
                   </p>
-                  <button type="button" className="sa-quiet" onClick={() => setOpen(isOpen ? null : w.runId)}>
-                    {isOpen ? 'Hide their work' : 'See their work'}
-                  </button>
+                  <div className="of-row">
+                    <button type="button" className="sa-quiet" onClick={() => setOpen(isOpen ? null : w.runId)}>
+                      {isOpen ? 'Hide their work' : 'See their work'}
+                    </button>
+                    <OfferButton candidateId={w.student.id} runId={w.runId} name={w.student.name} />
+                  </div>
                   {isOpen && (
                     <div className="ca-shared-work">
                       {w.tasks.map((t, i) => (
@@ -272,5 +285,121 @@ export function CompanyShared() {
         )}
       </div>
     </Frame>
+  );
+}
+
+const when = (iso: string) => new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+
+/**
+ * Tries at tests students sent from the company's simulations: the score,
+ * which try it was, and every answer beside the right one.
+ */
+function SentTests({ tests }: { tests: SentTest[] }) {
+  const [open, setOpen] = useState<string | null>(null);
+  return (
+    <>
+      <h2 className="ca-section-title">Tests sent to you</h2>
+      <ul className="ca-shared ca-tests">
+        {tests.map((t) => {
+          const isOpen = open === t.id;
+          const graded = t.total > 0;
+          return (
+            <li key={t.id}>
+              <div className="ca-shared-head">
+                <div>
+                  <h2>{t.student.name}</h2>
+                  <p>{[t.student.college, t.student.course, t.student.batch].filter(Boolean).join(' · ') || 'Student'}</p>
+                </div>
+                <span className={`ca-test-score ${graded && t.score === t.total ? 'is-full' : ''}`}>
+                  {graded ? `${t.score} of ${t.total} right` : 'Written answers'}
+                </span>
+              </div>
+              <dl className="sa-facts">
+                <div>
+                  <dt>Test</dt>
+                  <dd>{t.test}</dd>
+                </div>
+                <div>
+                  <dt>Task</dt>
+                  <dd>
+                    {t.task} · {t.simulation}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Try</dt>
+                  <dd>
+                    {t.attempt} of {t.tries}
+                    {t.attempt === 1 ? ' (first try)' : ''}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Sent</dt>
+                  <dd>{when(t.sentAt)}</dd>
+                </div>
+              </dl>
+              <p className="ca-contact">
+                <a href={`mailto:${t.student.email}`}>{t.student.email}</a>
+                {t.student.phone && <span>{t.student.phone}</span>}
+              </p>
+              <div className="of-row">
+                <button type="button" className="sa-quiet" onClick={() => setOpen(isOpen ? null : t.id)}>
+                  {isOpen ? 'Hide their answers' : 'See their answers'}
+                </button>
+                <OfferButton candidateId={t.student.id} runId={t.runId} name={t.student.name} />
+              </div>
+              {isOpen && (
+                <ol className="ca-test-answers">
+                  {t.questions.map((q, i) => (
+                    <li
+                      key={i}
+                      className={q.correct === null ? 'is-written' : q.correct ? 'is-right' : 'is-wrong'}
+                    >
+                      <p className="ca-test-q">
+                        <b>{i + 1}.</b> {q.prompt}
+                        <span>{q.correct === null ? 'For you to judge' : q.correct ? 'Right' : 'Not right'}</span>
+                      </p>
+                      {q.kind === 'text' ? (
+                        <p className="ca-test-written">{q.answer[0] || 'No answer.'}</p>
+                      ) : (
+                        <div className="ca-test-cols">
+                          <div>
+                            <h4>Their answer</h4>
+                            <AnswerList kind={q.kind} items={q.answer} />
+                          </div>
+                          {!q.correct && (
+                            <div>
+                              <h4>Right answer</h4>
+                              <AnswerList kind={q.kind} items={q.right} />
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </>
+  );
+}
+
+/** An order is numbered; anything else is a plain list. */
+export function AnswerList({ kind, items }: { kind: SentTest['questions'][number]['kind']; items: string[] }) {
+  if (!items.length) return <p className="ca-test-none">Nothing given.</p>;
+  return kind === 'order' ? (
+    <ol>
+      {items.map((x, i) => (
+        <li key={i}>{x}</li>
+      ))}
+    </ol>
+  ) : (
+    <ul>
+      {items.map((x, i) => (
+        <li key={i}>{x}</li>
+      ))}
+    </ul>
   );
 }

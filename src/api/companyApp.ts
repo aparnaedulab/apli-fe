@@ -109,6 +109,115 @@ export interface SharedWork {
   explainChange: string | null;
 }
 
+/** A try at a test a student sent the company, every answer written out. */
+export interface SentTest {
+  id: string;
+  runId: string;
+  sentAt: string;
+  takenAt: string;
+  /** Which try this was, of how many they have had. */
+  attempt: number;
+  tries: number;
+  score: number;
+  total: number;
+  simulation: string;
+  task: string;
+  test: string;
+  student: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string | null;
+    city: string | null;
+    college: string | null;
+    course: string | null;
+    batch: string | null;
+  };
+  questions: {
+    prompt: string;
+    kind: 'text' | 'choice' | 'sort' | 'order';
+    answer: string[];
+    right: string[];
+    /** Null for a written answer: it is for the company to judge. */
+    correct: boolean | null;
+  }[];
+}
+
+type Group = { rows: { label: string; count: number }[]; missing: number };
+export type RunStatus = 'ACTIVE' | 'IN_REVIEW' | 'NEEDS_WORK' | 'COMPLETED' | 'LEFT';
+type WrittenOut = SentTest['questions'];
+
+/** How a simulation is being used. Counts cover everyone; names only those who chose to show the company. */
+export interface SimAnalytics {
+  simulation: { id: string; title: string; status: SimStatus; publishedAt: string | null };
+  status: {
+    started: number;
+    working: number;
+    stalled: number;
+    toReview: number;
+    changesAsked: number;
+    verified: number;
+    left: number;
+    completionRate: number | null;
+    medianDaysToFinish: number | null;
+    rating: number | null;
+    ratings: number;
+    stalledAfterDays: number;
+  };
+  weeks: { week: string; started: number; finished: number }[];
+  who: { colleges: Group; courses: Group; branches: Group; cities: Group; classOf: Group; levels: Group };
+  tasks: {
+    id: string;
+    position: number;
+    title: string;
+    reached: number;
+    handedIn: number;
+    tests: {
+      id: string;
+      title: string;
+      graded: boolean;
+      takers: number;
+      firstTry: number | null;
+      latest: number | null;
+      averageTries: number | null;
+      sawAnswers: number;
+      sent: number;
+      questions: { prompt: string; kind: WrittenOut[number]['kind']; firstTryRight: number | null }[];
+    }[];
+  }[];
+  students: {
+    runId: string;
+    candidateId: string;
+    name: string;
+    email: string;
+    phone: string | null;
+    college: string | null;
+    course: string | null;
+    batch: string | null;
+    city: string | null;
+    status: RunStatus;
+    why: 'handed-in' | 'shared' | 'sent-a-test';
+    startedAt: string;
+    lastActiveAt: string;
+    completedAt: string | null;
+    tasksDone: number;
+    tasks: {
+      taskId: string;
+      handedInAt: string | null;
+      tests: {
+        pageId: string;
+        title: string;
+        tries: number;
+        visible: { number: number; score: number; total: number; sent: boolean }[];
+        latest: { score: number; total: number } | null;
+        sawAnswers: boolean | null;
+        answers: { number: number; questions: WrittenOut } | null;
+      }[];
+    }[];
+  }[];
+  anonymous: number;
+}
+
 export interface SimToCheck {
   id: string;
   title: string;
@@ -155,6 +264,8 @@ export const companyAppApi = {
   decide: (runId: string, decision: 'approve' | 'changes', note?: string) =>
     api.post<{ reviews: ReviewItem[] }>(`${base}/reviews/${runId}`, { decision, note }).then((r) => r.reviews),
   shared: () => api.get<{ shared: SharedWork[] }>(`${base}/shared`).then((r) => r.shared),
+  tests: () => api.get<{ tests: SentTest[] }>(`${base}/tests`).then((r) => r.tests),
+  analytics: (id: string) => api.get<SimAnalytics>(`${base}/simulations/${id}/analytics`),
   uploadCover: (file: File) => {
     const form = new FormData();
     form.append('file', file);

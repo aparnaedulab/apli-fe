@@ -88,12 +88,28 @@ export type StudentPage =
  */
 export type Answers = Record<string, number[] | string>;
 
+/** One try at a test: its number, its score, and whether it was sent to the company. */
+export interface CheckTry {
+  number: number;
+  score: number;
+  total: number;
+  at: string;
+  sentAt: string | null;
+}
+
 export interface MarkedCheck {
   answers: Answers;
   score: number;
   total: number;
-  /** `correct` is null for a written answer: the reviewer reads it. */
+  /**
+   * `correct` is null for a written answer: the reviewer reads it. The right
+   * answer and the explanation are empty until the student chooses to see them.
+   */
   questions: Record<string, { correct: boolean | null; solution: number[]; explain: string | null }>;
+  /** They chose to see the answers; the test cannot be taken again. */
+  revealed: boolean;
+  /** Every try, first to latest. The latest is the one that counts. */
+  tries: CheckTry[];
 }
 
 export const newText = (): TextDraft => ({ kind: 'text', prompt: '', hint: '', minWords: 0, explain: '' });
