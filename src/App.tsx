@@ -45,6 +45,7 @@ import CompanyAnalytics from './pages/company-app/Analytics';
 import { CompanyOffers } from './pages/company-app/Offers';
 import { CompanyReviews, CompanyShared } from './pages/company-app/Work';
 import { CompanyInterviewList, CompanyInterviewEditor } from './pages/company-app/Interviews';
+import { CompanyJobList, CompanyJobEditor } from './pages/company-app/Jobs';
 import CompanySignup from './pages/signup/CompanySignup';
 import InstitutionSignup from './pages/signup/InstitutionSignup';
 import Join from './pages/signup/Join';
@@ -580,6 +581,30 @@ export default function App() {
         element={
           <RequireAuth roles={['COMPANY']}>
             <CompanyInterviewEditor />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/company/jobs"
+        element={
+          <RequireAuth roles={['COMPANY']}>
+            <CompanyJobList />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/company/jobs/new"
+        element={
+          <RequireAuth roles={['COMPANY']}>
+            <CompanyJobEditor />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/company/jobs/:id"
+        element={
+          <RequireAuth roles={['COMPANY']}>
+            <CompanyJobEditor />
           </RequireAuth>
         }
       />
