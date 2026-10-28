@@ -4,6 +4,7 @@ import { companyAppApi, type SentTest, type SharedWork } from '../../api/company
 import type { ReviewItem } from '../../api/studentApp';
 import Frame from './Frame';
 import { OfferButton } from './Offers';
+import InviteToInterview from '../../components/InviteToInterview';
 
 const message = (e: unknown, fallback: string) => (e instanceof ApiError ? e.message : fallback);
 
@@ -147,6 +148,7 @@ function ReviewCard({ item: r, onDone }: { item: ReviewItem; onDone: (next: Revi
         </div>
       ) : (
         <div className="ca-review-actions">
+          <InviteToInterview candidateId={r.student.id} candidateName={r.student.name} />
           <OfferButton candidateId={r.student.id} runId={r.runId} name={r.student.name} />
           <button type="button" className="sa-btn is-ghost" onClick={() => setAsking(true)} disabled={busy}>
             Ask for changes
@@ -248,6 +250,7 @@ export function CompanyShared() {
                     <button type="button" className="sa-quiet" onClick={() => setOpen(isOpen ? null : w.runId)}>
                       {isOpen ? 'Hide their work' : 'See their work'}
                     </button>
+                    <InviteToInterview candidateId={w.student.id} candidateName={w.student.name} />
                     <OfferButton candidateId={w.student.id} runId={w.runId} name={w.student.name} />
                   </div>
                   {isOpen && (
@@ -345,6 +348,7 @@ function SentTests({ tests }: { tests: SentTest[] }) {
                 <button type="button" className="sa-quiet" onClick={() => setOpen(isOpen ? null : t.id)}>
                   {isOpen ? 'Hide their answers' : 'See their answers'}
                 </button>
+                <InviteToInterview candidateId={t.student.id} candidateName={t.student.name} />
                 <OfferButton candidateId={t.student.id} runId={t.runId} name={t.student.name} />
               </div>
               {isOpen && (

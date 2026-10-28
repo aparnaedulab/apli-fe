@@ -23,6 +23,8 @@ export interface SignupCourse {
   name: string;
   level: DegreeLevel | null;
   years: number | null;
+  /** The course's usual branches, suggested in the branch field. */
+  specialisations?: string[];
 }
 
 export interface SignupOptions {

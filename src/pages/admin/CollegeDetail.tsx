@@ -140,7 +140,7 @@ export default function CollegeDetail() {
         <Stat label="Team members" value={college.members.length} />
         <Stat label="Pending invites" value={college.invites.length} />
         <Stat label="Batches" value={college._count.batches} />
-        <Stat label="Seasons" value={college._count.placements} />
+        <Stat label="Students" value={college._count.candidates} />
       </div>
 
       {freshLink && <InviteLink link={freshLink} onDismiss={() => setFreshLink(null)} />}

@@ -120,8 +120,8 @@ export function PickTenantFirst() {
       <p className="eyebrow">Platform team</p>
       <h1>Choose an institution to work in.</h1>
       <p>
-        Every screen here shows one institution’s colleges, students and drives. Pick one from the switcher at the top of
-        the sidebar, or open the console to onboard a new one.
+        Every screen here shows one institution’s students and what they are doing. Open one from the platform
+        console, or onboard a new one there.
       </p>
       <Link to="/platform" className="btn btn-primary">
         Open the platform console

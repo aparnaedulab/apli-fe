@@ -327,7 +327,7 @@ function CompanyPanel({ id, onClose, onDecided }: { id: string; onClose: () => v
         <Fact label="Size" value={c.sizeBand ? `${SIZE[c.sizeBand]} people` : null} />
         <Fact label="Founded" value={c.foundedYear} />
         <Fact label="Head office" value={[c.city, c.state, c.pincode].filter(Boolean).join(', ') || null} />
-        <Fact label="Roles posted" value={c._count.jobs} />
+        <Fact label="Simulations" value={c._count.workSimulations} />
       </dl>
       {c.about && <p className="co-about">{c.about}</p>}
 

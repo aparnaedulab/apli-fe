@@ -43,6 +43,11 @@ interface AdminTableProps<T> {
   banner?: ReactNode;
   /** Bumped by a caller to force a reload after it changed something. */
   reloadKey?: number;
+  /**
+   * Just the list - no admin frame, no page heading. For screens outside the
+   * admin portal (the platform console) that want the same list.
+   */
+  bare?: boolean;
 }
 
 /**
@@ -63,12 +68,22 @@ export default function AdminTable<T>({
   action,
   banner,
   reloadKey = 0,
+  bare = false,
 }: AdminTableProps<T>) {
   const [data, setData] = useState<Paged<T> | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [q, setQ] = useState('');
   const [page, setPage] = useState(1);
-  const [active, setActive] = useState<Record<string, string>>({});
+  // A link can open the list already filtered: /admin/work?status=IN_REVIEW.
+  const [active, setActive] = useState<Record<string, string>>(() => {
+    const url = new URLSearchParams(window.location.search);
+    const start: Record<string, string> = {};
+    for (const f of filters) {
+      const v = url.get(f.key);
+      if (v && f.options.some((o) => o.value === v)) start[f.key] = v;
+    }
+    return start;
+  });
 
   const load = useCallback(async () => {
     setError(null);
@@ -90,8 +105,7 @@ export default function AdminTable<T>({
     // reloadKey lets a caller that created a row pull the list again.
   }, [load, q, reloadKey]);
 
-  return (
-    <AdminLayout>
+  const heading = (
       <header className="page-head">
         <div>
           <p className="eyebrow">Operations</p>
@@ -107,7 +121,10 @@ export default function AdminTable<T>({
           {action}
         </div>
       </header>
+  );
 
+  const list = (
+    <>
       {banner}
 
       {children}
@@ -205,6 +222,14 @@ export default function AdminTable<T>({
           )}
         </>
       )}
+    </>
+  );
+
+  if (bare) return <div className="data-list">{list}</div>;
+  return (
+    <AdminLayout>
+      {heading}
+      {list}
     </AdminLayout>
   );
 }

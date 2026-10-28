@@ -1,0 +1,400 @@
+/*
+  The admin portal, in the student and company apps' language.
+
+  The admin screens keep their own components (tables, cards, stat tiles,
+  forms) but sit in the same frame as the company app and wear its look:
+  white page, navy ink, one electric blue, Sora headings, soft rounded
+  cards. Mostly done by pointing the shared colour names at the app's
+  palette, then a few shapes on top. Scoped to `.sa.adm`; light only, like
+  the student and company apps.
+*/
+
+.sa.adm {
+  --paper: var(--sa-bg);
+  --paper-2: var(--sa-soft);
+  --surface: var(--sa-card);
+  --ink: var(--sa-ink);
+  --ink-2: var(--sa-ink-2);
+  --ink-3: var(--sa-ink-3);
+  --rule: var(--sa-line);
+  --rule-2: #cfd7e6;
+  --brand: var(--sa-blue);
+  --brand-hover: var(--sa-blue-hover);
+  --brand-soft: var(--sa-blue-soft);
+  --on-brand: #ffffff;
+  --pass: var(--sa-green);
+  --pass-soft: var(--sa-green-soft);
+  --hold: #b4610d;
+  --hold-soft: #fff1dc;
+  --stop: var(--sa-red);
+  --stop-soft: #fde5e7;
+  --radius: 10px;
+  --display: var(--sa-display);
+}
+
+/* --- the page -------------------------------------------------------------- */
+
+.adm-page {
+  padding-block: 0 72px;
+}
+
+/* Each page's heading becomes the apps' hero band, edge to edge. */
+.adm-page > .page-head,
+.adm-page > .ts-pick {
+  position: relative;
+  margin: 0 calc(-1 * clamp(16px, 3vw, 48px)) 28px;
+  padding: 30px clamp(16px, 3vw, 48px) 26px;
+  border-bottom: 1px solid var(--sa-line);
+  background:
+    radial-gradient(ellipse 55% 80% at 90% 10%, var(--sa-blue-soft) 0%, transparent 70%),
+    radial-gradient(ellipse 35% 60% at 65% 110%, var(--sa-orange-soft) 0%, transparent 70%),
+    var(--sa-bg);
+}
+
+.adm .page-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.adm .page-head .eyebrow,
+.adm .ts-pick .eyebrow {
+  font-family: var(--sans);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sa-blue);
+}
+
+.adm .page-head h1,
+.adm .ts-pick h1 {
+  margin-top: 8px;
+  font-family: var(--sa-display);
+  font-size: clamp(24px, 2.8vw, 32px);
+  line-height: 1.12;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.adm .page-lede,
+.adm .ts-pick p {
+  margin-top: 8px;
+  max-width: 44em;
+  color: var(--sa-ink-2);
+  font-size: 14.5px;
+}
+
+.adm .ts-pick .btn {
+  margin-top: 16px;
+}
+
+/* --- buttons: the apps' blue button ---------------------------------------- */
+
+.adm .btn {
+  padding: 9px 16px;
+  border-radius: 10px;
+  border-width: 1.5px;
+  font-size: 14px;
+  font-weight: 650;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.adm .btn-primary {
+  background: var(--sa-blue);
+  color: #fff;
+}
+
+.adm .btn-primary:hover {
+  background: var(--sa-blue-hover);
+  transform: translateY(-1px);
+}
+
+.adm .btn-secondary {
+  border-color: var(--sa-line);
+  background: var(--sa-card);
+}
+
+.adm .btn-secondary:hover {
+  border-color: var(--sa-ink);
+  background: var(--sa-card);
+}
+
+.adm .link-btn {
+  color: var(--sa-blue);
+  font-weight: 650;
+}
+
+/* --- cards, stat tiles and "worth a look" ---------------------------------- */
+
+.adm .card {
+  border: 1px solid var(--sa-line);
+  border-radius: var(--sa-radius);
+  background: var(--sa-card);
+  box-shadow: none;
+}
+
+.adm .card h2,
+.adm .stat-group h2,
+.adm .attention h2 {
+  font-family: var(--sa-display);
+  font-size: 17px;
+  letter-spacing: -0.01em;
+}
+
+.adm .stat-group h2,
+.adm .attention h2 {
+  margin-bottom: 12px;
+  text-transform: none;
+  color: var(--sa-ink);
+}
+
+/* Stat tiles become the apps' KPI cards, each tinted with one of its tones. */
+.adm .stat {
+  --tone: var(--sa-blue);
+  --tone-soft: var(--sa-blue-soft);
+  position: relative;
+  overflow: hidden;
+  padding: 16px 18px;
+  border: 1px solid var(--sa-line);
+  border-radius: var(--sa-radius);
+  background: var(--sa-card);
+  text-decoration: none;
+  color: var(--sa-ink);
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.adm .stat::after {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: var(--tone-soft);
+  opacity: 0.7;
+}
+
+.adm .stat-row > .stat:nth-child(4n + 2) {
+  --tone: var(--sa-violet);
+  --tone-soft: var(--sa-violet-soft);
+}
+
+.adm .stat-row > .stat:nth-child(4n + 3) {
+  --tone: var(--sa-orange);
+  --tone-soft: var(--sa-orange-soft);
+}
+
+.adm .stat-row > .stat:nth-child(4n + 4) {
+  --tone: var(--sa-green);
+  --tone-soft: var(--sa-green-soft);
+}
+
+.adm .stat.is-link:hover {
+  box-shadow: var(--sa-shadow);
+  transform: translateY(-2px);
+}
+
+.adm .stat-value {
+  position: relative;
+  z-index: 1;
+  color: var(--tone);
+  font: 700 28px/1.1 var(--sa-display);
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.adm .stat-label {
+  position: relative;
+  z-index: 1;
+  margin-top: 4px;
+  color: var(--sa-ink);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.adm .attention {
+  margin-bottom: 28px;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.adm .attention-item {
+  border: 1px solid var(--sa-line);
+  border-left: 4px solid var(--sa-orange);
+  border-radius: 12px;
+  background: var(--sa-card);
+  color: var(--sa-ink);
+  text-decoration: none;
+}
+
+.adm .attention-item:hover {
+  box-shadow: var(--sa-shadow);
+}
+
+.adm .attention-item b {
+  color: var(--sa-orange);
+  font-family: var(--sa-display);
+}
+
+/* --- lists: the company app's table ------------------------------------ */
+
+.adm .list-controls .search,
+.adm .list-controls select,
+.adm input[type='text'],
+.adm input[type='email'],
+.adm input[type='search'],
+.adm input:not([type]),
+.adm select,
+.adm textarea {
+  border: 1.5px solid var(--sa-line);
+  border-radius: 10px;
+  background: var(--sa-card);
+  color: var(--sa-ink);
+  font: inherit;
+}
+
+.adm .list-controls .search:focus,
+.adm .list-controls select:focus,
+.adm input:focus,
+.adm select:focus,
+.adm textarea:focus {
+  border-color: var(--sa-blue);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--sa-blue-soft);
+}
+
+.adm .table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--sa-line);
+  border-radius: var(--sa-radius);
+  background: var(--sa-card);
+}
+
+.adm .data-table {
+  font-size: 13.5px;
+}
+
+.adm .data-table thead th {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--sa-line);
+  background: none;
+  color: var(--sa-ink-3);
+  font-family: var(--sans);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.adm .data-table tbody td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--sa-line);
+}
+
+.adm .data-table tbody tr:hover td {
+  background: var(--sa-soft);
+}
+
+.adm .row-link {
+  font-family: var(--sa-display);
+  font-weight: 700;
+  color: var(--sa-ink);
+}
+
+.adm .row-sub {
+  color: var(--sa-ink-3);
+  font-size: 12px;
+}
+
+.adm .count-chip {
+  border-radius: 999px;
+  background: var(--sa-blue-soft);
+  color: var(--sa-blue);
+  font-weight: 650;
+}
+
+/* Status pills: the apps' rounded chips, not the old monospace tags. */
+.adm .pill {
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: none;
+}
+
+.adm .empty {
+  border: 1.5px dashed var(--sa-line);
+  border-radius: var(--sa-radius);
+  background: var(--sa-soft);
+}
+
+.adm .empty h2 {
+  font-family: var(--sa-display);
+}
+
+.adm .alert {
+  border-radius: 10px;
+}
+
+/* --- the header's extras ------------------------------------------------- */
+
+.adm-tenant {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: 1.5px solid var(--sa-line);
+  border-radius: 999px;
+  color: var(--sa-ink-2) !important;
+  font-size: 13px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.adm-tenant b {
+  color: var(--sa-ink);
+  font-weight: 650;
+}
+
+.adm-tenant:hover {
+  border-color: var(--sa-ink-3);
+}
+
+/* Six places across the top: on a phone they scroll sideways, not wrap. */
+.adm .sa-nav {
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.adm .sa-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.adm .sa-nav a {
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .adm-tenant-label {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .adm-tenant {
+    display: none;
+  }
+}

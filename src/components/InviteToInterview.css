@@ -1,0 +1,76 @@
+/* "Invite to interview": a short form that opens in place, like the offer form. */
+.iti-form {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+  padding: 18px;
+  border: 1px solid var(--sa-line);
+  border-radius: var(--sa-radius);
+  background: var(--sa-card);
+  box-shadow: var(--sa-shadow);
+}
+
+.iti-title {
+  margin: 0;
+  font-size: 16px;
+}
+
+.iti-field {
+  display: grid;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.iti-field i {
+  color: var(--sa-ink-3);
+  font-style: normal;
+  font-weight: 500;
+}
+
+.iti-field input,
+.iti-field select,
+.iti-field textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--sa-line);
+  border-radius: 10px;
+  background: var(--sa-card);
+  color: var(--sa-ink);
+  font: inherit;
+  font-weight: 500;
+}
+
+.iti-field textarea {
+  resize: vertical;
+}
+
+.iti-loading,
+.iti-warn {
+  color: var(--sa-ink-2);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.iti-warn a {
+  color: var(--sa-blue);
+}
+
+.iti-error {
+  margin: 0;
+  color: var(--sa-red);
+  font-size: 13px;
+}
+
+.iti-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.iti-sent {
+  color: var(--sa-green);
+  font-size: 13.5px;
+  font-weight: 600;
+}

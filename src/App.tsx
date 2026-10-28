@@ -5,9 +5,6 @@ import TenantLogin from './pages/TenantLogin';
 import CampusConsent from './pages/campus/Consent';
 import CampusAlumni from './pages/campus/Alumni';
 import CampusFlags from './pages/campus/Flags';
-import AdminInstitutionRules from './pages/admin/InstitutionRules';
-import AdminInterviewQuestions from './pages/admin/InterviewQuestions';
-import AdminCompanyAccess from './pages/admin/CompanyAccess';
 import Status from './pages/Status';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import Colleges from './pages/admin/Colleges';
@@ -17,16 +14,15 @@ import Setup from './pages/admin/Setup';
 import MapDataPage from './pages/admin/MapDataPage';
 import CampusPrograms from './pages/campus/Programs';
 import { Companies, CompanyDetailPage } from './pages/admin/Companies';
+import { Batches as AdminBatches, Invites, Users } from './pages/admin/Operations';
 import {
-  Applications as AdminApplications,
-  Audit,
-  Batches as AdminBatches,
-  Drives as AdminDrives,
-  Invites,
-  Jobs as AdminJobs,
-  Students as AdminStudents,
-  Users,
-} from './pages/admin/Operations';
+  AdminInterviews,
+  AdminOffers,
+  AdminSimulations,
+  AdminStudents,
+  AdminWork,
+} from './pages/admin/StudentActivityPages';
+import ConsoleStudents from './pages/platform/ConsoleStudents';
 import Settings from './pages/admin/Settings';
 import Roles from './pages/admin/Roles';
 import Logins from './pages/admin/Logins';
@@ -45,6 +41,11 @@ import CompanyAnalytics from './pages/company-app/Analytics';
 import { CompanyOffers } from './pages/company-app/Offers';
 import { CompanyReviews, CompanyShared } from './pages/company-app/Work';
 import { CompanyInterviewList, CompanyInterviewEditor } from './pages/company-app/Interviews';
+import CompanyInterviewInvite from './pages/company-app/InterviewInvite';
+import StudentInterviews from './pages/student-app/Interviews';
+import StudentCertificates from './pages/student-app/Certificates';
+import StudentJobDetail from './pages/student-app/JobDetail';
+import CompanyJobApplicants from './pages/company-app/JobApplicants';
 import { CompanyJobList, CompanyJobEditor } from './pages/company-app/Jobs';
 import CompanySignup from './pages/signup/CompanySignup';
 import InstitutionSignup from './pages/signup/InstitutionSignup';
@@ -67,9 +68,6 @@ import SuperHome from './pages/super/SuperHome';
 import Onboarding from './pages/platform/Onboarding';
 import ConsoleCompanies from './pages/platform/ConsoleCompanies';
 import CampusReports from './pages/campus/Reports';
-import AdminReports from './pages/admin/Reports';
-import AdminPulse from './pages/admin/Pulse';
-import AdminNotices from './pages/admin/Notices';
 import CampusInternships from './pages/campus/Internships';
 import CampusReadiness from './pages/campus/Readiness';
 import CampusStories from './pages/campus/Stories';
@@ -81,7 +79,6 @@ import CertificateCheck from './pages/CertificateCheck';
 import CampusOffers from './pages/campus/Offers';
 import CampusPools from './pages/campus/Pools';
 import CampusSkills from './pages/campus/Skills';
-import AdminSkillDemand from './pages/admin/SkillDemand';
 import CampusMessages from './pages/campus/Messages';
 import CampusCampusWeeks from './pages/campus/CampusWeeks';
 
@@ -107,9 +104,6 @@ export default function App() {
       {(
         [
           ['/campus/reports', 'CAMPUS', <CampusReports key="cr" />],
-          ['/admin/pulse', 'ADMIN', <AdminPulse key="apu" />],
-          ['/admin/notices', 'ADMIN', <AdminNotices key="ano" />],
-          ['/admin/reports', 'ADMIN', <AdminReports key="ar" />],
           // Phase 2
           ['/campus/internships', 'CAMPUS', <CampusInternships key="ci" />],
           ['/campus/readiness', 'CAMPUS', <CampusReadiness key="crd" />],
@@ -121,20 +115,32 @@ export default function App() {
           ['/campus/consent', 'CAMPUS', <CampusConsent key="ccn" />],
           ['/campus/alumni', 'CAMPUS', <CampusAlumni key="cal" />],
           ['/campus/flags', 'CAMPUS', <CampusFlags key="cfl" />],
-          ['/admin/institution-rules', 'ADMIN', <AdminInstitutionRules key="air" />],
-          ['/admin/interview-questions', 'ADMIN', <AdminInterviewQuestions key="aiq" />],
-          ['/admin/company-access', 'ADMIN', <AdminCompanyAccess key="aca" />],
           // Phase 3
           ['/campus/offers', 'CAMPUS', <CampusOffers key="co" />],
           ['/campus/pools', 'CAMPUS', <CampusPools key="cpo" />],
           ['/campus/skills', 'CAMPUS', <CampusSkills key="csk" />],
-          ['/admin/skill-demand', 'ADMIN', <AdminSkillDemand key="ask" />],
           ['/campus/messages', 'CAMPUS', <CampusMessages key="cms" />],
           ['/campus/events', 'CAMPUS', <CampusCampusWeeks key="caw" />],
           ['/campus/campus-weeks', 'CAMPUS', <Navigate key="cawo" to="/campus/events" replace />],
         ] as const
       ).map(([path, role, page]) => (
         <Route key={path} path={path} element={<RequireAuth roles={[role]}>{page}</RequireAuth>} />
+      ))}
+      {/* The old placement screens are gone; anything bookmarked lands on the overview. */}
+      {[
+        '/admin/drives',
+        '/admin/jobs',
+        '/admin/applications',
+        '/admin/audit',
+        '/admin/pulse',
+        '/admin/notices',
+        '/admin/reports',
+        '/admin/institution-rules',
+        '/admin/interview-questions',
+        '/admin/company-access',
+        '/admin/skill-demand',
+      ].map((path) => (
+        <Route key={path} path={path} element={<Navigate to="/admin" replace />} />
       ))}
       <Route path="/join/:code" element={<JoinBatch />} />
       {/* Open sign-up: any student, from any college, no code and no approval. */}
@@ -171,6 +177,14 @@ export default function App() {
         element={
           <RequireAuth roles={['ADMIN']} platform>
             <ConsoleReviews />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/platform/students"
+        element={
+          <RequireAuth roles={['ADMIN']} platform>
+            <ConsoleStudents />
           </RequireAuth>
         }
       />
@@ -311,6 +325,38 @@ export default function App() {
         }
       />
       <Route
+        path="/admin/simulations"
+        element={
+          <RequireAuth roles={['ADMIN']}>
+            <AdminSimulations />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/admin/work"
+        element={
+          <RequireAuth roles={['ADMIN']}>
+            <AdminWork />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/admin/offers"
+        element={
+          <RequireAuth roles={['ADMIN']}>
+            <AdminOffers />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/admin/interviews"
+        element={
+          <RequireAuth roles={['ADMIN']}>
+            <AdminInterviews />
+          </RequireAuth>
+        }
+      />
+      <Route
         path="/admin/invites"
         element={
           <RequireAuth roles={['ADMIN']}>
@@ -331,38 +377,6 @@ export default function App() {
         element={
           <RequireAuth roles={['ADMIN']}>
             <AdminBatchDetail />
-          </RequireAuth>
-        }
-      />
-      <Route
-        path="/admin/drives"
-        element={
-          <RequireAuth roles={['ADMIN']}>
-            <AdminDrives />
-          </RequireAuth>
-        }
-      />
-      <Route
-        path="/admin/jobs"
-        element={
-          <RequireAuth roles={['ADMIN']}>
-            <AdminJobs />
-          </RequireAuth>
-        }
-      />
-      <Route
-        path="/admin/applications"
-        element={
-          <RequireAuth roles={['ADMIN']}>
-            <AdminApplications />
-          </RequireAuth>
-        }
-      />
-      <Route
-        path="/admin/audit"
-        element={
-          <RequireAuth roles={['ADMIN']}>
-            <Audit />
           </RequireAuth>
         }
       />
@@ -469,6 +483,14 @@ export default function App() {
         }
       />
       <Route
+        path="/student/interviews"
+        element={
+          <RequireAuth roles={['CANDIDATE']}>
+            <StudentInterviews />
+          </RequireAuth>
+        }
+      />
+      <Route
         path="/student/jobs"
         element={
           <RequireAuth roles={['CANDIDATE']}>
@@ -481,6 +503,30 @@ export default function App() {
         element={
           <RequireAuth roles={['CANDIDATE']}>
             <StudentTaskPlayer />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/student/jobs/:id"
+        element={
+          <RequireAuth roles={['CANDIDATE']}>
+            <StudentJobDetail />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/company/jobs/:id/applicants"
+        element={
+          <RequireAuth roles={['COMPANY']}>
+            <CompanyJobApplicants />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/student/certificates"
+        element={
+          <RequireAuth roles={['CANDIDATE']}>
+            <StudentCertificates />
           </RequireAuth>
         }
       />
@@ -573,6 +619,14 @@ export default function App() {
         element={
           <RequireAuth roles={['COMPANY']}>
             <CompanyInterviewEditor />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/company/interviews/invites/:inviteId"
+        element={
+          <RequireAuth roles={['COMPANY']}>
+            <CompanyInterviewInvite />
           </RequireAuth>
         }
       />

@@ -4,22 +4,60 @@ import { ApiError } from '../../api/client';
 import {
   interviewProcessApi,
   PROCESS_TYPE_LABELS,
+  QUESTION_TYPE_LABELS,
   ROUND_TYPE_LABELS,
   ROUND_TYPE_ICONS,
   ROUND_TYPE_HINTS,
-  ROUND_TYPES,
   STATUS_LABELS,
   type CreateProcessInput,
   type InterviewProcess,
   type InterviewProcessSummary,
   type InterviewProcessStatus,
+  type QuestionPack,
+  type QuestionType,
   type RoundInput,
-  type RoundType,
 } from '../../api/companyInterviews';
+import type { JobOption } from '../../api/jobs';
+import { companyInviteApi, INVITE_STATUS, type CompanyInvite } from '../../api/interviewInvites';
 import Frame from './Frame';
 import './interviews.css';
 
 const msg = (e: unknown, fallback: string) => (e instanceof ApiError ? e.message : fallback);
+const VIDEO = 'VIDEO_INTERVIEW';
+const SIMULATION = 'WORK_SIMULATION';
+const iconOf = (type: string) => ROUND_TYPE_ICONS[type] ?? '🧩';
+const dayText = (iso: string) => new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+
+/** The students a company has invited, with where each one is. */
+function InviteRows({ invites }: { invites: CompanyInvite[] }) {
+  return (
+    <ul className="ip-invites">
+      {invites.map((v) => {
+        const st = INVITE_STATUS[v.status];
+        const round = v.process.rounds.find((r) => r.order === v.currentRoundOrder);
+        return (
+          <li key={v.id}>
+            <Link to={`/company/interviews/invites/${v.id}`} className="ip-invite-row">
+              <span>
+                <b>{v.candidate.name}</b>
+                <small>
+                  {v.role} · {v.process.title}
+                  {v.candidate.college ? ` · ${v.candidate.college}` : ''}
+                </small>
+              </span>
+              <span className="ip-invite-where">
+                {v.status === 'ACCEPTED' && round
+                  ? `Round ${round.order} of ${v.process.rounds.length}: ${round.name}`
+                  : `Invited ${dayText(v.createdAt)}`}
+              </span>
+              <span className={`sa-status ${st.tone}`}>{st.label}</span>
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
 
 /* ─── List ──────────────────────────────────────────────────────────────── */
 
@@ -27,6 +65,7 @@ export function CompanyInterviewList() {
   const [rows, setRows] = useState<InterviewProcessSummary[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [invites, setInvites] = useState<CompanyInvite[] | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,6 +73,10 @@ export function CompanyInterviewList() {
       .list()
       .then(setRows)
       .catch((e) => setError(msg(e, 'Could not load interview processes.')));
+    companyInviteApi
+      .list()
+      .then(setInvites)
+      .catch(() => setInvites([]));
   }, []);
 
   async function remove(id: string, title: string) {
@@ -103,6 +146,14 @@ export function CompanyInterviewList() {
                     <span className="ip-rounds-pill">
                       {p.roundCount} round{p.roundCount === 1 ? '' : 's'}
                     </span>
+                    {p.inviteCount > 0 && (
+                      <>
+                        <span className="ip-meta-dot" />
+                        <span>
+                          {p.inviteCount} student{p.inviteCount === 1 ? '' : 's'} invited
+                        </span>
+                      </>
+                    )}
                     <span className="ip-meta-dot" />
                     <span>
                       Updated{' '}
@@ -118,19 +169,33 @@ export function CompanyInterviewList() {
                   <Link to={`/company/interviews/${p.id}`} className="sa-btn is-ghost ip-card-edit-btn">
                     Edit
                   </Link>
-                  <button
-                    type="button"
-                    className="ip-card-del-btn"
-                    disabled={deleting === p.id}
-                    onClick={() => void remove(p.id, p.title)}
-                  >
-                    {deleting === p.id ? '…' : 'Delete'}
-                  </button>
+                  {p.inviteCount === 0 && (
+                    <button
+                      type="button"
+                      className="ip-card-del-btn"
+                      disabled={deleting === p.id}
+                      onClick={() => void remove(p.id, p.title)}
+                    >
+                      {deleting === p.id ? '…' : 'Delete'}
+                    </button>
+                  )}
                 </div>
               </li>
             ))}
           </ul>
         )}
+
+        <section className="ip-invited">
+          <h2>Students you invited</h2>
+          {invites === null && <p className="sa-loading">Loading…</p>}
+          {invites && invites.length === 0 && (
+            <p className="ip-muted">
+              No one yet. Invite a student from their work - under Students' work, Shared with you, or a simulation's
+              analytics.
+            </p>
+          )}
+          {invites && invites.length > 0 && <InviteRows invites={invites} />}
+        </section>
       </div>
     </Frame>
   );
@@ -141,17 +206,36 @@ export function CompanyInterviewList() {
 let seq = 0;
 const uid = () => `r${seq++}`;
 
-interface RoundDraft extends RoundInput {
+interface QuestionDraft {
   _key: string;
-  expanded: boolean;
+  text: string;
+  hint: string;
+  type: QuestionType;
 }
 
-function blankRound(type: RoundType, order: number): RoundDraft {
+interface RoundDraft extends Omit<RoundInput, 'questions'> {
+  _key: string;
+  expanded: boolean;
+  questions: QuestionDraft[];
+}
+
+const blankQuestion = (text = '', type: QuestionType = 'behavioural', hint = ''): QuestionDraft => ({
+  _key: uid(),
+  text,
+  hint,
+  type,
+});
+
+function blankRound(type: string, label: string, order: number): RoundDraft {
   return {
     _key: uid(),
     order,
-    name: ROUND_TYPE_LABELS[type] ?? type,
+    name: label,
     type,
+    questions: type === VIDEO ? [blankQuestion()] : [],
+    questionTimeSec: type === VIDEO ? 90 : undefined,
+    prepTimeSec: type === VIDEO ? 30 : undefined,
+    simulationId: undefined,
     isElimination: false,
     description: '',
     isOnline: type === 'MCQ_TEST' || type === 'VIDEO_INTERVIEW',
@@ -169,6 +253,10 @@ interface RoundCardProps {
   round: RoundDraft;
   index: number;
   total: number;
+  types: JobOption[];
+  modes: JobOption[];
+  sims: { id: string; title: string }[];
+  packs: QuestionPack[];
   onToggle: () => void;
   onMove: (dir: -1 | 1) => void;
   onRemove: () => void;
@@ -183,6 +271,10 @@ function RoundCard({
   round: r,
   index: i,
   total,
+  types,
+  modes,
+  sims,
+  packs,
   onToggle,
   onMove,
   onRemove,
@@ -193,6 +285,16 @@ function RoundCard({
   isDragOver,
 }: RoundCardProps) {
   const dragRef = useRef<HTMLLIElement>(null);
+  const labelOf = (type: string) => types.find((t) => t.value === type)?.label ?? ROUND_TYPE_LABELS[type] ?? type;
+  const setQuestion = (key: string, patch: Partial<QuestionDraft>) =>
+    onUpdate({ questions: r.questions.map((q) => (q._key === key ? { ...q, ...patch } : q)) });
+  const moveQuestion = (k: number, dir: -1 | 1) => {
+    const list = [...r.questions];
+    const j = k + dir;
+    if (j < 0 || j >= list.length) return;
+    [list[k], list[j]] = [list[j]!, list[k]!];
+    onUpdate({ questions: list });
+  };
 
   return (
     <li
@@ -212,11 +314,12 @@ function RoundCard({
       <div className="ip-round-main">
         {/* Summary row */}
         <div className="ip-round-summary" onClick={onToggle}>
-          <span className="ip-round-type-icon">{ROUND_TYPE_ICONS[r.type]}</span>
+          <span className="ip-round-type-icon">{iconOf(r.type)}</span>
           <div className="ip-round-summary-text">
-            <b>{r.name || ROUND_TYPE_LABELS[r.type]}</b>
+            <b>{r.name || labelOf(r.type)}</b>
             <span>
-              {ROUND_TYPE_LABELS[r.type]}
+              {labelOf(r.type)}
+              {r.type === VIDEO ? ` · ${r.questions.length} question${r.questions.length === 1 ? '' : 's'}` : ''}
               {r.durationMin ? ` · ${r.durationMin} min` : ''}
               {r.isElimination ? ' · Eliminating' : ''}
               {r.isOnline ? ' · Online' : ' · In-person'}
@@ -235,7 +338,7 @@ function RoundCard({
                   type="text"
                   value={r.name}
                   maxLength={80}
-                  placeholder={ROUND_TYPE_LABELS[r.type]}
+                  placeholder={labelOf(r.type)}
                   onChange={(e) => onUpdate({ name: e.target.value })}
                 />
               </div>
@@ -243,16 +346,20 @@ function RoundCard({
                 <label className="ip-label">Round type</label>
                 <select
                   value={r.type}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const type = e.target.value;
                     onUpdate({
-                      type: e.target.value as RoundType,
-                      isOnline: e.target.value === 'MCQ_TEST' || e.target.value === 'VIDEO_INTERVIEW',
-                    })
-                  }
+                      type,
+                      isOnline: type === 'MCQ_TEST' || type === VIDEO || type === SIMULATION || r.isOnline,
+                      questions: type === VIDEO && !r.questions.length ? [blankQuestion()] : r.questions,
+                      questionTimeSec: type === VIDEO ? (r.questionTimeSec ?? 90) : undefined,
+                      prepTimeSec: type === VIDEO ? (r.prepTimeSec ?? 30) : undefined,
+                    });
+                  }}
                 >
-                  {ROUND_TYPES.map((t) => (
-                    <option key={t} value={t}>
-                      {ROUND_TYPE_ICONS[t]} {ROUND_TYPE_LABELS[t]}
+                  {types.map((t) => (
+                    <option key={t.value} value={t.value}>
+                      {iconOf(t.value)} {t.label}
                     </option>
                   ))}
                 </select>
@@ -263,7 +370,7 @@ function RoundCard({
               <label className="ip-label">What this round involves <i>optional</i></label>
               <textarea
                 rows={2}
-                placeholder={ROUND_TYPE_HINTS[r.type]}
+                placeholder={ROUND_TYPE_HINTS[r.type] ?? 'What happens in this round, and how to prepare.'}
                 value={r.description}
                 maxLength={400}
                 onChange={(e) => onUpdate({ description: e.target.value })}
@@ -299,12 +406,162 @@ function RoundCard({
                 <label className="ip-label">Mode</label>
                 <select value={r.mode ?? ''} onChange={(e) => onUpdate({ mode: e.target.value || undefined })}>
                   <option value="">Not specified</option>
-                  <option value="ON_CAMPUS">On campus</option>
-                  <option value="ONLINE">Online</option>
-                  <option value="AT_OFFICE">At our office</option>
+                  {modes.map((m) => (
+                    <option key={m.value} value={m.value}>
+                      {m.label}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
+
+            {r.type === SIMULATION && (
+              <div className="ip-field ip-special">
+                <label className="ip-label">Which simulation</label>
+                {sims.length === 0 ? (
+                  <p className="ip-muted">
+                    You have no live simulation yet. <Link to="/company/simulations">Write one</Link> - once Apli.ai
+                    approves it, you can use it as a round.
+                  </p>
+                ) : (
+                  <select value={r.simulationId ?? ''} onChange={(e) => onUpdate({ simulationId: e.target.value || undefined })}>
+                    <option value="">Choose one of your live simulations</option>
+                    {sims.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.title}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                <span className="ip-muted">Students do it in the app; you see their work as for any simulation.</span>
+              </div>
+            )}
+
+            {r.type === VIDEO && (
+              <div className="ip-special ip-video">
+                <div className="ip-round-row">
+                  <div className="ip-field">
+                    <label className="ip-label">Time to think, per question</label>
+                    <select value={r.prepTimeSec ?? 30} onChange={(e) => onUpdate({ prepTimeSec: Number(e.target.value) })}>
+                      {[0, 15, 30, 60, 120].map((v) => (
+                        <option key={v} value={v}>
+                          {v === 0 ? 'None - start recording at once' : `${v} seconds`}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="ip-field">
+                    <label className="ip-label">Time to answer, per question</label>
+                    <select
+                      value={r.questionTimeSec ?? 90}
+                      onChange={(e) => onUpdate({ questionTimeSec: Number(e.target.value) })}
+                    >
+                      {[30, 60, 90, 120, 180, 300].map((v) => (
+                        <option key={v} value={v}>
+                          {v < 120 ? `${v} seconds` : `${v / 60} minutes`}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="ip-q-head">
+                  <span className="ip-label">Questions ({r.questions.length} of 10)</span>
+                  {packs.length > 0 && (
+                    <select
+                      value=""
+                      aria-label="Add questions from a pack"
+                      onChange={(e) => {
+                        const pack = packs.find((p) => p.id === e.target.value);
+                        if (!pack) return;
+                        const added = pack.questions.map((q) =>
+                          blankQuestion(q.text, (q.type in QUESTION_TYPE_LABELS ? q.type : 'behavioural') as QuestionType, q.hint ?? ''),
+                        );
+                        const kept = r.questions.filter((q) => q.text.trim());
+                        onUpdate({ questions: [...kept, ...added].slice(0, 10) });
+                      }}
+                    >
+                      <option value="">＋ Add from a question pack…</option>
+                      {packs.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.title} ({p.questions.length})
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+                <ol className="ip-questions">
+                  {r.questions.map((q, k) => (
+                    <li key={q._key}>
+                      <span className="ip-q-num">{k + 1}</span>
+                      <div className="ip-q-body">
+                        <textarea
+                          rows={2}
+                          maxLength={600}
+                          placeholder="e.g. Tell us about a time you had to learn something quickly."
+                          value={q.text}
+                          onChange={(e) => setQuestion(q._key, { text: e.target.value })}
+                        />
+                        <div className="ip-q-row">
+                          <select
+                            value={q.type}
+                            aria-label="Kind of question"
+                            onChange={(e) => setQuestion(q._key, { type: e.target.value as QuestionType })}
+                          >
+                            {(Object.keys(QUESTION_TYPE_LABELS) as QuestionType[]).map((t) => (
+                              <option key={t} value={t}>
+                                {QUESTION_TYPE_LABELS[t]}
+                              </option>
+                            ))}
+                          </select>
+                          <input
+                            type="text"
+                            maxLength={400}
+                            placeholder="A hint the student sees before recording (optional)"
+                            value={q.hint}
+                            onChange={(e) => setQuestion(q._key, { hint: e.target.value })}
+                          />
+                        </div>
+                      </div>
+                      <div className="ip-q-tools">
+                        <button type="button" className="ip-icon-btn" title="Move up" disabled={k === 0} onClick={() => moveQuestion(k, -1)}>
+                          ↑
+                        </button>
+                        <button
+                          type="button"
+                          className="ip-icon-btn"
+                          title="Move down"
+                          disabled={k === r.questions.length - 1}
+                          onClick={() => moveQuestion(k, 1)}
+                        >
+                          ↓
+                        </button>
+                        <button
+                          type="button"
+                          className="ip-icon-btn is-danger"
+                          title="Remove question"
+                          disabled={r.questions.length === 1}
+                          onClick={() => onUpdate({ questions: r.questions.filter((x) => x._key !== q._key) })}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+                {r.questions.length < 10 && (
+                  <button
+                    type="button"
+                    className="sa-btn is-ghost is-small"
+                    onClick={() => onUpdate({ questions: [...r.questions, blankQuestion()] })}
+                  >
+                    ＋ Add a question
+                  </button>
+                )}
+                <span className="ip-muted">
+                  Students see one question at a time, get the time to think, then record their answer in the app.
+                </span>
+              </div>
+            )}
 
             {/* Location toggle */}
             <div className="ip-location-row">
@@ -400,6 +657,63 @@ export function CompanyInterviewEditor() {
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [showRoundPicker, setShowRoundPicker] = useState(false);
+  const [types, setTypes] = useState<JobOption[]>([]);
+  const [modes, setModes] = useState<JobOption[]>([]);
+  const [sims, setSims] = useState<{ id: string; title: string }[]>([]);
+  const [packs, setPacks] = useState<QuestionPack[]>([]);
+  const [newType, setNewType] = useState('');
+  const [addingType, setAddingType] = useState(false);
+  const [invites, setInvites] = useState<CompanyInvite[]>([]);
+  const [copying, setCopying] = useState(false);
+  const locked = Boolean(process && !process.editable);
+
+  useEffect(() => {
+    interviewProcessApi
+      .options()
+      .then((o) => {
+        setTypes(o.ROUND_TYPE ?? []);
+        setModes(o.ROUND_MODE ?? []);
+      })
+      .catch(() => undefined);
+    interviewProcessApi.simulations().then(setSims).catch(() => undefined);
+    interviewProcessApi.packs().then(setPacks).catch(() => undefined);
+  }, []);
+
+  useEffect(() => {
+    if (isNew) return;
+    companyInviteApi
+      .list()
+      .then((all) => setInvites(all.filter((v) => v.process.id === id)))
+      .catch(() => undefined);
+  }, [id, isNew]);
+
+  async function addOwnType() {
+    if (!newType.trim()) return;
+    setAddingType(true);
+    try {
+      const opt = await interviewProcessApi.addRoundType(newType.trim());
+      setTypes((t) => [...t.filter((x) => x.value !== opt.value), opt]);
+      setNewType('');
+      addRound(opt.value, opt.label);
+    } catch (e) {
+      setSaveError(msg(e, 'Could not add that kind of round.'));
+    } finally {
+      setAddingType(false);
+    }
+  }
+
+  async function duplicate() {
+    if (!id) return;
+    setCopying(true);
+    try {
+      const copy = await interviewProcessApi.duplicate(id);
+      navigate(`/company/interviews/${copy.id}`);
+    } catch (e) {
+      setSaveError(msg(e, 'Could not copy this process.'));
+    } finally {
+      setCopying(false);
+    }
+  }
 
   // drag state
   const dragKey = useRef<string | null>(null);
@@ -420,8 +734,12 @@ export function CompanyInterviewEditor() {
             _key: uid(),
             order: r.order,
             name: r.name,
-            type: r.type as RoundType,
+            type: r.type,
             isElimination: r.isElimination,
+            questionTimeSec: r.questionTimeSec ?? undefined,
+            prepTimeSec: r.prepTimeSec ?? undefined,
+            simulationId: r.simulationId ?? undefined,
+            questions: r.questions.map((q) => blankQuestion(q.text, q.type, q.hint ?? '')),
             description: r.description ?? '',
             isOnline: r.isOnline,
             durationMin: r.durationMin ?? undefined,
@@ -458,8 +776,9 @@ export function CompanyInterviewEditor() {
     markDirty();
   }
 
-  function addRound(type: RoundType) {
-    setRounds((rs) => [...rs, blankRound(type, rs.length + 1)]);
+  function addRound(type: string, label?: string) {
+    const name = label ?? types.find((t) => t.value === type)?.label ?? ROUND_TYPE_LABELS[type] ?? type;
+    setRounds((rs) => [...rs, blankRound(type, name, rs.length + 1)]);
     setShowRoundPicker(false);
     markDirty();
   }
@@ -506,7 +825,7 @@ export function CompanyInterviewEditor() {
       } else {
         saved_process = await interviewProcessApi.update(id!, { ...payload, status });
       }
-      const roundPayload: RoundInput[] = rounds.map(({ _key, expanded, ...r }) => ({
+      const roundPayload: RoundInput[] = rounds.map(({ _key, expanded, questions, ...r }) => ({
         ...r,
         description: r.description || undefined,
         meetingLink: r.meetingLink || undefined,
@@ -514,8 +833,16 @@ export function CompanyInterviewEditor() {
         durationMin: r.durationMin || undefined,
         shortlistCount: r.shortlistCount || undefined,
         mode: r.mode || undefined,
+        simulationId: r.type === SIMULATION ? r.simulationId || undefined : undefined,
+        questions:
+          r.type === VIDEO
+            ? questions.filter((q) => q.text.trim()).map((q) => ({ text: q.text.trim(), hint: q.hint.trim() || undefined, type: q.type }))
+            : [],
       }));
-      const updated = await interviewProcessApi.setRounds(saved_process.id, roundPayload);
+      // Students are in it: only the details and status can change.
+      const updated = locked
+        ? await interviewProcessApi.get(saved_process.id)
+        : await interviewProcessApi.setRounds(saved_process.id, roundPayload);
       setProcess(updated);
       setDirty(false);
       setSaved(true);
@@ -590,6 +917,17 @@ export function CompanyInterviewEditor() {
         </div>
 
         {saveError && <p className="sa-alert" style={{ marginBottom: 16 }}>{saveError}</p>}
+        {locked && (
+          <div className="ip-locked">
+            <span>
+              <b>Students are going through this process,</b> so its rounds are fixed - changing them would move
+              people mid-interview. You can still rename it or archive it. To change the rounds, make a copy.
+            </span>
+            <button type="button" className="sa-btn is-ghost is-small" onClick={() => void duplicate()} disabled={copying}>
+              {copying ? 'Copying…' : 'Duplicate to edit'}
+            </button>
+          </div>
+        )}
 
         {/* ── Two-column layout ── */}
         <div className="ip-editor-grid">
@@ -695,6 +1033,7 @@ export function CompanyInterviewEditor() {
                 )}
 
                 {rounds.length > 0 && (
+                  <fieldset className="ip-rounds-fieldset" disabled={locked}>
                   <ol className="ip-rounds">
                     {rounds.map((r, i) => (
                       <RoundCard
@@ -710,31 +1049,59 @@ export function CompanyInterviewEditor() {
                         onDragOver={handleDragOver}
                         onDrop={handleDrop}
                         isDragOver={dragOverKey === r._key}
+                        types={types}
+                        modes={modes}
+                        sims={sims}
+                        packs={packs}
                       />
                     ))}
                   </ol>
+                  </fieldset>
                 )}
 
                 {/* Add round picker */}
-                {showRoundPicker ? (
+                {locked ? null : showRoundPicker ? (
                   <div className="ip-add-round-picker">
                     <div className="ip-picker-header">
                       <span>Choose a round type</span>
                       <button type="button" className="ip-icon-btn" onClick={() => setShowRoundPicker(false)}>×</button>
                     </div>
                     <div className="ip-picker-grid">
-                      {ROUND_TYPES.map((t) => (
+                      {types.map((t) => (
                         <button
-                          key={t}
+                          key={t.value}
                           type="button"
                           className="ip-picker-card"
-                          onClick={() => addRound(t)}
+                          onClick={() => addRound(t.value, t.label)}
                         >
-                          <span className="ip-picker-icon">{ROUND_TYPE_ICONS[t]}</span>
-                          <b>{ROUND_TYPE_LABELS[t]}</b>
-                          <span>{ROUND_TYPE_HINTS[t]}</span>
+                          <span className="ip-picker-icon">{iconOf(t.value)}</span>
+                          <b>{t.label}</b>
+                          <span>{ROUND_TYPE_HINTS[t.value] ?? 'A kind of round you added'}</span>
                         </button>
                       ))}
+                    </div>
+                    <div className="ip-own-type">
+                      <input
+                        type="text"
+                        maxLength={60}
+                        placeholder="Your own kind of round, e.g. Machine test"
+                        value={newType}
+                        onChange={(e) => setNewType(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            void addOwnType();
+                          }
+                        }}
+                      />
+                      <button
+                        type="button"
+                        className="sa-btn is-ghost is-small"
+                        disabled={!newType.trim() || addingType}
+                        onClick={() => void addOwnType()}
+                      >
+                        {addingType ? 'Adding…' : 'Add it'}
+                      </button>
                     </div>
                   </div>
                 ) : (
@@ -748,6 +1115,27 @@ export function CompanyInterviewEditor() {
                 )}
               </div>
             </section>
+
+            {!isNew && (
+              <section className="ip-section">
+                <div className="ip-section-head">
+                  <div>
+                    <h2>Students in this process</h2>
+                    <p>Open one to watch their answers and give your verdict on each round.</p>
+                  </div>
+                </div>
+                <div className="ip-section-body">
+                  {invites.length === 0 ? (
+                    <p className="ip-muted">
+                      No one invited yet. Invite a student from their work - Students' work, Shared with you, or a
+                      simulation's analytics.
+                    </p>
+                  ) : (
+                    <InviteRows invites={invites} />
+                  )}
+                </div>
+              </section>
+            )}
           </div>
 
         </div>

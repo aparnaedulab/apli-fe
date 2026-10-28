@@ -218,9 +218,9 @@ export default function Console() {
                     <button
                       type="button"
                       className="btn btn-secondary"
-                      onClick={() => enter(t, '/admin/pulse')}
+                      onClick={() => enter(t, '/admin/students')}
                     >
-                      Activity
+                      Students
                     </button>
                   )}
                   <Link to={`/platform/tenants/${t.id}/review`} className="btn btn-ghost">

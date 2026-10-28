@@ -379,7 +379,7 @@ function WorkStack({ motion }: { motion: boolean }) {
     return () => window.clearInterval(t);
   }, [motion]);
 
-  const tasks = ['Read the brief from the team', 'Design and build the endpoint', 'Explain your work on a 10-minute call'];
+  const tasks = ['Set up your environment', 'Fix the stock price feed', 'Show traders the ratio'];
   const done = Math.min(beat, 3);
   const pct = Math.round((done / tasks.length) * 100);
 
@@ -395,10 +395,10 @@ function WorkStack({ motion }: { motion: boolean }) {
     >
       <div className="lp-stack-tilt">
         <div className="lp-card lp-card-role">
-          <span className="lp-co-tile is-blue">IS</span>
+          <span className="lp-co-tile is-blue">JP</span>
           <div>
             <b>Software Engineering</b>
-            <i>Indus Systems · 5 hrs · 3 tasks</i>
+            <i>JPMorgan Chase &amp; Co. · 5 hrs · 3 tasks</i>
           </div>
           <span className="lp-pill">Software</span>
         </div>
@@ -425,14 +425,14 @@ function WorkStack({ motion }: { motion: boolean }) {
         <div className={`lp-card lp-card-cert ${beat >= 4 ? 'is-stamped' : ''}`}>
           <span className="lp-cert-label">Certificate</span>
           <b>Software Engineering</b>
-          <i>Indus Systems · verified by code</i>
+          <i>JPMorgan Chase &amp; Co. · verified by code</i>
           <span className="lp-cert-code">Q9VT URDE 69</span>
           <span className="lp-cert-seal">✓</span>
         </div>
 
         <div className={`lp-note ${beat >= 5 ? 'is-on' : ''}`}>
           <span className="lp-note-dot" />
-          Profile shared with Indus Systems
+          Profile shared with JPMorgan Chase &amp; Co.
         </div>
       </div>
     </div>
@@ -453,14 +453,21 @@ interface Employer {
   line: string;
 }
 
-/** The demo companies, as seeded. Shown as samples everywhere they appear. */
+/** The companies with simulations on Apli.ai, as seeded for the demo. */
 const EMPLOYERS: Employer[] = [
-  { name: 'Indus Systems', tile: 'IS', tone: 'blue', sector: 'IT services', simulations: 2, fields: ['Software', 'Testing'], line: 'Build and test the services their clients run on.' },
-  { name: 'Northwind Analytics', tile: 'NA', tone: 'green', sector: 'Data and analytics', simulations: 1, fields: ['Data'], line: 'Turn a messy sales file into a story a manager can act on.' },
-  { name: 'Harbour Fintech', tile: 'HF', tone: 'orange', sector: 'Payments', simulations: 2, fields: ['Product', 'Security'], line: 'Improve a UPI flow, then defend it against a phishing attempt.' },
-  { name: 'Vertex Motors', tile: 'VM', tone: 'violet', sector: 'Electric vehicles', simulations: 1, fields: ['Engineering'], line: 'Find out why a battery pack runs hot, and say how to fix it.' },
-  { name: 'Zenith Labs', tile: 'ZL', tone: 'violet', sector: 'Product and design', simulations: 1, fields: ['Design'], line: 'Research, sketch and test a better first-time experience.' },
-  { name: 'Solace Health', tile: 'SH', tone: 'green', sector: 'Healthcare', simulations: 1, fields: ['Operations'], line: 'Cut the waiting time at a busy outpatient desk.' },
+  { name: 'JPMorgan Chase & Co.', tile: 'JP', tone: 'blue', sector: 'Banking', simulations: 1, fields: ['Software'], line: 'Fix a broken stock price feed and build the chart traders watch.' },
+  { name: 'Goldman Sachs', tile: 'GS', tone: 'violet', sector: 'Investment banking', simulations: 1, fields: ['Finance'], line: 'Work as a Controllers analyst and value a fund from its books.' },
+  { name: 'BCG', tile: 'BC', tone: 'green', sector: 'Strategy consulting', simulations: 1, fields: ['Consulting'], line: 'Find out why a client is losing customers and tell the partner what to do.' },
+  { name: 'Accenture', tile: 'AC', tone: 'violet', sector: 'IT services and consulting', simulations: 1, fields: ['Data'], line: 'Find the five most popular content categories for a social media client.' },
+  { name: 'Tata Group', tile: 'TA', tone: 'blue', sector: 'Conglomerate', simulations: 1, fields: ['Data'], line: 'Build the dashboard a CEO uses to decide where to expand.' },
+  { name: 'Mastercard', tile: 'MC', tone: 'orange', sector: 'Payments', simulations: 1, fields: ['Cybersecurity'], line: 'Design a phishing test and decide which teams need training.' },
+  { name: 'Deloitte', tile: 'DE', tone: 'green', sector: 'Professional services', simulations: 1, fields: ['Technology'], line: 'Find why factory machines keep stopping, and build the dashboard that catches it.' },
+  { name: 'PwC', tile: 'PW', tone: 'orange', sector: 'Professional services', simulations: 1, fields: ['Cybersecurity'], line: 'Find the missing controls in a client company supplier payments.' },
+  { name: 'Bank of America', tile: 'BA', tone: 'blue', sector: 'Banking', simulations: 1, fields: ['Finance'], line: 'Read a client annual report and screen an acquisition target.' },
+  { name: 'Johnson & Johnson', tile: 'JJ', tone: 'green', sector: 'MedTech', simulations: 1, fields: ['Engineering'], line: 'Diagnose why a surgical robot arm overshoots, and fix its controller.' },
+  { name: 'Electronic Arts', tile: 'EA', tone: 'violet', sector: 'Video games', simulations: 1, fields: ['Software'], line: 'Pitch a game feature, design its classes and fix a slow inventory.' },
+  { name: 'White & Case', tile: 'WC', tone: 'orange', sector: 'Law', simulations: 1, fields: ['Law'], line: 'Map a cross-border infrastructure deal and brief the client board.' },
+  { name: 'CBRE', tile: 'CB', tone: 'green', sector: 'Real estate', simulations: 1, fields: ['Operations'], line: 'Plan a showroom build and rescue the schedule.' },
 ];
 
 /** A wall of company tiles that rolls past; the second copy is only for the seam. */
@@ -557,16 +564,21 @@ interface Simulation {
   skills: string[];
 }
 
-/** The demo companies' simulations, as seeded. Shown as samples. */
+/** Their simulations, as seeded for the demo. */
 const SIMULATIONS: Simulation[] = [
-  { field: 'Software', company: 'Indus Systems', tile: 'IS', tone: 'blue', title: 'Software Engineering', hours: 5, tasks: 3, level: 'Intermediate', skills: ['Java', 'REST APIs', 'SQL'] },
-  { field: 'Software', company: 'Indus Systems', tile: 'IS', tone: 'blue', title: 'Quality Assurance', hours: 3, tasks: 3, level: 'Beginner', skills: ['Test design', 'Bug reporting', 'Edge cases'] },
-  { field: 'Data', company: 'Northwind Analytics', tile: 'NA', tone: 'green', title: 'Data Analytics', hours: 4, tasks: 3, level: 'Beginner', skills: ['Excel', 'SQL', 'Visualisation'] },
-  { field: 'Finance', company: 'Harbour Fintech', tile: 'HF', tone: 'orange', title: 'Fintech Product Analyst', hours: 5, tasks: 3, level: 'Intermediate', skills: ['Product thinking', 'UPI', 'Writing specs'] },
-  { field: 'Security', company: 'Harbour Fintech', tile: 'HF', tone: 'orange', title: 'Cybersecurity', hours: 4, tasks: 3, level: 'Intermediate', skills: ['Log analysis', 'Incident response', 'Phishing'] },
-  { field: 'Engineering', company: 'Vertex Motors', tile: 'VM', tone: 'violet', title: 'EV Battery Engineering', hours: 6, tasks: 4, level: 'Intermediate', skills: ['Battery systems', 'Thermal analysis', 'MATLAB'] },
-  { field: 'Design', company: 'Zenith Labs', tile: 'ZL', tone: 'violet', title: 'Product Design', hours: 4, tasks: 3, level: 'Beginner', skills: ['UX research', 'Figma', 'Prototyping'] },
-  { field: 'Healthcare', company: 'Solace Health', tile: 'SH', tone: 'green', title: 'Healthcare Operations', hours: 3, tasks: 3, level: 'Beginner', skills: ['Process mapping', 'Operations', 'Patient experience'] },
+  { field: 'Software', company: 'JPMorgan Chase & Co.', tile: 'JP', tone: 'blue', title: 'Software Engineering', hours: 5, tasks: 3, level: 'Intermediate', skills: ['Python', 'Git', 'Data feeds'] },
+  { field: 'Software', company: 'Electronic Arts', tile: 'EA', tone: 'violet', title: 'Software Engineering', hours: 4, tasks: 3, level: 'Intermediate', skills: ['Feature design', 'C++', 'Data structures'] },
+  { field: 'Data', company: 'Accenture', tile: 'AC', tone: 'violet', title: 'Data Analytics and Visualization', hours: 4, tasks: 4, level: 'Beginner', skills: ['Data cleaning', 'Data modelling', 'Storytelling'] },
+  { field: 'Data', company: 'Tata Group', tile: 'TA', tone: 'blue', title: 'Data Visualisation', hours: 3, tasks: 3, level: 'Beginner', skills: ['Dashboards', 'Power BI', 'Business insight'] },
+  { field: 'Finance', company: 'Goldman Sachs', tile: 'GS', tone: 'violet', title: 'Controllers', hours: 2, tasks: 2, level: 'Beginner', skills: ['Fund accounting', 'Excel', 'Reporting'] },
+  { field: 'Finance', company: 'Bank of America', tile: 'BA', tone: 'blue', title: 'Investment Banking', hours: 4, tasks: 3, level: 'Intermediate', skills: ['Financial analysis', 'M&A', 'Valuation'] },
+  { field: 'Consulting', company: 'BCG', tile: 'BC', tone: 'green', title: 'Strategy Consulting', hours: 4, tasks: 3, level: 'Intermediate', skills: ['Problem structuring', 'Data analysis', 'Presentations'] },
+  { field: 'Cybersecurity', company: 'Mastercard', tile: 'MC', tone: 'orange', title: 'Cybersecurity', hours: 2, tasks: 2, level: 'Beginner', skills: ['Phishing awareness', 'Security training'] },
+  { field: 'Cybersecurity', company: 'PwC', tile: 'PW', tone: 'orange', title: 'Cyber Security Consulting', hours: 4, tasks: 3, level: 'Intermediate', skills: ['Risk assessment', 'Controls', 'Business writing'] },
+  { field: 'Technology', company: 'Deloitte', tile: 'DE', tone: 'green', title: 'Technology Consulting', hours: 3, tasks: 3, level: 'Beginner', skills: ['Data analysis', 'Dashboards', 'Client advice'] },
+  { field: 'Engineering', company: 'Johnson & Johnson', tile: 'JJ', tone: 'green', title: 'Robotics and Controls', hours: 3, tasks: 3, level: 'Intermediate', skills: ['Control systems', 'Debugging', 'Testing'] },
+  { field: 'Law', company: 'White & Case', tile: 'WC', tone: 'orange', title: 'Commercial Law', hours: 4, tasks: 2, level: 'Intermediate', skills: ['Legal research', 'Deal structuring', 'Client briefing'] },
+  { field: 'Operations', company: 'CBRE', tile: 'CB', tone: 'green', title: 'Project Management', hours: 1, tasks: 2, level: 'Beginner', skills: ['Project planning', 'Risk analysis', 'Excel'] },
 ];
 
 const FIELDS = ['All fields', ...Array.from(new Set(SIMULATIONS.map((x) => x.field)))];
@@ -864,7 +876,7 @@ function Confidence() {
             <div className="lp-meter-bar">
               <span className="is-after" />
             </div>
-            <span className="lp-meter-say is-strong">“I did this for Indus Systems. Let me show you.”</span>
+            <span className="lp-meter-say is-strong">“I did this for JPMorgan. Let me show you.”</span>
           </div>
           <p className="lp-meter-note">An illustration of the idea, not a measurement.</p>
         </div>

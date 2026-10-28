@@ -748,17 +748,43 @@ export function HandIn({
   onSubmit,
   onCancel,
   kinds = ['text', 'link', 'file'],
+  draftKey,
 }: {
   /** The ways the company allows; all three when not said. */
   kinds?: ('text' | 'link' | 'file')[];
+  /**
+   * Where an unsent answer is kept in this browser, so a refresh or a closed
+   * tab loses nothing. The caller clears it once the hand-in goes through.
+   */
+  draftKey?: string;
   initial: { answer: string | null; link: string | null; fileUrl?: string | null; fileName?: string | null } | null;
   busy: boolean;
   errors: Record<string, string>;
   onSubmit: (body: HandInBody) => void;
   onCancel?: () => void;
 }) {
-  const [answer, setAnswer] = useState(initial?.answer ?? '');
-  const [link, setLink] = useState(initial?.link ?? '');
+  const draft = draftKey && !initial ? readDraft(draftKey) : null;
+  const [answer, setAnswer] = useState(initial?.answer ?? draft?.answer ?? '');
+  const [link, setLink] = useState(initial?.link ?? draft?.link ?? '');
+  const [savedAt, setSavedAt] = useState<number | null>(draft ? Date.now() : null);
+
+  // Keep the unsent answer as it is typed, a moment after the last key.
+  useEffect(() => {
+    if (!draftKey) return;
+    const t = window.setTimeout(() => {
+      try {
+        if (answer.trim() || link.trim()) {
+          window.localStorage.setItem(draftKey, JSON.stringify({ answer, link }));
+          setSavedAt(Date.now());
+        } else {
+          window.localStorage.removeItem(draftKey);
+        }
+      } catch {
+        // A browser that refuses storage just does without drafts.
+      }
+    }, 600);
+    return () => window.clearTimeout(t);
+  }, [draftKey, answer, link]);
   const [file, setFile] = useState<{ url: string; name: string } | null>(
     initial?.fileUrl ? { url: initial.fileUrl, name: initial.fileName ?? 'Your file' } : null,
   );
@@ -858,7 +884,10 @@ export function HandIn({
         )}
       </div>
       <div className="sa-handin-foot">
-        <span>{kinds.includes('text') ? `${answer.trim().split(/\s+/).filter(Boolean).length} words` : ''}</span>
+        <span>
+          {kinds.includes('text') ? `${answer.trim().split(/\s+/).filter(Boolean).length} words` : ''}
+          {draftKey && savedAt && (answer.trim() || link.trim()) ? <i className="sa-draft-saved"> · Draft saved</i> : null}
+        </span>
         {onCancel && (
           <button type="button" className="sa-quiet" onClick={onCancel}>
             Cancel
@@ -870,6 +899,16 @@ export function HandIn({
       </div>
     </form>
   );
+}
+
+/** An unsent hand-in kept in this browser, if there is one. */
+function readDraft(key: string): { answer?: string; link?: string } | null {
+  try {
+    const raw = window.localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as { answer?: string; link?: string }) : null;
+  } catch {
+    return null;
+  }
 }
 
 /** The last step before review: the work, in the student's own words. */

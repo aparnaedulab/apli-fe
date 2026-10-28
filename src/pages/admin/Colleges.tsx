@@ -407,10 +407,6 @@ function CollegeCard({ college: c }: { college: CollegeSummary }) {
             <dt>Batches</dt>
             <dd>{c.batchCount}</dd>
           </div>
-          <div>
-            <dt>Seasons</dt>
-            <dd>{c.placementCount}</dd>
-          </div>
         </dl>
         <span className="ecard-note affil" title={c.affiliation ?? undefined}>
           {c.affiliation ?? 'Autonomous'}

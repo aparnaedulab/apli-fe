@@ -77,7 +77,7 @@ export interface CollegeDetail {
   createdAt: string;
   members: CollegeMember[];
   invites: PendingInvite[];
-  _count: { batches: number; placements: number };
+  _count: { batches: number; candidates: number };
 }
 
 export interface AdminStats {
@@ -154,7 +154,7 @@ export interface CompanySummary {
   appliedAt: string | null;
   createdAt: string;
   memberCount: number;
-  jobCount: number;
+  simulationCount: number;
 }
 
 export interface CompanyList {
@@ -201,7 +201,7 @@ export interface CompanyDetail {
     companyRole: string | null;
     expiresAt: string;
   }[];
-  _count: { jobs: number };
+  _count: { workSimulations: number };
 }
 
 export const companyAdminApi = {

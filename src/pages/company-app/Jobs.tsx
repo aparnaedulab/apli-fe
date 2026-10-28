@@ -203,6 +203,13 @@ export function CompanyJobList() {
                   </div>
                   <span className="jl-arrow">›</span>
                 </Link>
+                {j.status !== 'DRAFT' && (
+                  <Link to={`/company/jobs/${j.id}/applicants`} className={`jl-applicants ${j.applicationCount ? 'has-some' : ''}`}>
+                    {j.applicationCount
+                      ? `${j.applicationCount} applicant${j.applicationCount === 1 ? '' : 's'} →`
+                      : 'No applicants yet'}
+                  </Link>
+                )}
               </li>
             ))}
           </ul>

@@ -93,7 +93,8 @@
   transition: box-shadow 0.3s ease;
 }
 
-.sa.is-scrolled .sa-top {
+.sa.is-scrolled .sa-top,
+.sa-top.is-scrolled {
   box-shadow: 0 6px 24px rgb(13 27 62 / 0.08);
 }
 
@@ -4964,4 +4965,2584 @@
   .of-card-head {
     flex-wrap: wrap;
   }
+}
+
+/* Interviews: one student's rounds for the company, and the student's own view. */
+.iv-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.iv-muted {
+  margin: 0;
+  color: var(--sa-ink-3);
+  font-size: 12.5px;
+}
+
+.iv-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--sa-blue-soft);
+  font-size: 13.5px;
+}
+
+.iv-note.is-good {
+  background: var(--sa-green-soft);
+}
+
+.iv-rounds,
+.iv-cards,
+.iv-answers {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.iv-round,
+.iv-card {
+  display: grid;
+  gap: 14px;
+  padding: 18px 20px;
+  border: 1px solid var(--sa-line);
+  border-radius: var(--sa-radius);
+  background: var(--sa-card);
+}
+
+.iv-round.is-current,
+.iv-card.is-open {
+  border-color: var(--sa-blue);
+  box-shadow: var(--sa-shadow);
+}
+
+.iv-round.is-done {
+  background: var(--sa-soft);
+}
+
+.iv-round-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.iv-round-head > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.iv-round-head h2 {
+  font-size: 15.5px;
+}
+
+.iv-round-head p {
+  margin: 2px 0 0;
+  color: var(--sa-ink-2);
+  font-size: 13px;
+}
+
+.iv-round-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--sa-soft);
+  font-size: 18px;
+}
+
+.iv-answers > li {
+  display: grid;
+  gap: 6px;
+}
+
+.iv-answers p {
+  margin: 0;
+  font-size: 13.5px;
+}
+
+.iv-answers small {
+  color: var(--sa-ink-3);
+  font-size: 12px;
+}
+
+.iv-video {
+  width: 100%;
+  max-width: 520px;
+  aspect-ratio: 4 / 3;
+  border-radius: 12px;
+  background: #0d1b3e;
+  object-fit: cover;
+}
+
+.iv-video.is-off {
+  opacity: 0.85;
+}
+
+.iv-verdict-note {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--sa-card);
+  border: 1px dashed var(--sa-line);
+  font-size: 13px;
+}
+
+.iv-verdict {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--sa-soft);
+}
+
+.iv-verdict h3 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.iv-outcomes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.iv-outcome {
+  padding: 8px 14px;
+  border: 1.5px solid var(--sa-line);
+  border-radius: 999px;
+  background: var(--sa-card);
+  color: var(--sa-ink);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.iv-outcome.is-on.is-passed {
+  border-color: var(--sa-green);
+  background: var(--sa-green-soft);
+  color: var(--sa-green);
+}
+
+.iv-outcome.is-on.is-failed {
+  border-color: var(--sa-orange);
+  background: var(--sa-orange-soft);
+  color: var(--sa-orange);
+}
+
+.iv-outcome.is-on.is-skipped {
+  border-color: var(--sa-ink-3);
+  background: var(--sa-card);
+}
+
+.iv-verdict-fields {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.iv-verdict-fields label {
+  display: grid;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.iv-verdict-fields i {
+  color: var(--sa-ink-3);
+  font-style: normal;
+  font-weight: 500;
+}
+
+.iv-verdict-fields input,
+.iv-verdict-fields textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--sa-line);
+  border-radius: 10px;
+  background: var(--sa-card);
+  font: inherit;
+}
+
+/* The student's side */
+.iv-message {
+  margin: 0;
+  color: var(--sa-ink-2);
+  font-size: 14px;
+  font-style: italic;
+}
+
+.iv-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.iv-steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--sa-line);
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+.iv-steps li > span:last-child {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.iv-steps small {
+  color: var(--sa-ink-3);
+  font-size: 12px;
+}
+
+.iv-steps li.is-here {
+  border-color: var(--sa-blue);
+  background: var(--sa-blue-soft);
+}
+
+.iv-steps li.is-passed,
+.iv-steps li.is-skipped {
+  background: var(--sa-green-soft);
+}
+
+.iv-steps li.is-failed {
+  background: var(--sa-orange-soft);
+}
+
+.iv-step-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: var(--sa-card);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.iv-current {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--sa-soft);
+}
+
+.iv-current h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.iv-desc {
+  margin: 0;
+  font-size: 13.5px;
+  white-space: pre-wrap;
+}
+
+.iv-video-round {
+  display: grid;
+  gap: 12px;
+}
+
+.iv-q-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.iv-q-tabs button {
+  width: 34px;
+  height: 34px;
+  border: 1.5px solid var(--sa-line);
+  border-radius: 10px;
+  background: var(--sa-card);
+  color: var(--sa-ink);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.iv-q-tabs button.is-done {
+  border-color: var(--sa-green);
+  color: var(--sa-green);
+}
+
+.iv-q-tabs button.is-on {
+  border-color: var(--sa-blue);
+  background: var(--sa-blue);
+  color: #fff;
+}
+
+.iv-stage {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--sa-card);
+}
+
+.iv-question {
+  display: grid;
+  gap: 4px;
+}
+
+.iv-q-label {
+  color: var(--sa-ink-3);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.iv-question p {
+  margin: 0;
+  font-family: var(--sa-display);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.iv-question small {
+  color: var(--sa-ink-2);
+  font-size: 13px;
+}
+
+.iv-screen {
+  position: relative;
+  max-width: 520px;
+}
+
+.iv-clock {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.iv-clock.is-prep {
+  background: rgb(36 83 255 / 0.9);
+}
+
+.iv-clock.is-rec {
+  background: rgb(208 51 63 / 0.92);
+}
+
+.iv-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 640px) {
+  .iv-verdict-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* --- the frame's optional pieces: things beside the person's menu, and
+       less-visited places inside it (admin and platform use both) -------- */
+
+.sa-extra {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.sa-me.has-extra {
+  margin-left: 0;
+}
+
+.sa-menu-item.active {
+  color: var(--sa-blue);
+  font-weight: 650;
+}
+
+.sa-menu-rule {
+  margin: 6px 4px;
+  border: 0;
+  border-top: 1px solid var(--sa-line);
+}
+
+/* Just the header, for pages that draw their own body (the platform
+   console): it carries the frame's look without becoming the page. */
+.sa.sa-head-only {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  min-height: 0;
+  background: transparent;
+}
+
+/* ===========================================================================
+   The task screen, across the whole width.
+
+   A bar along the top (the simulation and its progress), the tasks on the
+   left, the task in the middle with Back / Next pinned to the bottom, and a
+   work panel on the right (time, steps, notes, what to hand in). Focus mode
+   and test mode fold the side panels away and give the task the centre.
+=========================================================================== */
+
+.tp.is-wide {
+  --tp-top: 60px;
+  --tp-bar: 58px;
+  grid-template-columns: 280px minmax(0, 1fr) 340px;
+  grid-template-rows: auto 1fr;
+  max-width: none;
+  margin: 0;
+  background: linear-gradient(180deg, var(--sa-soft) 0, var(--sa-bg) 320px);
+}
+
+/* The top bar */
+.tp-topbar {
+  grid-column: 1 / -1;
+  position: sticky;
+  top: var(--tp-top);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: var(--tp-bar);
+  padding: 10px clamp(16px, 2vw, 32px);
+  border-bottom: 1px solid var(--sa-line);
+  background: color-mix(in srgb, var(--sa-bg) 92%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+.tp-top-back {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1.5px solid var(--sa-line);
+  border-radius: 10px;
+  color: var(--sa-ink-2);
+  text-decoration: none;
+  flex: none;
+}
+
+.tp-top-back:hover {
+  border-color: var(--sa-ink);
+  color: var(--sa-ink);
+}
+
+.tp-top-sim {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.tp-top-sim > span {
+  display: grid;
+  min-width: 0;
+}
+
+.tp-top-sim b {
+  overflow: hidden;
+  font-family: var(--sa-display);
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tp-top-sim i {
+  color: var(--sa-ink-3);
+  font-size: 12px;
+  font-style: normal;
+}
+
+.tp-top-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.tp-segs {
+  display: flex;
+  gap: 4px;
+  width: min(420px, 100%);
+}
+
+.tp-segs span {
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--sa-line);
+}
+
+.tp-segs span.is-done {
+  background: var(--sa-green);
+}
+
+.tp-segs span.is-here {
+  background: var(--sa-blue);
+  box-shadow: 0 0 0 3px var(--sa-blue-soft);
+}
+
+.tp-segs span.is-done.is-here {
+  background: var(--sa-green);
+  box-shadow: 0 0 0 3px var(--sa-green-soft);
+}
+
+.tp-top-count {
+  color: var(--sa-ink-2);
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tp-focus-btn {
+  flex: none;
+  padding: 7px 14px;
+  border: 1.5px solid var(--sa-line);
+  border-radius: 999px;
+  background: var(--sa-card);
+  color: var(--sa-ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.tp-focus-btn:hover {
+  border-color: var(--sa-ink);
+}
+
+.tp-focus-btn.is-on {
+  border-color: var(--sa-blue);
+  background: var(--sa-blue-soft);
+  color: var(--sa-blue);
+}
+
+/* The side panels stay in view under the bars */
+.tp.is-wide .tp-rail,
+.tp-panel {
+  position: sticky;
+  top: calc(var(--tp-top) + var(--tp-bar));
+  align-self: start;
+  max-height: calc(100vh - var(--tp-top) - var(--tp-bar));
+  overflow-y: auto;
+}
+
+.tp.is-wide .tp-rail {
+  padding: 20px 14px 32px clamp(16px, 2vw, 28px);
+  background: var(--sa-bg);
+}
+
+.tp-rail-title {
+  margin: 0 0 10px 4px !important;
+  color: var(--sa-ink-3);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* The task */
+.tp.is-wide .tp-main {
+  width: 100%;
+  max-width: none;
+  padding: 24px clamp(20px, 3vw, 48px) 0;
+}
+
+.tp.is-wide .tp-head {
+  align-items: center;
+}
+
+.tp.is-wide .tp-head h1 {
+  font-size: clamp(22px, 2.4vw, 30px);
+}
+
+.tp-done-chip {
+  flex: none;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--sa-green-soft);
+  color: var(--sa-green);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.tp.is-wide .tp-parts {
+  padding: 4px;
+  border: 1px solid var(--sa-line);
+  border-radius: 14px;
+  background: var(--sa-card);
+}
+
+.tp.is-wide .tp-parts button {
+  flex: 1;
+  justify-content: center;
+}
+
+.tp-brief-card {
+  padding: 20px 22px;
+  border: 1px solid var(--sa-line);
+  border-left: 4px solid var(--sa-blue);
+  border-radius: var(--sa-radius);
+  background: var(--sa-card);
+}
+
+.tp-brief-card .tp-lead {
+  margin-top: 8px !important;
+}
+
+.tp-two {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.tp-two > div {
+  margin: 0;
+}
+
+.tp.is-wide .tp-prose,
+.tp.is-wide .tp-lead {
+  max-width: 90ch;
+}
+
+/* Back / Next, pinned to the bottom of the screen */
+.tp.is-wide .tp-foot {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  gap: 12px;
+  margin: 24px calc(-1 * clamp(20px, 3vw, 48px)) 0;
+  padding: 12px clamp(20px, 3vw, 48px);
+  border-top: 1px solid var(--sa-line);
+  background: color-mix(in srgb, var(--sa-bg) 94%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.tp-foot-where {
+  flex: 1;
+  color: var(--sa-ink-3);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.tp.is-wide .tp-page {
+  padding-bottom: 8px;
+}
+
+/* The work panel */
+.tp-panel {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+  padding: 20px clamp(16px, 2vw, 28px) 32px 14px;
+}
+
+.tp-card {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid var(--sa-line);
+  border-radius: var(--sa-radius);
+  background: var(--sa-card);
+}
+
+.tp-card h3 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.tp-card-count {
+  color: var(--sa-ink-3);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.tp-card-text {
+  color: var(--sa-ink-2);
+  font-size: 13px;
+}
+
+.tp-card-hint {
+  color: var(--sa-ink-3);
+  font-size: 12px;
+}
+
+.tp-clock b {
+  font-family: var(--sa-display);
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+
+.tp-clock span {
+  color: var(--sa-ink-3);
+  font-size: 13px;
+}
+
+.tp-bar {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--sa-line);
+}
+
+.tp-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--sa-blue);
+  transition: width 0.4s ease;
+}
+
+.tp-bar.is-over span {
+  background: var(--sa-orange);
+}
+
+.tp-checklist {
+  display: grid;
+  gap: 4px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tp-checklist label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.45;
+  cursor: pointer;
+}
+
+.tp-checklist label:hover {
+  background: var(--sa-soft);
+}
+
+.tp-checklist input {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  accent-color: var(--sa-green);
+}
+
+.tp-checklist label.is-on span {
+  color: var(--sa-ink-3);
+  text-decoration: line-through;
+}
+
+.tp-notes {
+  width: 100%;
+  min-height: 120px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--sa-line);
+  border-radius: 10px;
+  background: var(--sa-soft);
+  color: var(--sa-ink);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.tp-notes:focus {
+  border-color: var(--sa-blue);
+  outline: none;
+  background: var(--sa-card);
+}
+
+.tp-card .sa-quiet {
+  justify-self: start;
+}
+
+.tp-handin-state {
+  color: var(--sa-orange);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.tp-handin-state.is-done {
+  color: var(--sa-green);
+}
+
+.tp-keys p {
+  color: var(--sa-ink-2);
+  font-size: 12.5px;
+}
+
+.tp-keys kbd {
+  display: inline-block;
+  min-width: 22px;
+  padding: 1px 6px;
+  border: 1px solid var(--sa-line);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  background: var(--sa-soft);
+  font-family: var(--mono, monospace);
+  font-size: 11.5px;
+  text-align: center;
+}
+
+.tp-clock-chip {
+  flex: none;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--sa-blue-soft);
+  color: var(--sa-blue);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tp-clock-chip.is-over {
+  background: var(--sa-orange-soft);
+  color: var(--sa-orange);
+}
+
+.sa-draft-saved {
+  color: var(--sa-green);
+  font-style: normal;
+  font-weight: 600;
+}
+
+.tp-skeleton {
+  display: grid;
+  gap: 14px;
+  padding-top: 8px;
+}
+
+/* Focus mode and test mode: the task takes the centre of the screen */
+.tp.is-wide.is-focus,
+.tp.is-wide.is-testing {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.tp.is-wide.is-focus .tp-rail,
+.tp.is-wide.is-focus .tp-panel,
+.tp.is-wide.is-testing .tp-rail {
+  display: none;
+}
+
+.tp.is-wide.is-focus .tp-main,
+.tp.is-wide.is-testing .tp-main {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.tp.is-wide.is-testing .tp-main {
+  padding-bottom: 64px;
+}
+
+.tp.is-wide .tp-testbar {
+  position: sticky;
+  top: calc(var(--tp-top) + var(--tp-bar));
+  z-index: 4;
+  margin: 0 -8px;
+  padding: 10px 8px;
+  background: color-mix(in srgb, var(--sa-bg) 94%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.tp.is-wide .tp-testbar > span {
+  flex: 1;
+  text-align: center;
+}
+
+/* Narrower screens: the work panel moves under the task, then everything stacks */
+@media (max-width: 1279px) {
+  .tp.is-wide {
+    grid-template-columns: 250px minmax(0, 1fr);
+  }
+
+  .tp.is-wide .tp-panel {
+    grid-column: 2;
+    position: static;
+    max-height: none;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    padding: 8px clamp(20px, 3vw, 48px) 40px;
+  }
+}
+
+@media (max-width: 900px) {
+  .tp.is-wide {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tp.is-wide .tp-rail {
+    position: static;
+    max-height: none;
+    padding: 14px 16px;
+  }
+
+  .tp.is-wide .tp-panel {
+    grid-column: 1;
+    padding: 8px 16px 40px;
+  }
+
+  .tp.is-wide .tp-main {
+    padding: 18px 16px 0;
+  }
+
+  .tp.is-wide .tp-foot {
+    margin: 20px -16px 0;
+    padding: 10px 16px;
+  }
+
+  .tp-top-sim i,
+  .tp-top-count,
+  .tp-foot-where {
+    display: none;
+  }
+
+  .tp.is-wide .tp-parts button {
+    flex: 1 1 auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .tp-top-sim {
+    display: none;
+  }
+
+  .tp-focus-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+}
+
+/* "Start the test", reachable from the top of the task, not only below the reading. */
+.tp-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  flex: none;
+}
+
+.tp-test-cta {
+  border-color: var(--sa-blue);
+  background: linear-gradient(180deg, var(--sa-blue-soft), var(--sa-card) 70%);
+}
+
+.tp-test-cta.is-done {
+  border-color: var(--sa-line);
+  background: var(--sa-card);
+}
+
+@media (max-width: 900px) {
+  .tp-head-actions {
+    width: 100%;
+  }
+
+  .tp-head-actions .sa-btn {
+    flex: 1;
+  }
+}
+
+/* ===========================================================================
+   The test, across the whole width.
+
+   Left: the questions (jump to any; answered / right / not right). Centre:
+   the question in hand, with Previous / Next pinned to the bottom of the
+   screen. Right: how to answer this kind of question, and - once checked -
+   the score and tries. Before it, a step-by-step onboarding with a practice
+   question for each kind.
+=========================================================================== */
+
+/* In test mode the task screen hands the test the full width. */
+.tp.is-wide.is-testing .tp-main {
+  max-width: none;
+}
+
+.qc.is-wide {
+  --qc-top: calc(var(--tp-top, 60px) + var(--tp-bar, 58px) + 56px);
+  display: grid;
+  grid-template-columns: 270px minmax(0, 1fr) 320px;
+  gap: 24px;
+  align-items: start;
+}
+
+/* Left: the questions */
+.qc-nav,
+.qc-side {
+  position: sticky;
+  top: var(--qc-top);
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  max-height: calc(100vh - var(--qc-top) - 12px);
+  overflow-y: auto;
+  padding-bottom: 12px;
+}
+
+.qc-nav-head {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px;
+  border: 1px solid var(--sa-line);
+  border-radius: var(--sa-radius);
+  background: var(--sa-card);
+}
+
+.qc-nav-head b {
+  font-family: var(--sa-display);
+  font-size: 15px;
+}
+
+.qc-nav-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.qc-nav-list button {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--sa-line);
+  border-radius: 12px;
+  background: var(--sa-card);
+  color: var(--sa-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.qc-nav-list button:hover {
+  border-color: var(--sa-ink-3);
+}
+
+.qc-nav-list button.is-on {
+  border-color: var(--sa-blue);
+  background: var(--sa-blue-soft);
+}
+
+.qc-nav-n {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--sa-soft);
+  color: var(--sa-ink-2);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.qc-nav-list button.is-on .qc-nav-n {
+  background: var(--sa-blue);
+  color: #fff;
+}
+
+.qc-nav-list button.is-answered .qc-nav-n,
+.qc-nav-list button.is-right .qc-nav-n {
+  background: var(--sa-green);
+  color: #fff;
+}
+
+.qc-nav-list button.is-wrong .qc-nav-n {
+  background: var(--sa-red);
+  color: #fff;
+}
+
+.qc-nav-list button.is-sent .qc-nav-n {
+  background: var(--sa-violet);
+  color: #fff;
+}
+
+.qc-nav-text {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.qc-nav-text b {
+  font-size: 13px;
+}
+
+.qc-nav-text span {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--sa-ink-2);
+  font-size: 12px;
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.qc-nav-text i {
+  color: var(--sa-ink-3);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.qc.is-wide .qc-howto {
+  justify-self: start;
+  padding: 6px 2px;
+  font-size: 13px;
+}
+
+/* Centre: the question, with the buttons pinned to the bottom */
+.qc-stage {
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  gap: 14px;
+  min-width: 0;
+  min-height: calc(100vh - var(--qc-top) - 12px);
+}
+
+.qc.is-wide .qc-head {
+  align-items: center;
+}
+
+.qc.is-wide .qc-head h2 {
+  font-size: clamp(18px, 1.8vw, 22px);
+}
+
+.qc.is-wide .qc-card {
+  align-content: start;
+  padding: clamp(18px, 2vw, 28px);
+}
+
+.qc.is-wide .qc-prompt {
+  font-size: clamp(16px, 1.4vw, 19px);
+}
+
+.qc.is-wide .qc-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 4px;
+}
+
+.qc.is-wide .qc-hint .ti-pic {
+  width: 34px;
+  height: 22px;
+  border-radius: 999px;
+  transform: scale(0.9);
+}
+
+.qc.is-wide .qc-hint .ti-pic * {
+  transform: scale(0.55);
+}
+
+.qc.is-wide .qc-foot {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  padding: 12px 0;
+  border-top: 1px solid var(--sa-line);
+  background: color-mix(in srgb, var(--sa-bg) 94%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.qc.is-wide .qc-foot-mid {
+  flex: 1;
+  color: var(--sa-ink-3);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Right: how to answer, and the result */
+.qc-how-pic {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.qc-how-steps {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 20px;
+  color: var(--sa-ink);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.qc-side .qc-results {
+  margin: 0;
+}
+
+.qc-side .qc-results-top {
+  flex-direction: column;
+}
+
+.qc-side .qc-send {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* --- the onboarding ------------------------------------------------------ */
+
+.ti.ti-onboard {
+  gap: 18px;
+  max-width: 1180px;
+  margin: 0 auto;
+  width: 100%;
+  padding: clamp(18px, 2.4vw, 32px);
+}
+
+.ti-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.ti-top h2 {
+  margin-top: 4px;
+  font-size: clamp(20px, 2vw, 26px);
+}
+
+.ti-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  border: 1px solid var(--sa-line);
+  border-radius: 14px;
+  background: var(--sa-soft);
+}
+
+.ti-dots li {
+  flex: 1 1 140px;
+}
+
+.ti-dots button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--sa-ink-2);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ti-dots button.is-on {
+  background: var(--sa-card);
+  color: var(--sa-ink);
+  box-shadow: 0 1px 3px rgb(13 27 62 / 0.12);
+}
+
+.ti-dot-n {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--sa-line);
+  font-size: 11.5px;
+}
+
+.ti-dots button.is-on .ti-dot-n {
+  background: var(--sa-blue);
+  color: #fff;
+}
+
+.ti-dots button.is-done .ti-dot-n {
+  background: var(--sa-green);
+  color: #fff;
+}
+
+.ti-slide {
+  display: grid;
+  gap: 16px;
+  min-height: 340px;
+  align-content: start;
+  animation: qcIn 0.25s ease both;
+}
+
+.ti-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr 1fr;
+  gap: 10px;
+}
+
+.ti-layout > div {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+  min-height: 120px;
+  padding: 14px;
+  border: 1.5px dashed var(--sa-line);
+  border-radius: 12px;
+  background: var(--sa-soft);
+}
+
+.ti-layout > div.is-main {
+  border-style: solid;
+  border-color: var(--sa-blue);
+  background: var(--sa-blue-soft);
+}
+
+.ti-layout b {
+  font-size: 13.5px;
+}
+
+.ti-layout span {
+  color: var(--sa-ink-2);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.ti-note {
+  color: var(--sa-ink-2);
+  font-size: 13.5px;
+}
+
+.ti-kind {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.ti-kind-how {
+  display: grid;
+  gap: 12px;
+}
+
+.ti-kind-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.ti-kind-count {
+  color: var(--sa-ink-3);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.ti-kind-steps {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.ti-kind-steps li {
+  position: relative;
+  padding: 10px 12px 10px 42px;
+  border: 1px solid var(--sa-line);
+  border-radius: 10px;
+  background: var(--sa-card);
+  font-size: 13.5px;
+  line-height: 1.45;
+  counter-increment: step;
+}
+
+.ti-kind-steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 12px;
+  top: 9px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--sa-blue);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.ti-practice {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border: 1.5px solid var(--sa-blue);
+  border-radius: 16px;
+  background: var(--sa-card);
+  box-shadow: var(--sa-shadow);
+}
+
+.ti-practice-label {
+  justify-self: start;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--sa-mark);
+  color: var(--sa-ink);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.ti-practice-fb {
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--sa-soft);
+  color: var(--sa-ink-2);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ti-practice-fb.is-ok {
+  background: var(--sa-green-soft);
+  color: var(--sa-green);
+}
+
+.ti-practice-fb.is-no {
+  background: var(--sa-orange-soft);
+  color: var(--sa-orange);
+}
+
+.ti-ready {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ti-ready li {
+  padding: 12px 14px;
+  border: 1px solid var(--sa-line);
+  border-left: 4px solid var(--sa-green);
+  border-radius: 10px;
+  background: var(--sa-card);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.ti-ready kbd {
+  display: inline-block;
+  min-width: 22px;
+  padding: 1px 6px;
+  border: 1px solid var(--sa-line);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  background: var(--sa-soft);
+  font-size: 12px;
+  text-align: center;
+}
+
+.ti-foot {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 calc(-1 * clamp(18px, 2.4vw, 32px)) calc(-1 * clamp(18px, 2.4vw, 32px));
+  padding: 14px clamp(18px, 2.4vw, 32px);
+  border-top: 1px solid var(--sa-line);
+  border-radius: 0 0 18px 18px;
+  background: color-mix(in srgb, var(--sa-card) 94%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.ti-foot-where {
+  flex: 1;
+  color: var(--sa-ink-3);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* --- smaller screens ----------------------------------------------------- */
+
+@media (max-width: 1200px) {
+  .qc.is-wide {
+    grid-template-columns: 230px minmax(0, 1fr);
+  }
+
+  .qc.is-wide .qc-side {
+    grid-column: 2;
+    position: static;
+    max-height: none;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .qc.is-wide {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .qc.is-wide .qc-nav {
+    position: static;
+    max-height: none;
+  }
+
+  .qc-nav-list {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(200px, 70%);
+    overflow-x: auto;
+  }
+
+  .qc.is-wide .qc-side {
+    grid-column: 1;
+  }
+
+  .qc-stage {
+    min-height: 0;
+  }
+
+  .ti-layout,
+  .ti-kind {
+    grid-template-columns: 1fr;
+  }
+
+  .ti-top {
+    flex-direction: column;
+  }
+
+  .ti-dot-label {
+    display: none;
+  }
+
+  .ti-dots li {
+    flex: 0 0 auto;
+  }
+}
+
+/* ===========================================================================
+   Certificates: each one drawn as a certificate, with its actions below.
+=========================================================================== */
+
+.cert-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 520px), 1fr));
+  gap: 24px;
+}
+
+.cert {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.cert-paper {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  padding: 28px 30px 22px;
+  border: 1px solid var(--sa-line);
+  border-radius: 18px;
+  background:
+    radial-gradient(ellipse 60% 50% at 100% 0%, var(--sa-blue-soft) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 0% 100%, var(--sa-green-soft) 0%, transparent 70%),
+    var(--sa-card);
+  box-shadow: var(--sa-shadow);
+  overflow: hidden;
+}
+
+/* A thin inner frame, like printed certificates have. */
+.cert-paper::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1.5px solid color-mix(in srgb, var(--sa-blue) 22%, transparent);
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+.cert-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cert-kind {
+  flex: 1;
+  color: var(--sa-blue);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.cert-seal {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--sa-green);
+  box-shadow:
+    0 0 0 4px var(--sa-green-soft),
+    0 0 0 6px color-mix(in srgb, var(--sa-green) 30%, transparent);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.cert-awarded {
+  margin-top: 6px !important;
+  color: var(--sa-ink-3);
+  font-size: 13px;
+}
+
+.cert-name {
+  font-family: var(--sa-display);
+  font-size: clamp(24px, 2.6vw, 32px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.cert-for {
+  max-width: 52ch;
+  color: var(--sa-ink-2);
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+
+.cert-for b {
+  color: var(--sa-ink);
+}
+
+.cert-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cert-facts li {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--sa-soft);
+  color: var(--sa-ink-2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.cert-skills {
+  color: var(--sa-ink-3);
+  font-size: 12.5px;
+}
+
+.cert-foot {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--sa-line);
+}
+
+.cert-foot span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.cert-foot i {
+  color: var(--sa-ink-3);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cert-foot b {
+  overflow-wrap: anywhere;
+  font-size: 13px;
+}
+
+.cert-code {
+  font-family: var(--mono, monospace);
+  color: var(--sa-blue);
+}
+
+.cert-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cert-actions .sa-btn.is-small {
+  margin-top: 0;
+}
+
+.cert-shared {
+  color: var(--sa-ink-3);
+  font-size: 12.5px;
+}
+
+.cert-empty {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.cert-empty-seal {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--sa-green-soft);
+  color: var(--sa-green);
+  font-size: 24px;
+}
+
+@media (max-width: 560px) {
+  .cert-paper {
+    padding: 22px 20px 18px;
+  }
+
+  .cert-foot {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* The notification bell in the app header: a round icon beside the person's
+   menu, with a red count, and its list hanging from the right edge. */
+.sa-bell .bell-wrap {
+  margin: 0;
+}
+
+.sa-bell .bell {
+  position: relative;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1.5px solid var(--sa-line);
+  border-radius: 50%;
+  background: var(--sa-card);
+  color: var(--sa-ink-2);
+  cursor: pointer;
+}
+
+.sa-bell .bell:hover,
+.sa-bell .bell[aria-expanded='true'] {
+  border-color: var(--sa-ink-3);
+  color: var(--sa-ink);
+}
+
+.sa-bell .bell::after {
+  content: none;
+}
+
+.sa-bell .bell svg {
+  width: 18px;
+  height: 18px;
+}
+
+.sa-bell .bell-count {
+  position: absolute;
+  top: -5px;
+  right: -6px;
+  min-width: 19px;
+  margin: 0;
+  padding: 1px 5px;
+  border: 2px solid var(--sa-bg);
+  border-radius: 999px;
+  background: var(--sa-red);
+  color: #fff;
+  font-family: var(--sans);
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.sa-bell .bell-panel {
+  left: auto;
+  right: 0;
+  width: min(380px, calc(100vw - 32px));
+  border-color: var(--sa-line);
+  border-radius: 14px;
+  background: var(--sa-card);
+  box-shadow: var(--sa-shadow-lift);
+}
+
+/* ===========================================================================
+   Jobs: the student's job board, a job, their applications - and the
+   company's applicants for a job.
+=========================================================================== */
+
+/* Tabs under the hero */
+.jb-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 18px;
+}
+
+.jb-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1.5px solid var(--sa-line);
+  border-radius: 999px;
+  background: var(--sa-card);
+  color: var(--sa-ink-2);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.jb-tabs button.is-on {
+  border-color: var(--sa-blue);
+  background: var(--sa-blue);
+  color: #fff;
+}
+
+.jb-tabs button span {
+  min-width: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--sa-soft);
+  color: var(--sa-ink-2);
+  font-size: 11.5px;
+  text-align: center;
+}
+
+.jb-tabs button.is-on span {
+  background: rgb(255 255 255 / 0.25);
+  color: #fff;
+}
+
+.jb-tabs button span.is-alert {
+  background: var(--sa-orange);
+  color: #fff;
+}
+
+/* Filters */
+.jb-filters,
+.ja-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.jb-search {
+  flex: 1 1 240px;
+  min-width: 0;
+  padding: 10px 14px;
+  border: 1.5px solid var(--sa-line);
+  border-radius: 12px;
+  background: var(--sa-card);
+  color: var(--sa-ink);
+  font: inherit;
+}
+
+.jb-search:focus,
+.jb-filters select:focus {
+  border-color: var(--sa-blue);
+  outline: none;
+}
+
+.jb-filters select {
+  padding: 10px 12px;
+  border: 1.5px solid var(--sa-line);
+  border-radius: 12px;
+  background: var(--sa-card);
+  color: var(--sa-ink);
+  font: inherit;
+}
+
+.jb-seg {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--sa-line);
+  border-radius: 12px;
+  background: var(--sa-soft);
+}
+
+.jb-seg button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--sa-ink-2);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.jb-seg button.is-on {
+  background: var(--sa-card);
+  color: var(--sa-blue);
+  box-shadow: 0 1px 3px rgb(13 27 62 / 0.12);
+}
+
+.jb-seg button span {
+  color: var(--sa-ink-3);
+  font-size: 11.5px;
+}
+
+.jb-mine {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--sa-ink-2);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.jb-mine input {
+  accent-color: var(--sa-green);
+}
+
+/* Job cards */
+.jb-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.jb-card {
+  display: grid;
+  gap: 10px;
+  height: 100%;
+  padding: 18px;
+  border: 1px solid var(--sa-line);
+  border-radius: var(--sa-radius);
+  background: var(--sa-card);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.jb-card:hover {
+  border-color: var(--sa-blue);
+  box-shadow: var(--sa-shadow);
+  transform: translateY(-2px);
+}
+
+.jb-card.is-known {
+  border-color: color-mix(in srgb, var(--sa-green) 45%, var(--sa-line));
+}
+
+.jb-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.jb-card-who {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.jb-card-who b {
+  font-family: var(--sa-display);
+  font-size: 15.5px;
+  line-height: 1.3;
+}
+
+.jb-card-who i {
+  color: var(--sa-ink-2);
+  font-size: 13px;
+  font-style: normal;
+}
+
+.jb-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.jb-chip {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--sa-soft);
+  color: var(--sa-ink-2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.jb-chip.is-intern {
+  background: var(--sa-violet-soft);
+  color: var(--sa-violet);
+}
+
+.jb-pay {
+  font-family: var(--sa-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--sa-ink);
+}
+
+.jb-known {
+  color: var(--sa-green);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.jb-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px dashed var(--sa-line);
+  color: var(--sa-ink-3);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.jb-foot .is-soon {
+  color: var(--sa-orange);
+}
+
+/* My applications */
+.jb-empty {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 36px 20px;
+  text-align: center;
+}
+
+.jb-apps {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.jb-app {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--sa-line);
+  border-radius: var(--sa-radius);
+  background: var(--sa-card);
+}
+
+.jb-app-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.jb-app-head > div {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.jb-app-title {
+  font-family: var(--sa-display);
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.jb-app-title:hover {
+  color: var(--sa-blue);
+}
+
+.jb-app-head span {
+  color: var(--sa-ink-2);
+  font-size: 13px;
+}
+
+/* The track: one step per stage, then one per interview round. */
+.jb-track {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: st;
+}
+
+.jb-track li {
+  position: relative;
+  padding: 6px 12px 6px 30px;
+  border: 1px solid var(--sa-line);
+  border-radius: 999px;
+  background: var(--sa-soft);
+  color: var(--sa-ink-3);
+  font-size: 12.5px;
+  font-weight: 600;
+  counter-increment: st;
+}
+
+.jb-track li::before {
+  content: counter(st);
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--sa-line);
+  color: var(--sa-ink-2);
+  font-size: 10.5px;
+  transform: translateY(-50%);
+}
+
+.jb-track li.is-done {
+  border-color: color-mix(in srgb, var(--sa-green) 40%, var(--sa-line));
+  background: var(--sa-green-soft);
+  color: var(--sa-green);
+}
+
+.jb-track li.is-done::before {
+  content: '✓';
+  background: var(--sa-green);
+  color: #fff;
+}
+
+.jb-track li.is-now {
+  border-color: var(--sa-blue);
+  background: var(--sa-blue-soft);
+  color: var(--sa-blue);
+}
+
+.jb-track li.is-now::before {
+  background: var(--sa-blue);
+  color: #fff;
+}
+
+.jb-track li.is-stop {
+  border-color: color-mix(in srgb, var(--sa-red) 40%, var(--sa-line));
+  background: #fde5e7;
+  color: var(--sa-red);
+}
+
+.jb-track li.is-stop::before {
+  content: '✗';
+  background: var(--sa-red);
+  color: #fff;
+}
+
+.jb-app-next {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--sa-blue-soft);
+  font-size: 13.5px;
+}
+
+/* One job */
+.jd-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.jd-head > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.jd-text {
+  max-width: 80ch;
+  color: var(--sa-ink-2);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.jd-muted {
+  color: var(--sa-ink-3);
+  font-size: 13px;
+}
+
+.jd-list {
+  display: grid;
+  gap: 8px;
+  margin: 8px 0 0;
+  padding-left: 20px;
+  color: var(--sa-ink-2);
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+
+.jd-rounds {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.jd-rounds li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--sa-line);
+  border-radius: 12px;
+  background: var(--sa-card);
+}
+
+.jd-round-n {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--sa-blue);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.jd-round-icon {
+  font-size: 18px;
+}
+
+.jd-rounds li > span:last-child {
+  display: grid;
+}
+
+.jd-rounds b {
+  font-size: 14px;
+}
+
+.jd-rounds i {
+  color: var(--sa-ink-3);
+  font-size: 12.5px;
+  font-style: normal;
+}
+
+.jd-apply {
+  display: grid;
+  gap: 12px;
+  border-color: var(--sa-blue) !important;
+}
+
+.jd-pay {
+  font-family: var(--sa-display);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.jd-facts {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 0;
+  border-top: 1px dashed var(--sa-line);
+  border-bottom: 1px dashed var(--sa-line);
+}
+
+.jd-facts div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.jd-facts dt {
+  color: var(--sa-ink-3);
+}
+
+.jd-facts dd {
+  margin: 0;
+  font-weight: 650;
+  text-align: right;
+}
+
+.jd-facts dd.is-soon {
+  color: var(--sa-orange);
+}
+
+.jd-applyform {
+  display: grid;
+  gap: 10px;
+}
+
+.jd-applyform label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.jd-applyform input:not([type='checkbox']) {
+  padding: 9px 12px;
+  border: 1.5px solid var(--sa-line);
+  border-radius: 10px;
+  font: inherit;
+}
+
+.jd-agree {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.jd-applied {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--sa-green-soft);
+}
+
+.jd-applied b {
+  color: var(--sa-green);
+}
+
+.jd-applied span {
+  color: var(--sa-ink-2);
+  font-size: 13px;
+}
+
+.jd-checks {
+  display: grid;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.jd-checks li {
+  display: flex;
+  gap: 10px;
+  font-size: 13.5px;
+}
+
+.jd-checks li > span:first-child {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--sa-soft);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.jd-checks li.is-ok > span:first-child {
+  background: var(--sa-green-soft);
+  color: var(--sa-green);
+}
+
+.jd-checks li.is-no > span:first-child {
+  background: #fde5e7;
+  color: var(--sa-red);
+}
+
+.jd-checks li > span:last-child {
+  display: grid;
+}
+
+.jd-checks i {
+  color: var(--sa-ink-3);
+  font-size: 12px;
+  font-style: normal;
+}
+
+/* Company: a job's applicants */
+.jl-grid > li {
+  display: grid;
+  gap: 6px;
+}
+
+.jl-applicants {
+  justify-self: end;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--sa-soft);
+  color: var(--sa-ink-3);
+  font-size: 12.5px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.jl-applicants.has-some {
+  background: var(--sa-blue);
+  color: #fff;
+}
+
+.jl-applicants.has-some:hover {
+  background: var(--sa-blue-hover);
+}
+
+.ja-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ja-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) 80px minmax(0, 1fr) minmax(0, 1.6fr);
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--sa-line);
+  border-radius: var(--sa-radius);
+  background: var(--sa-card);
+}
+
+.ja-who {
+  display: grid;
+  min-width: 0;
+}
+
+.ja-who b {
+  font-family: var(--sa-display);
+  font-size: 15px;
+}
+
+.ja-who span {
+  color: var(--sa-ink-2);
+  font-size: 13px;
+}
+
+.ja-who i {
+  overflow: hidden;
+  color: var(--sa-ink-3);
+  font-size: 12px;
+  font-style: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ja-cgpa {
+  display: grid;
+  text-align: center;
+}
+
+.ja-cgpa b {
+  font-family: var(--sa-display);
+  font-size: 18px;
+}
+
+.ja-cgpa span {
+  color: var(--sa-ink-3);
+  font-size: 11px;
+}
+
+.ja-stage {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+}
+
+.ja-round {
+  color: var(--sa-ink-3);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ja-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.ja-actions .sa-btn.is-small {
+  margin-top: 0;
+}
+
+@media (max-width: 900px) {
+  .ja-row {
+    grid-template-columns: 1fr auto;
+  }
+
+  .ja-stage,
+  .ja-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+
+  .jd-head {
+    flex-wrap: wrap;
+  }
+}
+
+/* Asking for consent before the first application. */
+.jd-consent {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1.5px solid var(--sa-blue);
+  border-radius: 12px;
+  background: var(--sa-blue-soft);
+}
+
+.jd-consent span {
+  color: var(--sa-ink-2);
+  font-size: 13px;
+  line-height: 1.5;
 }

@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import ApliLogo from '../../components/ApliLogo';
+import NotificationBell from '../../components/NotificationBell';
+import { inSection, markNotificationsRead, useNotifications } from '../../components/useNotifications';
 import { useAuth } from '../../auth/AuthContext';
 import type { SimulationCard } from '../../api/studentApp';
 import { LEVEL_LABEL } from '../../api/studentApp';
@@ -21,6 +23,8 @@ export interface NavItem {
 const STUDENT_NAV: NavItem[] = [
   { to: '/student', label: 'Dashboard', end: true },
   { to: '/student/simulations', label: 'Simulations' },
+  { to: '/student/certificates', label: 'Certificates' },
+  { to: '/student/interviews', label: 'Interviews' },
   { to: '/student/jobs', label: 'Jobs' },
 ];
 
@@ -37,23 +41,64 @@ export default function Shell({ children }: { children: ReactNode }) {
  * The frame both apps sit in - students and companies - so they are one
  * product: the logo, a few places to go, and the person's own menu.
  */
-export function AppFrame({
-  nav,
-  home,
-  profile,
-  children,
-}: {
+export interface FrameProps {
   nav: NavItem[];
   home: string;
   /** Where "Your profile" goes in the menu, when there is one. */
   profile?: string;
+  /** Places that are not visited every day - set-up, people, settings - kept in the person's menu. */
+  menu?: NavItem[];
+  /** Beside the person's menu: a bell, the institution being looked after. */
+  extra?: ReactNode;
+}
+
+export function AppFrame({
+  className = '',
+  children,
+  ...header
+}: FrameProps & {
+  /** On the frame's root, for an app that adds its own styles. */
+  className?: string;
   children: ReactNode;
 }) {
+  return (
+    <div className={`sa ${className}`}>
+      <AppHeader {...header} />
+      <main className="sa-main">{children}</main>
+    </div>
+  );
+}
+
+/**
+ * The header on its own: the logo, a few places to go, and the person's
+ * menu. AppFrame wraps a page in it; the platform console, whose pages draw
+ * their own body, places just this.
+ */
+export function AppHeader({ nav, home, profile, menu: menuLinks = [], extra }: FrameProps) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const menu = useRef<HTMLDivElement>(null);
+  const { items } = useNotifications();
+  const { pathname } = useLocation();
+
+  // What is new in each section: its unread notifications.
+  const unreadIn = (n: NavItem) => items.filter((x) => !x.readAt && inSection(x.link, n.to, n.end));
+
+  // Opening a section counts as seeing what is new there: after a moment its
+  // count clears (the bell's count too).
+  useEffect(() => {
+    const here = [...nav, ...menuLinks]
+      .filter((n) => inSection(pathname, n.to, n.end))
+      .sort((a, b) => b.to.length - a.to.length)[0];
+    if (!here) return;
+    const ids = unreadIn(here).map((x) => x.id);
+    if (!ids.length) return;
+    const t = window.setTimeout(() => void markNotificationsRead(ids), 1500);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname, items]);
 
   useEffect(() => {
     if (!open) return;
@@ -82,63 +127,88 @@ export function AppFrame({
       .join('') || '?';
 
   return (
-    <div className={`sa ${scrolled ? 'is-scrolled' : ''}`}>
-      <header className="sa-top">
-        <div className="sa-wrap sa-top-in">
-          <Link to={home} className="sa-logo" aria-label="Apli.ai, home">
-            <ApliLogo />
-          </Link>
-          <nav className="sa-nav" aria-label="Main">
-            {nav.map((n) => (
+    <header className={`sa-top ${scrolled ? 'is-scrolled' : ''}`}>
+      <div className="sa-wrap sa-top-in">
+        <Link to={home} className="sa-logo" aria-label="Apli.ai, home">
+          <ApliLogo />
+        </Link>
+        <nav className="sa-nav" aria-label="Main">
+          {nav.map((n) => {
+            // Waiting work the page counts itself, plus anything new here.
+            const count = (n.badge ?? 0) + unreadIn(n).length;
+            return (
               <NavLink key={n.to} to={n.to} end={n.end}>
                 {n.label}
-                {n.badge ? <span className="sa-nav-badge">{n.badge}</span> : null}
+                {count ? (
+                  <span className="sa-nav-badge" aria-label={`${count} new`}>
+                    {count > 9 ? '9+' : count}
+                  </span>
+                ) : null}
               </NavLink>
-            ))}
-          </nav>
-          <div className="sa-me" ref={menu}>
-            <button
-              type="button"
-              className="sa-me-btn"
-              aria-haspopup="menu"
-              aria-expanded={open}
-              aria-label="Your account"
-              onClick={() => setOpen((v) => !v)}
-            >
-              <span className="sa-avatar">{initials}</span>
-              <span className="sa-me-name">{name.split(/\s+/)[0]}</span>
-              <span className="sa-caret" aria-hidden="true">
-                ▾
-              </span>
-            </button>
-            {open && (
-              <div className="sa-menu" role="menu">
-                <p className="sa-menu-who">
-                  <b>{name}</b>
-                  <span>{user?.email}</span>
-                </p>
-                {profile && (
-                  <Link to={profile} role="menuitem" className="sa-menu-item" onClick={() => setOpen(false)}>
-                    Your profile
-                  </Link>
-                )}
-                <button
-                  type="button"
-                  role="menuitem"
-                  onClick={async () => {
-                    await logout();
-                    navigate('/login', { replace: true });
-                  }}
-                >
-                  Sign out
-                </button>
-              </div>
-            )}
-          </div>
+            );
+          })}
+        </nav>
+        {/* What the page adds, then the bell: every app tells its people what happened. */}
+        <div className="sa-extra">
+          {extra}
+          <span className="sa-bell">
+            <NotificationBell />
+          </span>
         </div>
-      </header>
-      <main className="sa-main">{children}</main>
-    </div>
+        <div className="sa-me has-extra" ref={menu}>
+          <button
+            type="button"
+            className="sa-me-btn"
+            aria-haspopup="menu"
+            aria-expanded={open}
+            aria-label="Your account"
+            onClick={() => setOpen((v) => !v)}
+          >
+            <span className="sa-avatar">{initials}</span>
+            <span className="sa-me-name">{name.split(/\s+/)[0]}</span>
+            <span className="sa-caret" aria-hidden="true">
+              ▾
+            </span>
+          </button>
+          {open && (
+            <div className="sa-menu" role="menu">
+              <p className="sa-menu-who">
+                <b>{name}</b>
+                <span>{user?.email}</span>
+              </p>
+              {profile && (
+                <Link to={profile} role="menuitem" className="sa-menu-item" onClick={() => setOpen(false)}>
+                  Your profile
+                </Link>
+              )}
+              {menuLinks.map((m) => (
+                <NavLink
+                  key={m.to}
+                  to={m.to}
+                  end={m.end}
+                  role="menuitem"
+                  className="sa-menu-item"
+                  onClick={() => setOpen(false)}
+                >
+                  {m.label}
+                </NavLink>
+              ))}
+              {menuLinks.length > 0 && <hr className="sa-menu-rule" />}
+              <button
+                type="button"
+                role="menuitem"
+                onClick={async () => {
+                  await logout();
+                  navigate('/login', { replace: true });
+                }}
+              >
+                Sign out
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </header>
   );
 }
 

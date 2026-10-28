@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { ApiError } from '../../api/client';
 import { dateText, offersApi, type StudentOffer } from '../../api/offers';
+import { studentInviteApi, type StudentInvite } from '../../api/interviewInvites';
 import {
   studentAppApi,
   type ActivityEvent,
@@ -42,7 +43,12 @@ export default function Home() {
       .mine()
       .then((o) => setOffers(o.filter((x) => x.status === 'SENT')))
       .catch(() => undefined);
+    studentInviteApi
+      .list()
+      .then((l) => setInvites(l.filter((x) => x.status === 'PENDING')))
+      .catch(() => undefined);
   }, []);
+  const [invites, setInvites] = useState<StudentInvite[]>([]);
 
   // Gone at once; the server is told in the background.
   function hide(kind: 'suggestion' | 'run', id: string) {
@@ -90,6 +96,22 @@ export default function Home() {
             <span aria-hidden="true">→</span>
           </Link>
         )}
+        {invites.length > 0 && (
+          <Link to="/student/interviews" className="of-banner">
+            <span className="of-banner-icon" aria-hidden="true">
+              🎙
+            </span>
+            <span>
+              <b>
+                {invites.length === 1
+                  ? `${invites[0]!.company.name} invited you to interview: ${invites[0]!.role}`
+                  : `You have ${invites.length} interview invites`}
+              </b>
+              <small>See the rounds and accept to begin.</small>
+            </span>
+            <span aria-hidden="true">→</span>
+          </Link>
+        )}
         {!data && !error && <Skeleton />}
         {data && (
           <>
@@ -113,7 +135,7 @@ export default function Home() {
               <Kpi
                 tone="green"
                 value={data.certificates.length}
-                label="Verified"
+                label="Certificates"
                 hint={data.stats.hoursVerified ? `${data.stats.hoursVerified} hours of approved work` : 'Approved by a reviewer'}
               />
               <Kpi
@@ -170,7 +192,12 @@ export default function Home() {
 
               <aside className="sa-aside">
                 <section className="sa-panel is-white">
-                  <h2>Verified work</h2>
+                  <div className="sa-panel-head">
+                    <h2>Certificates</h2>
+                    <Link to="/student/certificates" className="sa-link is-small">
+                      {data.certificates.length ? 'See all' : 'How to earn one'}
+                    </Link>
+                  </div>
                   {data.certificates.length === 0 ? (
                     <p className="sa-panel-empty">
                       When a reviewer approves your work, its certificate appears here with a code anyone can check.

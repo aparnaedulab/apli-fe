@@ -5,6 +5,7 @@ import { companyAppApi, STATUS_LABEL, type RunStatus, type SimAnalytics } from '
 import Frame from './Frame';
 import { AnswerList } from './Work';
 import { OfferButton } from './Offers';
+import InviteToInterview from '../../components/InviteToInterview';
 
 const message = (e: unknown, fallback: string) => (e instanceof ApiError ? e.message : fallback);
 const day = (iso: string) => new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
@@ -516,7 +517,10 @@ function StudentRow({
                 {s.completedAt ? ` · verified ${day(s.completedAt)}` : ''}
               </span>
             </p>
-            <OfferButton candidateId={s.candidateId} runId={s.runId} name={s.name} />
+            <div className="of-row">
+              <InviteToInterview candidateId={s.candidateId} candidateName={s.name} />
+              <OfferButton candidateId={s.candidateId} runId={s.runId} name={s.name} />
+            </div>
             {s.why === 'sent-a-test' && (
               <p className="an-note">They sent you a test, so you see the tries they sent - not the rest of their work.</p>
             )}

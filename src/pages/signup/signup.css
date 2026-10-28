@@ -745,6 +745,62 @@
   color: var(--su-ink-3);
 }
 
+/* The partner colleges, in plain sight under the field before any typing. */
+.su-college-quick {
+  margin-top: 10px;
+}
+
+.su-college-quick-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--su-ink-2);
+}
+
+.su-college-quick ul {
+  display: grid;
+  gap: 6px;
+  max-height: 240px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.su-college-quick button {
+  display: grid;
+  gap: 1px;
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--su-line);
+  border-radius: 12px;
+  background: var(--su-card);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.su-college-quick button:hover,
+.su-college-quick button:focus-visible {
+  border-color: var(--su-blue, #2453ff);
+  background: var(--su-soft, #f3f6fc);
+}
+
+.su-college-quick b {
+  font-size: 14px;
+}
+
+.su-college-quick i {
+  font-size: 12.5px;
+  font-style: normal;
+  color: var(--su-ink-2);
+}
+
 .su-combo-empty {
   cursor: default !important;
   font-size: 13.5px;
@@ -1564,6 +1620,16 @@
   border-color: var(--su-blue);
   background: var(--su-blue-soft);
   color: var(--su-blue);
+}
+
+/* "Other": the student's own field, typed under the chips. */
+.su input.su-interest-other {
+  margin-top: 10px;
+  max-width: 360px;
+}
+
+.su input.su-interest-other[aria-invalid='true'] {
+  border-color: var(--su-red);
 }
 
 .su-interests button:disabled {

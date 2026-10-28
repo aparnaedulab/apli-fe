@@ -1,0 +1,324 @@
+/* The student app seen from the admin and platform sides: lists, a stat strip
+   and the one-student panel. Prefixed sv- so nothing here leaks. */
+
+.sv-name {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+
+.sv-name:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+.sv-cert {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--brand);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.sv-cert:hover {
+  text-decoration: underline;
+}
+
+.sv-progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.sv-progress-bar {
+  position: relative;
+  width: 64px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--paper-2);
+  overflow: hidden;
+}
+
+.sv-progress-bar > span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--brand);
+  border-radius: 3px;
+}
+
+.sv-progress-text {
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+/* Stat strip */
+
+.sv-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
+  margin: 0 0 24px;
+}
+
+/* The apps' KPI card: a big number in one of four tones, a soft disc behind. */
+.sv-stat {
+  --tone: #2453ff;
+  --tone-soft: #e6ecff;
+  position: relative;
+  overflow: hidden;
+  padding: 16px 18px;
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.sv-stat::after {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: var(--tone-soft);
+  opacity: 0.7;
+}
+
+.sv-stat:nth-child(4n + 2) {
+  --tone: #6d45f0;
+  --tone-soft: #ece6ff;
+}
+
+.sv-stat:nth-child(4n + 3) {
+  --tone: #f2662b;
+  --tone-soft: #ffe9df;
+}
+
+.sv-stat:nth-child(4n + 4) {
+  --tone: #0f9a6d;
+  --tone-soft: #dbf4ea;
+}
+
+.sv-stat-value {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: var(--tone);
+  font: 700 28px/1.1 'Sora', 'Segoe UI', system-ui, sans-serif;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.sv-stat-label {
+  position: relative;
+  z-index: 1;
+  margin: 4px 0 0;
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--ink);
+}
+
+.sv-stat-hint {
+  position: relative;
+  z-index: 1;
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+/* One student's panel */
+
+.sv-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: flex-end;
+  background: rgb(14 17 22 / 0.4);
+}
+
+.sv-panel {
+  display: flex;
+  flex-direction: column;
+  width: min(720px, 100vw);
+  height: 100%;
+  background: var(--paper);
+  box-shadow: -18px 0 50px rgb(0 0 0 / 0.2);
+  outline: none;
+  animation: sv-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes sv-in {
+  from {
+    transform: translateX(40px);
+    opacity: 0;
+  }
+}
+
+.sv-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+.sv-head h2 {
+  margin: 0 0 2px;
+  font-family: var(--display);
+  font-size: 19px;
+  color: var(--ink);
+}
+
+.sv-head p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.sv-close {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: var(--paper);
+  font-size: 20px;
+  line-height: 1;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.sv-close:hover {
+  color: var(--ink);
+  border-color: var(--rule-2);
+}
+
+.sv-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 22px 28px;
+}
+
+.sv-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 12px 18px;
+  margin: 0 0 16px;
+}
+
+.sv-facts dt {
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-3);
+}
+
+.sv-facts dd {
+  margin: 2px 0 0;
+  font-size: 14px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.sv-headline {
+  margin: 0 0 10px;
+  font-style: italic;
+  color: var(--ink-2);
+}
+
+.sv-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.sv-chip {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 12.5px;
+}
+
+.sv-section {
+  margin-top: 22px;
+}
+
+.sv-section h3 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.sv-items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.sv-items li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+}
+
+.sv-items li + li {
+  border-top: 1px solid var(--rule);
+}
+
+.sv-item-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sv-item-main b {
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.sv-item-main span {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.sv-item-main .sv-note {
+  margin-top: 4px;
+  font-size: 12.5px;
+  color: var(--stop);
+}
+
+.sv-item-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 560px) {
+  .sv-items li {
+    flex-direction: column;
+  }
+
+  .sv-item-side {
+    align-items: flex-start;
+  }
+}

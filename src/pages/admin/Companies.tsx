@@ -141,8 +141,8 @@ export function Companies() {
                     <dd>{c.memberCount}</dd>
                   </div>
                   <div>
-                    <dt>Jobs</dt>
-                    <dd>{c.jobCount}</dd>
+                    <dt>Simulations</dt>
+                    <dd>{c.simulationCount}</dd>
                   </div>
                 </dl>
                 <span className="ecard-foot">
@@ -323,8 +323,8 @@ export function CompanyDetailPage() {
           <p className="stat-label">Pending invites</p>
         </div>
         <div className="stat">
-          <p className="stat-value">{company._count.jobs}</p>
-          <p className="stat-label">Jobs</p>
+          <p className="stat-value">{company._count.workSimulations}</p>
+          <p className="stat-label">Simulations</p>
         </div>
       </div>
 

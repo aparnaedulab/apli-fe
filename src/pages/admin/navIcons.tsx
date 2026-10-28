@@ -98,6 +98,22 @@ export const NAV_ICONS: Record<string, (p: IconProps) => JSX.Element> = {
     </svg>
   ),
 
+  // Internship offers: an envelope with a star.
+  offers: (p) => (
+    <svg {...base} {...p}>
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="m3.5 6.5 8.5 6 8.5-6" />
+    </svg>
+  ),
+
+  // Interviews: two speech bubbles.
+  interviews: (p) => (
+    <svg {...base} {...p}>
+      <path d="M4 5h11a1.5 1.5 0 0 1 1.5 1.5v6A1.5 1.5 0 0 1 15 14H9l-3.5 3v-3H4a1.5 1.5 0 0 1-1.5-1.5v-6A1.5 1.5 0 0 1 4 5Z" />
+      <path d="M16.5 9H20a1.5 1.5 0 0 1 1.5 1.5v6A1.5 1.5 0 0 1 20 18h-1v3l-3.5-3H11" />
+    </svg>
+  ),
+
   // Roles: a tag.
   jobs: (p) => (
     <svg {...base} {...p}>

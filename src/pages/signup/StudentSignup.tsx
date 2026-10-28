@@ -49,12 +49,21 @@ const USUAL_YEARS: Record<DegreeLevel, number> = { DIPLOMA: 3, UG: 3, PG: 2, PHD
 /** Used only if the platform's own gender list cannot be loaded. */
 const FALLBACK_GENDERS = ['Female', 'Male', 'Other', 'Prefer not to say'];
 
-/** The latest date of birth that is at least 14 years ago, for the date picker. */
-const LATEST_DOB = (() => {
+/** The ages a student can be: the same limits the server checks. */
+const MIN_AGE = 14;
+const MAX_AGE = 70;
+
+/** A date this many years before today, as YYYY-MM-DD for the date picker. */
+function yearsAgo(years: number) {
   const d = new Date();
-  d.setFullYear(d.getFullYear() - 14);
+  d.setFullYear(d.getFullYear() - years);
   return d.toISOString().slice(0, 10);
-})();
+}
+
+/** The latest date of birth allowed (at least 14 years old) and the earliest (at most 70). */
+const LATEST_DOB = yearsAgo(MIN_AGE);
+const EARLIEST_DOB = yearsAgo(MAX_AGE);
+const TODAY = new Date().toISOString().slice(0, 10);
 
 /**
  * Batches a student can be in: joined up to six years ago, still studying
@@ -122,6 +131,11 @@ export default function StudentSignup() {
 
   // Step 3
   const [interests, setInterests] = useState<string[]>([]);
+  // "Other": a field of their own that the list does not have. It counts
+  // towards the three.
+  const [otherOn, setOtherOn] = useState(false);
+  const [otherInterest, setOtherInterest] = useState('');
+  const interestCount = interests.length + (otherOn ? 1 : 0);
   const [agree, setAgree] = useState(false);
 
   const [errors, setErrors] = useState<Errors>({});
@@ -147,7 +161,9 @@ export default function StudentSignup() {
       if (!phone.trim()) e.phone = 'Enter your mobile number.';
       else if (!isValidMobile(phone, phoneCountry)) e.phone = 'Enter a valid mobile number for that country.';
       if (!dob) e.dateOfBirth = 'Enter your date of birth.';
-      else if (dob > LATEST_DOB) e.dateOfBirth = 'Check your date of birth.';
+      else if (dob >= TODAY) e.dateOfBirth = 'Your date of birth cannot be today or in the future.';
+      else if (dob > LATEST_DOB) e.dateOfBirth = `You need to be at least ${MIN_AGE} years old to sign up.`;
+      else if (dob < EARLIEST_DOB) e.dateOfBirth = 'Check the year - that is more than 70 years ago.';
       if (!gender) e.gender = 'Choose one, or “Prefer not to say”.';
     }
     if (at === 1) {
@@ -160,6 +176,7 @@ export default function StudentSignup() {
       if (!batch) e.startYear = 'Pick your batch.';
       if (cgpa.trim() && !(Number(cgpa) >= 0 && Number(cgpa) <= 10)) e.cgpa = 'A CGPA is between 0 and 10.';
     }
+    if (at === 2 && otherOn && otherInterest.trim().length < 2) e.interests = 'Type the field you would like to try, or untick Other.';
     if (at === 2 && !agree) e.agree = 'Agree to the terms to create your account.';
     return e;
   }
@@ -208,7 +225,7 @@ export default function StudentSignup() {
         gender,
         dateOfBirth: dob,
         cgpa: cgpa.trim() ? Number(cgpa) : undefined,
-        interests,
+        interests: otherOn && otherInterest.trim() ? [...interests, otherInterest.trim()] : interests,
         startYear: batch!.start,
         graduationYear: batch!.end,
         agree: true,
@@ -348,7 +365,7 @@ export default function StudentSignup() {
                         id="su-dob"
                         type="date"
                         autoComplete="bday"
-                        min="1950-01-01"
+                        min={EARLIEST_DOB}
                         max={LATEST_DOB}
                         value={dob}
                         onChange={(e) => setDob(e.target.value)}
@@ -451,8 +468,23 @@ export default function StudentSignup() {
                       id="su-branch"
                       value={branch}
                       onChange={(e) => setBranch(e.target.value)}
-                      placeholder="For example, Computer Science or Economics"
+                      // The chosen course's usual branches, offered as the student types;
+                      // anything else can still be typed.
+                      list={picked?.specialisations?.length ? 'su-branch-list' : undefined}
+                      autoComplete="off"
+                      placeholder={
+                        picked?.specialisations?.length
+                          ? `For example, ${picked.specialisations.slice(0, 2).join(' or ')}`
+                          : 'For example, Computer Science or Economics'
+                      }
                     />
+                    {picked?.specialisations?.length ? (
+                      <datalist id="su-branch-list">
+                        {picked.specialisations.map((s) => (
+                          <option key={s} value={s} />
+                        ))}
+                      </datalist>
+                    ) : null}
                   </Field>
                   <div className="su-row">
                     <Field id="su-batch" label="Batch" error={errors.startYear}>
@@ -497,7 +529,7 @@ export default function StudentSignup() {
                       <div className="su-interests" role="group" aria-label="Fields you would like to try">
                         {options.interests.map((i) => {
                           const on = interests.includes(i);
-                          const full = !on && interests.length >= 3;
+                          const full = !on && interestCount >= 3;
                           return (
                             <button
                               key={i}
@@ -512,7 +544,33 @@ export default function StudentSignup() {
                             </button>
                           );
                         })}
+                        <button
+                          type="button"
+                          aria-pressed={otherOn}
+                          disabled={!otherOn && interestCount >= 3}
+                          className={otherOn ? 'is-on' : ''}
+                          onClick={() => {
+                            setOtherOn((v) => !v);
+                            setErrors((e) => ({ ...e, interests: undefined }));
+                          }}
+                        >
+                          {otherOn ? '✓ ' : ''}Other
+                        </button>
                       </div>
+                      {otherOn && (
+                        <input
+                          id="su-interest-other"
+                          className="su-interest-other"
+                          value={otherInterest}
+                          onChange={(e) => setOtherInterest(e.target.value)}
+                          placeholder="Which field? e.g. Architecture, Journalism"
+                          maxLength={40}
+                          aria-label="The field you would like to try"
+                          aria-invalid={Boolean(errors.interests)}
+                          autoFocus
+                        />
+                      )}
+                      {errors.interests && <span className="su-error">{errors.interests}</span>}
                       <span className="su-hint">We show you simulations in these first. You can try anything.</span>
                     </div>
                   )}
@@ -586,12 +644,12 @@ function CollegePicker({
   const [active, setActive] = useState(0);
   const latest = useRef(0);
 
+  // Before two letters are typed the server offers the partner colleges, so
+  // the list is never empty when the field is opened.
+  const searching = q.trim().length >= 2;
+
   useEffect(() => {
-    const text = q.trim();
-    if (text.length < 2) {
-      setResults([]);
-      return;
-    }
+    const text = searching ? q.trim() : '';
     const ticket = ++latest.current;
     setBusy(true);
     const t = window.setTimeout(() => {
@@ -605,9 +663,9 @@ function CollegePicker({
         })
         .catch(() => setResults([]))
         .finally(() => ticket === latest.current && setBusy(false));
-    }, 220);
+    }, searching ? 220 : 0);
     return () => window.clearTimeout(t);
-  }, [q]);
+  }, [q, searching]);
 
   if (value) {
     return (
@@ -632,7 +690,7 @@ function CollegePicker({
   }
 
   const listId = 'su-college-list';
-  const showList = open && q.trim().length >= 2;
+  const showList = open && searching;
 
   return (
     <div className="su-combo">
@@ -646,7 +704,6 @@ function CollegePicker({
         value={q}
         placeholder="Start typing your college's name or city"
         autoComplete="off"
-        autoFocus
         onChange={(e) => {
           setQ(e.target.value);
           setOpen(true);
@@ -692,6 +749,21 @@ function CollegePicker({
             ))
           )}
         </ul>
+      )}
+      {!searching && results.length > 0 && (
+        <div className="su-college-quick">
+          <span className="su-college-quick-label">Colleges on Apli.ai - pick yours, or type to search</span>
+          <ul>
+            {results.map((c) => (
+              <li key={c.id}>
+                <button type="button" onClick={() => onChange(c)}>
+                  <b>{c.name}</b>
+                  <i>{[c.city, c.institution].filter(Boolean).join(' · ')}</i>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );

@@ -263,6 +263,11 @@ export interface JobCard {
   id: string;
   title: string;
   companyName: string;
+  company?: { id: string; name: string; logoUrl: string | null };
+  /** An internship's monthly stipend and length, and what it converts to. */
+  stipend?: string | null;
+  internshipMonths?: number | null;
+  ppoCtc?: string | null;
   jobType: string;
   location: string | null;
   workMode?: string | null;
