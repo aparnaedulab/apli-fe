@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, typ
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import ApliLogo from '../../components/ApliLogo';
 import NotificationBell from '../../components/NotificationBell';
+import AppGuide from '../../components/guide/AppGuide';
 import { inSection, markNotificationsRead, useNotifications } from '../../components/useNotifications';
 import { useAuth } from '../../auth/AuthContext';
 import type { SimulationCard } from '../../api/studentApp';
@@ -151,6 +152,7 @@ export function AppHeader({ nav, home, profile, menu: menuLinks = [], extra }: F
         {/* What the page adds, then the bell: every app tells its people what happened. */}
         <div className="sa-extra">
           {extra}
+          <AppGuide />
           <span className="sa-bell">
             <NotificationBell />
           </span>

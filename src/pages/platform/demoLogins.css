@@ -1,0 +1,171 @@
+/* Demo logins (ConsoleDemoLogins.tsx) */
+
+.dl-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: 16px;
+  margin: 8px 0 20px;
+}
+.dl-pass,
+.dl-reset {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+  padding: 16px 18px;
+}
+.dl-pass {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.dl-pass .dl-label {
+  width: 100%;
+}
+.dl-pass code {
+  font-family: var(--mono);
+  font-size: 1.05rem;
+  background: var(--brand-soft);
+  padding: 4px 10px;
+  border-radius: var(--r-sm);
+}
+.dl-reset p {
+  margin: 0 0 12px;
+  line-height: 1.5;
+}
+.dl-confirm {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.dl-done {
+  background: var(--pass-soft);
+  color: var(--pass);
+}
+.dl-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  opacity: 0.65;
+  margin: 12px 0 4px;
+}
+.dl-pass .dl-label {
+  margin: 0;
+}
+.dl-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+.dl-search {
+  max-width: 320px;
+  width: 100%;
+}
+
+.dl-list {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+}
+.dl-card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+}
+.dl-card.is-missing {
+  opacity: 0.55;
+}
+.dl-card h3 {
+  margin: 8px 0 4px;
+  font-size: 1.02rem;
+}
+.dl-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.dl-group {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+.dl-group.dl-company {
+  background: var(--hold-soft);
+  color: var(--hold);
+}
+.dl-group.dl-student {
+  background: var(--pass-soft);
+  color: var(--pass);
+}
+.dl-used {
+  font-size: 0.75rem;
+  color: var(--hold);
+  font-weight: 600;
+}
+.dl-fresh {
+  font-size: 0.75rem;
+  color: var(--ink);
+  opacity: 0.55;
+}
+.dl-situation {
+  margin: 0 0 10px;
+  line-height: 1.45;
+}
+.dl-email {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  border: 1px dashed var(--rule);
+  border-radius: var(--r-sm);
+  background: transparent;
+  padding: 6px 10px;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+.dl-email:hover {
+  border-color: var(--brand);
+}
+.dl-email code {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+.dl-email span {
+  font-size: 0.75rem;
+  color: var(--brand);
+  font-weight: 600;
+  flex: none;
+}
+.dl-try {
+  margin: 0;
+  padding-left: 18px;
+  line-height: 1.5;
+  font-size: 0.92rem;
+}
+
+@media (max-width: 760px) {
+  .dl-panel {
+    grid-template-columns: 1fr;
+  }
+  .dl-search {
+    max-width: none;
+  }
+}

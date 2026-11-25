@@ -41,6 +41,7 @@ export default function ConsoleHeader() {
           { to: '/platform/reviews', label: 'Reviews', badge: reviews },
           { to: '/platform/requests', label: 'Partner requests' },
           { to: '/platform/data', label: 'Onboard data' },
+          { to: '/platform/demo-logins', label: 'Demo logins' },
         ]}
         extra={
           acting ? (

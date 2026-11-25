@@ -52,6 +52,7 @@ import InstitutionSignup from './pages/signup/InstitutionSignup';
 import Join from './pages/signup/Join';
 import ConsoleRequests from './pages/platform/ConsoleRequests';
 import ConsoleData from './pages/platform/ConsoleData';
+import ConsoleDemoLogins from './pages/platform/ConsoleDemoLogins';
 import ConsoleReviews from './pages/platform/ConsoleReviews';
 import CampusDashboard from './pages/campus/CampusDashboard';
 import Batches from './pages/campus/Batches';
@@ -193,6 +194,14 @@ export default function App() {
         element={
           <RequireAuth roles={['ADMIN']} platform>
             <ConsoleData />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/platform/demo-logins"
+        element={
+          <RequireAuth roles={['ADMIN']} platform>
+            <ConsoleDemoLogins />
           </RequireAuth>
         }
       />

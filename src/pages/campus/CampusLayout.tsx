@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 import NotificationBell from '../../components/NotificationBell';
+import AppGuide from '../../components/guide/AppGuide';
 import '../admin/AdminLayout.css';
 import '../shared/Company.css';
 import ApliLogo from '../../components/ApliLogo';
@@ -115,6 +116,7 @@ export default function CampusLayout({ children }: { children: ReactNode }) {
 
       <main className="admin-main">
         <div className="admin-topbar">
+          <AppGuide area="campus" />
           <NotificationBell />
         </div>
         {children}
